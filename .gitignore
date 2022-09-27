@@ -1,0 +1,4 @@
+/common/target/
+/email-service/target/
+/security/target/
+/users-schema-modules/target/
