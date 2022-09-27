@@ -1,7 +1,0 @@
-emails:
-  templates:
-    - newUser:
-        from: new-user@email.com
-        subject: Welcome {0}!
-        type: text/html
-        template: templates/newUser.vm
