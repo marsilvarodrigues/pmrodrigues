@@ -1,0 +1,8 @@
+kafka:
+  bootstrapAddress: localhost:29092
+spring:
+  mail:
+    host: smtp.example.com
+    port: 587
+    username: marcelo@teste.com
+    password: secretpassword

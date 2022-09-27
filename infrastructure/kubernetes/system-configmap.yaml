@@ -1,0 +1,11 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: system-configmap
+data:
+  KEYCLOAK_CLIENT_ID: 94cf4fee-1b57-4e3c-8d97-195e7f7f1173
+  KEYCLOAK_CLIENT_SECRET: HJmC4DWLZXIw3YYDw0TRZ66BOTuPkXSh
+  KEYCLOAK_LOCATION: localhost:8080
+  CLIENT_EMAIL_LOCATION: localhost:8144
+  USER_SERVICES: localhost:8143
+  KAFKA_BOOTSTRAP_URL: localhost:29092

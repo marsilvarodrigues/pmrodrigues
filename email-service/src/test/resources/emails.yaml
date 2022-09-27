@@ -1,0 +1,7 @@
+emails:
+  templates:
+    - newUser:
+        from: new-user@email.com
+        subject: Welcome {0}!
+        message: teste {0}
+        type: text/plain

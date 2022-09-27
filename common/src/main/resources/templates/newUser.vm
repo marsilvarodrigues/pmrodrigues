@@ -1,0 +1,9 @@
+<html>
+    <head>
+        <title>Welcome ${fullName}</title>
+    </head>
+    <body>
+        <h1>Welcome ${fullName}!</h1>
+        Your password is ${password}
+    </body>
+</html>
