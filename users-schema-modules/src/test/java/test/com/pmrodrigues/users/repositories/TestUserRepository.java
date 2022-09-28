@@ -9,7 +9,6 @@ import org.springframework.boot.autoconfigure.domain.EntityScan;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
-import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 
 import javax.persistence.EntityManager;
@@ -32,7 +31,7 @@ class TestUserRepository {
     private EntityManager entityManager;
 
     @Test
-    public void shouldSave(){
+    void shouldSave(){
         val user = userRepository.save(User.builder().firstName("teste")
                         .lastName("teste")
                 .email("teste@teste.com")
@@ -44,7 +43,7 @@ class TestUserRepository {
     }
 
     @Test
-    public void shouldFindByEmail(){
+    void shouldFindByEmail(){
 
         val user = User.builder().firstName("teste")
                 .lastName("teste")

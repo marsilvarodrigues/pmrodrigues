@@ -1,11 +1,15 @@
 package com.pmrodrigues.commons.stringutils;
 
 import com.pmrodrigues.commons.dtos.Password;
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
 import lombok.val;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
+
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class PasswordGenerator {
 
     private static final BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();

@@ -18,7 +18,6 @@ public class EmailConsumerRecordRecovered implements ConsumerRecordRecoverer {
     @Override
     public void accept(ConsumerRecord<?, ?> consumerRecord, Exception e) {
         final String key = (String) consumerRecord.key();
-        final Email email = (Email) consumerRecord.value();
 
         log.error("error trying to consume a message {}, {}", key, e);
     }

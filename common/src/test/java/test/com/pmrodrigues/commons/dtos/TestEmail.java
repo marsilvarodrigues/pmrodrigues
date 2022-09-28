@@ -9,7 +9,7 @@ import static org.junit.jupiter.api.Assertions.*;
 class TestEmail {
 
     @Test
-    public void prepareEmail() {
+    void prepareEmail() {
 
         val path = "templates/newUser.vm";
 

@@ -2,15 +2,12 @@ package com.pmrodrigues.commons.request.validates;
 
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
-
-import java.util.List;
 import java.util.regex.Pattern;
 
 public class ValuesAllowedValidator implements ConstraintValidator<ValuesAllowed, String[]> {
 
     private String propName;
     private String message;
-    private List<String> allowable;
 
     @Override
     public void initialize(ValuesAllowed requiredIfChecked) {

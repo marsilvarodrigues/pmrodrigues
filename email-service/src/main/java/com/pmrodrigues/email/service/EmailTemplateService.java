@@ -26,17 +26,16 @@ public class EmailTemplateService {
 
         if( this.emails.isEmpty() ) this.postConstruct();
 
-        return (Email) Optional.ofNullable(emails.get(template))
-                            .orElseThrow(() -> new TemplateNotFoundException())
-                            .clone();
+        return Optional.ofNullable(emails.get(template))
+                            .orElseThrow(TemplateNotFoundException::new)
+                            .copy();
     }
 
     @PostConstruct
     public void postConstruct() {
 
         if( templates == null ) return;
-        templates
-                .forEach(template -> emails.putAll(template));
+        templates.forEach(emails::putAll);
     }
 
 }

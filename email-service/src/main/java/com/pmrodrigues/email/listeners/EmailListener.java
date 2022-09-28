@@ -1,6 +1,5 @@
 package com.pmrodrigues.email.listeners;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.pmrodrigues.commons.dtos.Email;
 import io.micrometer.core.annotation.Timed;
 import lombok.NonNull;
@@ -24,7 +23,6 @@ import static java.nio.charset.StandardCharsets.UTF_8;
 @Slf4j
 public class EmailListener {
     private final JavaMailSender emailSender;
-    private final ObjectMapper objectMapper = new ObjectMapper();
 
     @Timed(histogram = true, value = "EmailListener.send")
     @KafkaListener(topics = "email", groupId = "send")

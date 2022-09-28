@@ -10,7 +10,6 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.context.request.ServletWebRequest;
 import org.springframework.web.context.request.WebRequest;
-import org.springframework.web.context.support.WebApplicationContextUtils;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.ConstraintViolationException;
@@ -27,7 +26,7 @@ public class ValidationErrorControllerAdvice {
     public Map<String, String> handleValidationExceptions(MethodArgumentNotValidException ex, WebRequest request) {
         Map<String, String> errors = new HashMap<>();
 
-        ex.getBindingResult().getAllErrors().forEach((error) -> {
+        ex.getBindingResult().getAllErrors().forEach(error -> {
             String fieldName = ((FieldError) error).getField();
             String errorMessage = error.getDefaultMessage();
             log.error("failed to validate {} {} {}",error.getObjectName(), fieldName, errorMessage);
@@ -42,7 +41,7 @@ public class ValidationErrorControllerAdvice {
     public Map<String, String> handleConstraintException(ConstraintViolationException ex, WebRequest request){
         Map<String, String> errors = new HashMap<>();
         HttpServletRequest httpRequest = (HttpServletRequest) ((ServletWebRequest)request).getNativeRequest();
-        ex.getConstraintViolations().forEach((error) -> {
+        ex.getConstraintViolations().forEach(error -> {
             String methodName = error.getPropertyPath().toString().split("\\.")[1];
             String argsName = error.getPropertyPath().toString().split("\\.")[2];
             String url = httpRequest.getRequestURL().toString();

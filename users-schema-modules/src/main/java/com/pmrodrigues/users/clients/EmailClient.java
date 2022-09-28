@@ -1,12 +1,10 @@
 package com.pmrodrigues.users.clients;
 
 import com.pmrodrigues.commons.dtos.Email;
-import feign.Headers;
 import io.micrometer.core.annotation.Timed;
 import lombok.NonNull;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Component;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;

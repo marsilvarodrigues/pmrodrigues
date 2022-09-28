@@ -22,9 +22,8 @@ import javax.validation.Valid;
 import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
 import java.net.URI;
-import java.util.Arrays;
 import java.util.UUID;
-import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 
 @RestController
@@ -110,7 +109,7 @@ public class UserController{
             @ValuesAllowed(propName = "sort", message = "sort parameter is invalid") @Valid String[] sort){
         log.info("List all users");
 
-        var sortBy = Arrays.stream(sort)
+        var sortBy = Stream.of(sort)
                     .map(s -> {
                         var sortRule = s.split("\\.");
                         if( sortRule.length == 1) return Sort.Order.asc(sortRule[0]);
@@ -120,7 +119,7 @@ public class UserController{
                             return  Sort.Order.desc(sortRule[0]);
                         }
                     })
-                    .collect(Collectors.toList());
+                    .toList();
 
         val user = userService.findAll(PageRequest.of(page, size, Sort.by(sortBy)));
         return ResponseEntity.ok(user);

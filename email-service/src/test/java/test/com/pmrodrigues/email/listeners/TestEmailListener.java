@@ -45,7 +45,7 @@ class TestEmailListener {
 
     @SneakyThrows
     @Test
-    public void shouldSend() {
+    void shouldSend() {
 
         val email = new Email()
                 .to("teste@teste.com")

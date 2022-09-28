@@ -50,9 +50,9 @@ class TestKeycloakUserRepository {
     @Test
     void shouldNotCreateUser() {
         given(userClient.add(any(UserRepresentation.class))).willReturn(ResponseEntity.badRequest().build());
-
+        val user = User.builder().email("teste").firstName("teste").lastName("teste").build();
         assertThrows(KeycloakIntegrationFailed.class, () ->
-            repository.insert(User.builder().email("teste").firstName("teste").lastName("teste").build())
+            repository.insert(user)
         );
     }
 
@@ -115,7 +115,8 @@ class TestKeycloakUserRepository {
     @Test
     void shouldNotDelete() {
         given(userClient.delete(any(UUID.class))).willReturn(ResponseEntity.badRequest().build());
-        assertThrows(KeycloakIntegrationFailed.class, () -> repository.delete(UUID.randomUUID()));
+        val uuid = UUID.randomUUID();
+        assertThrows(KeycloakIntegrationFailed.class, () -> repository.delete(uuid));
     }
 
 }

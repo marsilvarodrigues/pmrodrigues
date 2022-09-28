@@ -1,13 +1,11 @@
 package com.pmrodrigues.commons.dtos;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import lombok.*;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.velocity.VelocityContext;
-import org.apache.velocity.app.Velocity;
 import org.apache.velocity.app.VelocityEngine;
 import org.apache.velocity.runtime.RuntimeConstants;
 import org.apache.velocity.runtime.resource.loader.ClasspathResourceLoader;
@@ -17,6 +15,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
+import static org.apache.velocity.runtime.RuntimeConstants.RUNTIME_LOG_INSTANCE;
 import static org.springframework.http.MediaType.TEXT_HTML;
 
 @Data
@@ -26,7 +25,7 @@ import static org.springframework.http.MediaType.TEXT_HTML;
 @JsonIgnoreProperties({"html","formatMessage"})
 @Slf4j
 @JsonSerialize
-public class Email {
+public class Email{
     @NonNull
     private String from;
     private List<String> to;
@@ -77,8 +76,7 @@ public class Email {
         return this;
     }
 
-    @Override
-    public Object clone() {
+    public Email copy() {
         return new Email(this.from, this.to, this.cc, this.subject, this.type, this.message, this.template, this.parameters);
     }
 
@@ -92,17 +90,17 @@ public class Email {
         if( !StringUtils.isBlank(template) ) {
 
             val context = new VelocityContext();
-            this.parameters.forEach((k,v) -> context.put(k,v));
+            this.parameters.forEach(context::put);
 
             val engine = new VelocityEngine();
-            engine.setProperty(Velocity.RUNTIME_LOG_INSTANCE, log);
+            engine.setProperty(RUNTIME_LOG_INSTANCE, log);
             engine.setProperty(RuntimeConstants.RESOURCE_LOADER, "classpath");
             engine.setProperty("classpath.resource.loader.class", ClasspathResourceLoader.class.getName());
             engine.init();
 
-            val template = engine.getTemplate(this.template);
+            val pattern = engine.getTemplate(this.template);
             val writer = new StringWriter();
-            template.merge(context, writer);
+            pattern.merge(context, writer);
             return writer.toString();
         } else {
             return message;

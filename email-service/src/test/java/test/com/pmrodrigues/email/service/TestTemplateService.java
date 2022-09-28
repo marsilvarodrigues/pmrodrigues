@@ -25,18 +25,18 @@ public class TestTemplateService {
     private EmailTemplateService templateService;
 
     @Test
-    public void shouldLoadTemplates() {
+    void shouldLoadTemplates() {
         assertNotNull(templateService.getEmails());
     }
 
     @Test
-    public void shouldFoundATemplate() {
+    void shouldFoundATemplate() {
         val email = templateService.getByEmailType("newUser");
         assertNotNull(email);
     }
 
     @Test
-    public void shouldNotFountATemplate() {
+    void shouldNotFountATemplate() {
 
         assertThrows(TemplateNotFoundException.class,
                 () -> templateService.getByEmailType("not_exist")

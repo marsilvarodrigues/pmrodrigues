@@ -2,23 +2,17 @@ package test.com.pmrodrigues.users.integrations;
 
 import com.pmrodrigues.users.UserApplication;
 import com.pmrodrigues.users.model.User;
-import com.pmrodrigues.users.repositories.UserRepository;
 import lombok.val;
 import org.jboss.resteasy.client.jaxrs.ResteasyClientBuilder;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.keycloak.admin.client.Keycloak;
 import org.keycloak.admin.client.KeycloakBuilder;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.web.client.RestTemplateBuilder;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.client.ClientHttpRequestInterceptor;
-import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.web.client.RestTemplate;
 
@@ -66,7 +60,7 @@ public class ITUserController {
     }
 
     @Test
-    public void testAddUser() {
+    void testAddUser() {
         val user = User.builder()
                 .firstName("test")
                 .lastName("test")
