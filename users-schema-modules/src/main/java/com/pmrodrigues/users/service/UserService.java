@@ -15,7 +15,6 @@ import lombok.val;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Propagation;
@@ -23,7 +22,9 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.UUID;
 
+import static com.pmrodrigues.users.specifications.SpecificationUser.*;
 import static java.text.MessageFormat.format;
+import static org.springframework.data.jpa.domain.Specification.where;
 
 @RequiredArgsConstructor
 @Slf4j
@@ -95,9 +96,14 @@ public class UserService {
 
     @Timed(histogram = true, value = "UserService.findAll")
     @SneakyThrows
-    public Page<User> findAll(@NonNull PageRequest pageRequest){
-        log.info("list all users");
-        return repository.findAll(pageRequest);
+    public Page<User> findAll(@NonNull User user, @NonNull PageRequest pageRequest){
+        log.info("list all users by {}", user);
+        return repository.findAll(
+                    where(firstName(user.getFirstName())).
+                    and(lastName(user.getLastName())).
+                    and(email(user.getEmail())).
+                    and(expiredDate(user.getExpiredDate())),
+                pageRequest);
     }
 
     @Timed(histogram = true, value = "UserService.updateUser")

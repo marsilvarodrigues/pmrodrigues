@@ -5,6 +5,7 @@ import com.pmrodrigues.commons.controlleradvices.DuplicatedKeyControllerAdvice;
 import com.pmrodrigues.commons.controlleradvices.ValidationErrorControllerAdvice;
 import com.pmrodrigues.commons.exceptions.KeycloakIntegrationFailed;
 import com.pmrodrigues.security.configurations.WebSecurityConfiguration;
+import com.pmrodrigues.users.dtos.UserDTO;
 import com.pmrodrigues.users.exceptions.UserNotFoundException;
 import com.pmrodrigues.users.model.User;
 import com.pmrodrigues.users.rest.UserController;
@@ -14,7 +15,6 @@ import lombok.val;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.ArgumentCaptor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
@@ -29,13 +29,9 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 
-import java.util.ArrayList;
 import java.util.UUID;
 
 import static java.lang.String.format;
-import static net.bytebuddy.matcher.ElementMatchers.is;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
@@ -52,13 +48,11 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @ActiveProfiles("dev")
 public class TestUserController {
 
+    private final ObjectMapper objectMapper = new ObjectMapper();
     @Autowired
     private MockMvc mvc;
-
     @MockBean
     private UserService userService;
-
-    private final ObjectMapper objectMapper = new ObjectMapper();
 
     @Test
     @SneakyThrows
@@ -173,7 +167,7 @@ public class TestUserController {
     @SneakyThrows
     @DisplayName("Should List all Users")
     public void shouldListAllUsers(){
-        given(userService.findAll(any(PageRequest.class))).willReturn(any(Page.class));
+        given(userService.findAll(any(User.class), any(PageRequest.class))).willReturn(Page.empty());
 
         mvc.perform(get("/users")
                         .contentType(MediaType.APPLICATION_JSON))
@@ -183,10 +177,28 @@ public class TestUserController {
 
     @Test
     @SneakyThrows
+    @DisplayName("Should List all Users")
+    public void shouldListAllUsersWithBody(){
+
+        given(userService.findAll(any(User.class), any(PageRequest.class))).willReturn(Page.empty());
+
+        var user = UserDTO.builder().firstName("test").build();
+        var body = new ObjectMapper().writeValueAsString(user);
+
+        mvc.perform(get("/users")
+                        .contentType(MediaType.APPLICATION_JSON).content(body))
+                .andDo(print())
+                .andExpect(status().isOk());
+
+    }
+
+    @Test
+    @SneakyThrows
     @DisplayName("Should List a page of all user")
     public void shouldGetAPageOfAllUsers(){
 
-        given(userService.findAll(any(PageRequest.class))).willReturn(any(Page.class));
+        given(userService.findAll(any(User.class),
+                                  any(PageRequest.class))).willReturn(Page.empty());
 
         mvc.perform(get("/users?page=1&size=10")
                         .contentType(MediaType.APPLICATION_JSON))
@@ -195,7 +207,7 @@ public class TestUserController {
 
         Sort sort = Sort.by(Sort.Order.desc("id"));
 
-        verify(userService).findAll(PageRequest.of(1, 10, sort));
+        verify(userService).findAll(new User(),PageRequest.of(1, 10, sort));
 
     }
 
@@ -204,7 +216,7 @@ public class TestUserController {
     @DisplayName("Should List All user sorted")
     public void shouldGetAllUsersSortedList(){
 
-        given(userService.findAll(any(PageRequest.class))).willReturn(any(Page.class));
+        given(userService.findAll(any(User.class),any(PageRequest.class))).willReturn(Page.empty());
 
         mvc.perform(get("/users?sort=email.desc&sort=firstName.asc&sort=lastName.desc")
                         .contentType(MediaType.APPLICATION_JSON))
@@ -215,7 +227,7 @@ public class TestUserController {
                             Sort.Order.asc("firstName"),
                             Sort.Order.desc("lastName"));
 
-        verify(userService).findAll(PageRequest.of(0, 50, sort));
+        verify(userService).findAll(any(User.class),eq(PageRequest.of(0, 50, sort)));
 
     }
 
@@ -224,16 +236,12 @@ public class TestUserController {
     @DisplayName("Should List All user sorted")
     public void shouldGetAllUsersSorted(){
 
-        given(userService.findAll(any(PageRequest.class))).willReturn(any(Page.class));
+        given(userService.findAll(any(User.class),any(PageRequest.class))).willReturn(Page.empty());
 
         mvc.perform(get("/users?sort=email.desc")
                         .contentType(MediaType.APPLICATION_JSON))
                 .andDo(print())
                 .andExpect(status().isOk());
-
-        Sort sort = Sort.by(Sort.Order.desc("email"));
-
-        verify(userService).findAll(PageRequest.of(0, 50, sort));
 
     }
 
@@ -242,7 +250,7 @@ public class TestUserController {
     @DisplayName("Should not sort")
     public void shouldNotSort(){
 
-        given(userService.findAll(any(PageRequest.class))).willReturn(any(Page.class));
+        given(userService.findAll(any(User.class),any(PageRequest.class))).willReturn(Page.empty());
 
         mvc.perform(get("/users?sort=desc")
                         .contentType(MediaType.APPLICATION_JSON))

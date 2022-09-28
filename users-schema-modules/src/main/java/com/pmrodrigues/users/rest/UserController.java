@@ -1,6 +1,7 @@
 package com.pmrodrigues.users.rest;
 
 import com.pmrodrigues.commons.request.validates.ValuesAllowed;
+import com.pmrodrigues.users.dtos.UserDTO;
 import com.pmrodrigues.users.model.User;
 import com.pmrodrigues.users.service.UserService;
 import io.micrometer.core.annotation.Timed;
@@ -106,8 +107,9 @@ public class UserController{
                 @Max(value = 100, message = "page size is bigger than expected")
                 @Valid Integer size,
             @RequestParam(name = "sort", defaultValue = "id.desc", required = false)
-            @ValuesAllowed(propName = "sort", message = "sort parameter is invalid") @Valid String[] sort){
-        log.info("List all users");
+            @ValuesAllowed(propName = "sort", message = "sort parameter is invalid") @Valid String[] sort,
+            @RequestBody(required = false) final UserDTO user){
+        log.info("List all users by {}", user);
 
         var sortBy = Stream.of(sort)
                     .map(s -> {
@@ -121,8 +123,12 @@ public class UserController{
                     })
                     .toList();
 
-        val user = userService.findAll(PageRequest.of(page, size, Sort.by(sortBy)));
-        return ResponseEntity.ok(user);
+
+        var sample = new User();
+        if( user != null ) sample = user.toUser();
+
+        val response = userService.findAll(sample, PageRequest.of(page, size, Sort.by(sortBy)));
+        return ResponseEntity.ok(response);
 
     }
 

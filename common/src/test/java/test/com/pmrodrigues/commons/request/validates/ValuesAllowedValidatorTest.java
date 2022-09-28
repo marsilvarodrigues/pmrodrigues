@@ -5,14 +5,15 @@ import com.pmrodrigues.commons.request.validates.ValuesAllowedValidator;
 import lombok.val;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import javax.validation.ConstraintValidatorContext;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.*;
+import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.mock;
 
 @ExtendWith(MockitoExtension.class)
 class ValuesAllowedValidatorTest {
@@ -40,11 +41,11 @@ class ValuesAllowedValidatorTest {
         var context = mock(ConstraintValidatorContext.class);
         var constraintBuilder = mock(ConstraintValidatorContext.ConstraintViolationBuilder.class);
         var nodeBuilder = mock(ConstraintValidatorContext.ConstraintViolationBuilder.NodeBuilderCustomizableContext.class);
-        when(validAllowed.propName()).thenReturn("sort");
-        when(validAllowed.message()).thenReturn("sort is invalid");
-        when(context.buildConstraintViolationWithTemplate(any(String.class))).thenReturn(constraintBuilder);
-        when(constraintBuilder.addPropertyNode(any(String.class))).thenReturn(nodeBuilder);
-        when(nodeBuilder.addConstraintViolation()).thenReturn(context);
+        given(validAllowed.propName()).willReturn("sort");
+        given(validAllowed.message()).willReturn("sort is invalid");
+        given(context.buildConstraintViolationWithTemplate(any(String.class))).willReturn(constraintBuilder);
+        given(constraintBuilder.addPropertyNode(any(String.class))).willReturn(nodeBuilder);
+        given(nodeBuilder.addConstraintViolation()).willReturn(context);
 
 
         var allowedValidator = new ValuesAllowedValidator();
