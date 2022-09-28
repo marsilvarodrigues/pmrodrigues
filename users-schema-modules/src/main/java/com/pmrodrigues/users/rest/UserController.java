@@ -1,5 +1,6 @@
 package com.pmrodrigues.users.rest;
 
+import com.pmrodrigues.commons.request.validates.ValuesAllowed;
 import com.pmrodrigues.users.model.User;
 import com.pmrodrigues.users.service.UserService;
 import io.micrometer.core.annotation.Timed;
@@ -10,18 +11,27 @@ import io.swagger.annotations.ApiResponses;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
-import org.springframework.http.HttpStatus;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import javax.validation.constraints.Max;
+import javax.validation.constraints.Min;
 import java.net.URI;
+import java.util.Arrays;
 import java.util.UUID;
+import java.util.stream.Collectors;
+
 
 @RestController
 @Slf4j
 @RequiredArgsConstructor
 @RequestMapping(value = "/users")
+@Validated
 public class UserController{
 
     private final UserService userService;
@@ -89,9 +99,30 @@ public class UserController{
             method = RequestMethod.GET,
             produces = { "application/json" }
     )
-    public ResponseEntity<Iterable<User>> listAll() {
+    public ResponseEntity<Page<User>> listAll(
+            @RequestParam(name = "page", defaultValue = "0", required = false)
+                @Min(value = 0, message = "page number is invalid") @Valid Integer page,
+            @RequestParam(name = "size", defaultValue = "50", required = false)
+                @Min(value = 1 , message = "page size is invalid")
+                @Max(value = 100, message = "page size is bigger than expected")
+                @Valid Integer size,
+            @RequestParam(name = "sort", defaultValue = "id.desc", required = false)
+            @ValuesAllowed(propName = "sort", message = "sort parameter is invalid") @Valid String[] sort){
         log.info("List all users");
-        val user = userService.findAll();
+
+        var sortBy = Arrays.stream(sort)
+                    .map(s -> {
+                        var sortRule = s.split("\\.");
+                        if( sortRule.length == 1) return Sort.Order.asc(sortRule[0]);
+                        if(Sort.Direction.ASC == Sort.Direction.valueOf(sortRule[1].toUpperCase())){
+                            return Sort.Order.asc(sortRule[0]);
+                        }else{
+                            return  Sort.Order.desc(sortRule[0]);
+                        }
+                    })
+                    .collect(Collectors.toList());
+
+        val user = userService.findAll(PageRequest.of(page, size, Sort.by(sortBy)));
         return ResponseEntity.ok(user);
 
     }

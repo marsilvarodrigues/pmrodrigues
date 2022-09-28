@@ -14,11 +14,15 @@ import lombok.val;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.dao.DuplicateKeyException;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
@@ -29,10 +33,13 @@ import java.util.ArrayList;
 import java.util.UUID;
 
 import static java.lang.String.format;
+import static net.bytebuddy.matcher.ElementMatchers.is;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @ExtendWith(SpringExtension.class)
@@ -166,13 +173,87 @@ public class TestUserController {
     @SneakyThrows
     @DisplayName("Should List all Users")
     public void shouldListAllUsers(){
-        given(userService.findAll()).willReturn(new ArrayList<>());
+        given(userService.findAll(any(PageRequest.class))).willReturn(any(Page.class));
 
         mvc.perform(get("/users")
                         .contentType(MediaType.APPLICATION_JSON))
                 .andDo(print())
                 .andExpect(status().isOk());
     }
+
+    @Test
+    @SneakyThrows
+    @DisplayName("Should List a page of all user")
+    public void shouldGetAPageOfAllUsers(){
+
+        given(userService.findAll(any(PageRequest.class))).willReturn(any(Page.class));
+
+        mvc.perform(get("/users?page=1&size=10")
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andDo(print())
+                .andExpect(status().isOk());
+
+        Sort sort = Sort.by(Sort.Order.desc("id"));
+
+        verify(userService).findAll(PageRequest.of(1, 10, sort));
+
+    }
+
+    @Test
+    @SneakyThrows
+    @DisplayName("Should List All user sorted")
+    public void shouldGetAllUsersSortedList(){
+
+        given(userService.findAll(any(PageRequest.class))).willReturn(any(Page.class));
+
+        mvc.perform(get("/users?sort=email.desc&sort=firstName.asc&sort=lastName.desc")
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andDo(print())
+                .andExpect(status().isOk());
+
+        Sort sort = Sort.by(Sort.Order.desc("email"),
+                            Sort.Order.asc("firstName"),
+                            Sort.Order.desc("lastName"));
+
+        verify(userService).findAll(PageRequest.of(0, 50, sort));
+
+    }
+
+    @Test
+    @SneakyThrows
+    @DisplayName("Should List All user sorted")
+    public void shouldGetAllUsersSorted(){
+
+        given(userService.findAll(any(PageRequest.class))).willReturn(any(Page.class));
+
+        mvc.perform(get("/users?sort=email.desc")
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andDo(print())
+                .andExpect(status().isOk());
+
+        Sort sort = Sort.by(Sort.Order.desc("email"));
+
+        verify(userService).findAll(PageRequest.of(0, 50, sort));
+
+    }
+
+    @Test
+    @SneakyThrows
+    @DisplayName("Should not sort")
+    public void shouldNotSort(){
+
+        given(userService.findAll(any(PageRequest.class))).willReturn(any(Page.class));
+
+        mvc.perform(get("/users?sort=desc")
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andDo(print())
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.sort=desc").hasJsonPath());
+
+
+
+    }
+
 
     @Test
     @SneakyThrows

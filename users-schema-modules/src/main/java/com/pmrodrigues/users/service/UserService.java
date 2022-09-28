@@ -13,6 +13,9 @@ import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 import org.springframework.dao.DuplicateKeyException;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Propagation;
@@ -92,9 +95,9 @@ public class UserService {
 
     @Timed(histogram = true, value = "UserService.findAll")
     @SneakyThrows
-    public Iterable<User> findAll(){
+    public Page<User> findAll(@NonNull PageRequest pageRequest){
         log.info("list all users");
-        return repository.findAll();
+        return repository.findAll(pageRequest);
     }
 
     @Timed(histogram = true, value = "UserService.updateUser")
