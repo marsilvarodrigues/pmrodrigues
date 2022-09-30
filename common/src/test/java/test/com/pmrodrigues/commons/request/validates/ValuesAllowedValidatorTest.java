@@ -41,11 +41,13 @@ class ValuesAllowedValidatorTest {
         var context = mock(ConstraintValidatorContext.class);
         var constraintBuilder = mock(ConstraintValidatorContext.ConstraintViolationBuilder.class);
         var nodeBuilder = mock(ConstraintValidatorContext.ConstraintViolationBuilder.NodeBuilderCustomizableContext.class);
+        var leafNodeBuilder = mock(ConstraintValidatorContext.ConstraintViolationBuilder.LeafNodeBuilderCustomizableContext.class);
         given(validAllowed.propName()).willReturn("sort");
         given(validAllowed.message()).willReturn("sort is invalid");
         given(context.buildConstraintViolationWithTemplate(any(String.class))).willReturn(constraintBuilder);
         given(constraintBuilder.addPropertyNode(any(String.class))).willReturn(nodeBuilder);
-        given(nodeBuilder.addConstraintViolation()).willReturn(context);
+        given(nodeBuilder.addBeanNode()).willReturn(leafNodeBuilder);
+        given(leafNodeBuilder.addConstraintViolation()).willReturn(context);
 
 
         var allowedValidator = new ValuesAllowedValidator();

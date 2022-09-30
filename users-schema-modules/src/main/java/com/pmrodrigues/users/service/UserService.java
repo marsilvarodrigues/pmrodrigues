@@ -50,13 +50,9 @@ public class UserService {
         log.info("creating a new user {}", user);
 
         val existed = repository.findByEmail(user.getEmail());
-
-        if( existed.isPresent() )
-            throw new DuplicateKeyException("I´m sorry but this was used before");
-
         val existedInKeyCloak = keycloakUserRepository.getUserIdByEmail(user.getEmail());
 
-        if( !existedInKeyCloak.isEmpty() )
+        if( existed.isPresent() || !existedInKeyCloak.isEmpty() )
             throw new DuplicateKeyException("I´m sorry but this was used before");
 
         user = repository.save(user);
@@ -66,8 +62,8 @@ public class UserService {
         val email = emailService.getEmailByName("newUser")
                         .getBody()
                         .to(user.getEmail())
-                        .subject(format("You are Welcome {0} {1}", user.getFirstName(), user.getLastName()))
-                        .set("fullName",format("{0} {1}", user.getFirstName(),user.getLastName()));
+                        .subject(format("You are Welcome {0} ", user.getFullName()))
+                        .set("fullName",format("{0} ", user.getFullName()));
 
         val response = emailService.send(email);
         if( response.getStatusCode() == HttpStatus.OK ) {

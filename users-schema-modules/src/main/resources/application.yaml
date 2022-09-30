@@ -6,6 +6,10 @@ server:
 logging:
   level:
     root: INFO
+    app: DEBUG
+  group:
+    app:
+      - com.pmrodrigues
 
 spring:
   jpa:
