@@ -24,4 +24,5 @@ public class UserApplication {
     public TimedAspect timedAspect(MeterRegistry registry) {
         return new TimedAspect(registry);
     }
+
 }

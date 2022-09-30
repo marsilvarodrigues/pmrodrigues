@@ -1,0 +1,174 @@
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+		http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.8.xsd">
+
+    <property name="uuid"  value="gen_random_uuid()"/>
+    <changeSet id="alter_table_state" author="marcelo">
+        <addColumn tableName="states">
+            <column name="code" type="char(2)"/>
+        </addColumn>
+
+        <insert tableName="states">
+            <column name="id"  valueComputed="${uuid}"/>
+            <column name="name" value="Acre"></column>
+            <column name="code" value="AC"></column>
+        </insert>
+        <insert tableName="states">
+            <column name="id" valueComputed="${uuid}"/>
+            <column name="name" value="Alagoas"></column>
+            <column name="code" value="AL"></column>
+        </insert>
+        <insert tableName="states">
+            <column name="id" valueComputed="${uuid}"/>
+            <column name="name" value="Amapá"></column>
+            <column name="code" value="AP"></column>
+        </insert>
+
+        <insert tableName="states">
+            <column name="id" valueComputed="${uuid}"/>
+            <column name="name" value="Amazonas"></column>
+            <column name="code" value="AM"></column>
+        </insert>
+
+        <insert tableName="states">
+            <column name="id" valueComputed="${uuid}"/>
+            <column name="name" value="Bahia"></column>
+            <column name="code" value="BA"></column>
+        </insert>
+
+        <insert tableName="states">
+            <column name="id" valueComputed="${uuid}"/>
+            <column name="name" value="Ceará"></column>
+            <column name="code" value="CE"></column>
+        </insert>
+
+        <insert tableName="states">
+            <column name="id" valueComputed="${uuid}"/>
+            <column name="name" value="Espírito Santo"></column>
+            <column name="code" value="ES"></column>
+        </insert>
+
+        <insert tableName="states">
+            <column name="id" valueComputed="${uuid}"/>
+            <column name="name" value="Goiás"></column>
+            <column name="code" value="GO"></column>
+        </insert>
+        <insert tableName="states">
+            <column name="id" valueComputed="${uuid}"/>
+            <column name="name" value="Maranhão"></column>
+            <column name="code" value="MA"></column>
+        </insert>
+
+        <insert tableName="states">
+            <column name="id" valueComputed="${uuid}"/>
+            <column name="name" value="Mato Grosso"></column>
+            <column name="code" value="MT"></column>
+        </insert>
+
+        <insert tableName="states">
+            <column name="id" valueComputed="${uuid}"/>
+            <column name="name" value="Mato Grosso do Sul"></column>
+            <column name="code" value="MS"></column>
+        </insert>
+
+        <insert tableName="states">
+            <column name="id" valueComputed="${uuid}"/>
+            <column name="name" value="Minas Gerais"></column>
+            <column name="code" value="MG"></column>
+        </insert>
+
+        <insert tableName="states">
+            <column name="id" valueComputed="${uuid}"/>
+            <column name="name" value="Pará"></column>
+            <column name="code" value="PA"></column>
+        </insert>
+
+        <insert tableName="states">
+            <column name="id" valueComputed="${uuid}"/>
+            <column name="name" value="Paraíba"></column>
+            <column name="code" value="PB"></column>
+        </insert>
+
+        <insert tableName="states">
+            <column name="id" valueComputed="${uuid}"/>
+            <column name="name" value="Paraná"></column>
+            <column name="code" value="PR"></column>
+        </insert>
+
+        <insert tableName="states">
+            <column name="id" valueComputed="${uuid}"/>
+            <column name="name" value="Pernambuco"></column>
+            <column name="code" value="PE"></column>
+        </insert>
+
+        <insert tableName="states">
+            <column name="id" valueComputed="${uuid}"/>
+            <column name="name" value="Piauí"></column>
+            <column name="code" value="PI"></column>
+        </insert>
+
+        <insert tableName="states">
+            <column name="id" valueComputed="${uuid}"/>
+            <column name="name" value="Rio de Janeiro"></column>
+            <column name="code" value="RJ"></column>
+        </insert>
+
+        <insert tableName="states">
+            <column name="id" valueComputed="${uuid}"/>
+            <column name="name" value="Rio Grande do Norte"></column>
+            <column name="code" value="RN"></column>
+        </insert>
+
+        <insert tableName="states">
+            <column name="id" valueComputed="${uuid}"/>
+            <column name="name" value="Rio Grande do Sul"></column>
+            <column name="code" value="RS"></column>
+        </insert>
+
+        <insert tableName="states">
+            <column name="id" valueComputed="${uuid}"/>
+            <column name="name" value="Rondônia"></column>
+            <column name="code" value="RO"></column>
+        </insert>
+
+        <insert tableName="states">
+            <column name="id" valueComputed="${uuid}"/>
+            <column name="name" value="Roraima"></column>
+            <column name="code" value="RR"></column>
+        </insert>
+
+        <insert tableName="states">
+            <column name="id" valueComputed="${uuid}"/>
+            <column name="name" value="Santa Catarina"></column>
+            <column name="code" value="SC"></column>
+        </insert>
+
+        <insert tableName="states">
+            <column name="id" valueComputed="${uuid}"/>
+            <column name="name" value="São Paulo"></column>
+            <column name="code" value="SP"></column>
+        </insert>
+
+        <insert tableName="states">
+            <column name="id" valueComputed="${uuid}"/>
+            <column name="name" value="Sergipe"></column>
+            <column name="code" value="SE"></column>
+        </insert>
+
+        <insert tableName="states">
+            <column name="id" valueComputed="${uuid}"/>
+            <column name="name" value="Tocantins"></column>
+            <column name="code" value="TO"></column>
+        </insert>
+
+        <insert tableName="states">
+            <column name="id" valueComputed="${uuid}"/>
+            <column name="name" value="Distrito Federal"></column>
+            <column name="code" value="DF"></column>
+        </insert>
+
+    </changeSet>
+
+</databaseChangeLog>
