@@ -1,6 +1,8 @@
 package com.pmrodrigues.users.keycloak;
 
 import com.pmrodrigues.users.model.User;
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
 import lombok.val;
 import org.keycloak.representations.idm.CredentialRepresentation;
 import org.keycloak.representations.idm.UserRepresentation;
@@ -8,11 +10,8 @@ import org.keycloak.representations.idm.UserRepresentation;
 import java.util.List;
 
 
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class UserFactory {
-
-    private UserFactory() {
-
-    }
     public static UserRepresentation createUser(final User user) {
         val userRepresentation = new UserRepresentation();
         userRepresentation.setFirstName(user.getFirstName());
