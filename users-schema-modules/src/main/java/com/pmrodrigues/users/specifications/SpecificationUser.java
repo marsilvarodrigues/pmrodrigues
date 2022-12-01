@@ -1,10 +1,13 @@
 package com.pmrodrigues.users.specifications;
 
 import com.pmrodrigues.users.model.User;
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
 import org.springframework.data.jpa.domain.Specification;
 
 import java.time.LocalDateTime;
 
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class SpecificationUser {
 
     public static Specification<User> firstName(String firstName) {

@@ -14,6 +14,7 @@ import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import static org.apache.velocity.runtime.RuntimeConstants.RUNTIME_LOG_INSTANCE;
 import static org.springframework.http.MediaType.TEXT_HTML;
@@ -38,7 +39,7 @@ public class Email{
 
     private String template;
 
-    private HashMap<String, Object> parameters = new HashMap<>();
+    private Map<String, Object> parameters = new HashMap<>();
 
     public boolean isHTML() {
         return TEXT_HTML.toString().equalsIgnoreCase(type);

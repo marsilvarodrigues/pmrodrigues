@@ -15,6 +15,7 @@ import lombok.val;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -44,8 +45,8 @@ public class UserController{
             @ApiResponse(code = 409, message = "Other user with the same email exist previously")})
     @RequestMapping(
             method = RequestMethod.POST,
-            produces = { "application/json" },
-            consumes = { "application/json" }
+            produces = { MediaType.APPLICATION_JSON_VALUE },
+            consumes = { MediaType.APPLICATION_JSON_VALUE }
     )
     public ResponseEntity<User> add(@ApiParam(required = true) @Valid @RequestBody final User user) {
         log.info("try to save a new user as {}",user);
@@ -63,8 +64,8 @@ public class UserController{
             @ApiResponse(code = 404, message = "User not found")})
     @RequestMapping(value="/{id}",
             method = RequestMethod.PUT,
-            produces = { "application/json" },
-            consumes = { "application/json" }
+            produces = { MediaType.APPLICATION_JSON_VALUE },
+            consumes = { MediaType.APPLICATION_JSON_VALUE }
     )
     public ResponseEntity update(@ApiParam(required = true) @PathVariable("id") final UUID id,@ApiParam(required = true) @Valid @RequestBody final User user){
         log.info("try to update a user {}", user);
@@ -82,7 +83,7 @@ public class UserController{
     @RequestMapping(
             method = RequestMethod.GET,
             value = "/{id}",
-            produces = { "application/json" }
+            produces = { MediaType.APPLICATION_JSON_VALUE }
     )
     public ResponseEntity<User> getUserById(@ApiParam(required = true) @PathVariable("id") final UUID id) {
         log.info("finding user with id {}", id);
@@ -97,7 +98,7 @@ public class UserController{
             @ApiResponse(code = 200, message = "OK", response = User.class)})
     @RequestMapping(
             method = RequestMethod.GET,
-            produces = { "application/json" }
+            produces = { MediaType.APPLICATION_JSON_VALUE }
     )
     public ResponseEntity<Page<User>> listAll(
             @RequestParam(name = "page", defaultValue = "0", required = false)
@@ -140,7 +141,7 @@ public class UserController{
     @RequestMapping(
             method = RequestMethod.DELETE,
             value = "/{id}",
-            produces = { "application/json" }
+            produces = { MediaType.APPLICATION_JSON_VALUE }
     )
     public ResponseEntity deleteById(@ApiParam(required = true) @PathVariable("id") final UUID id) {
         log.info("deleting user with id {}", id);

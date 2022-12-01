@@ -14,7 +14,7 @@ public interface StateRepository extends CrudRepository<State, UUID> {
 
     @Override
     @Query
-    public Iterable<State> findAll();
+    Iterable<State> findAll();
 
-    public Optional<State> findByCode(@NonNull final String code);
+    Optional<State> findByCode(@NonNull final String code);
 }
