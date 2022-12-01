@@ -12,8 +12,6 @@
     <artifactId>email-service</artifactId>
 
     <properties>
-        <maven.compiler.source>18</maven.compiler.source>
-        <maven.compiler.target>18</maven.compiler.target>
         <spring-version>5.3.19</spring-version>
         <spring-boot.version>2.6.7</spring-boot.version>
         <jackson-databind.version>2.13.3</jackson-databind.version>

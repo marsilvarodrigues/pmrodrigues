@@ -11,8 +11,7 @@
 
 
     <properties>
-        <maven.compiler.source>18</maven.compiler.source>
-        <maven.compiler.target>18</maven.compiler.target>
+        <java.version>18</java.version>
         <spring-version>5.3.20</spring-version>
         <spring-boot.version>2.6.7</spring-boot.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
