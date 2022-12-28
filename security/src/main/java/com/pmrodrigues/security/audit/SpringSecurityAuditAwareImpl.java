@@ -1,6 +1,7 @@
 package com.pmrodrigues.security.audit;
 
 import lombok.extern.java.Log;
+import org.keycloak.KeycloakPrincipal;
 import org.springframework.data.domain.AuditorAware;
 import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -23,8 +24,12 @@ public class SpringSecurityAuditAwareImpl implements AuditorAware<UUID> {
                 authentication instanceof AnonymousAuthenticationToken) {
             return Optional.empty();
         }
+        return Optional.ofNullable((KeycloakPrincipal)authentication.getPrincipal())
+                .stream()
+                .map(KeycloakPrincipal::getName)
+                .map(UUID::fromString)
+                .findFirst();
 
-        return Optional.ofNullable((UUID)authentication.getPrincipal());
 
     }
 }

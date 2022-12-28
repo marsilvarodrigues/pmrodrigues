@@ -26,6 +26,7 @@ import java.util.Collections;
 import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @DataJpaTest()
 @ContextConfiguration(classes = { AddressRepository.class, StateRepository.class, UserRepository.class, SpringSecurityAuditAwareImpl.class})
@@ -76,7 +77,7 @@ class TestAddressRepository {
         val state = stateRepository.findByCode("RJ").get();
         val address = Address.builder()
                 .state(state)
-                .user(user)
+                .owner(user)
                 .address1("TESTE")
                 .neightboor("TESTE")
                 .city("TESTE")
@@ -90,6 +91,26 @@ class TestAddressRepository {
         assertNotNull(saved.getCreatedBy());
         assertNotNull(saved.getUpdatedBy());
 
+    }
+
+    @Test
+    public void shouldListMyAddress() {
+        val state = stateRepository.findByCode("RJ").get();
+        val address = Address.builder()
+                .state(state)
+                .owner(user)
+                .address1("TESTE")
+                .neightboor("TESTE")
+                .city("TESTE")
+                .zipcode("TESTE")
+                .addressType(AddressType.STREET)
+                .build();
+
+        val saved = addressRepository.save(address);
+
+
+        val addresses = addressRepository.findByOwner(user);
+        assertTrue(addresses.contains(saved));
     }
 
 }

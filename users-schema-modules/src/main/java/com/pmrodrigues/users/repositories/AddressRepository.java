@@ -1,12 +1,19 @@
 package com.pmrodrigues.users.repositories;
 
 import com.pmrodrigues.users.model.Address;
-import org.springframework.data.repository.CrudRepository;
+import com.pmrodrigues.users.model.User;
+import feign.Param;
+import lombok.NonNull;
+import org.springframework.data.repository.PagingAndSortingRepository;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
 import java.util.UUID;
 
 
 @Repository
-public interface AddressRepository extends CrudRepository<Address, UUID> {
+public interface AddressRepository extends PagingAndSortingRepository<Address, UUID> {
+
+    List<Address> findByOwner(@Param("owner") @NonNull final User owner);
+
 }

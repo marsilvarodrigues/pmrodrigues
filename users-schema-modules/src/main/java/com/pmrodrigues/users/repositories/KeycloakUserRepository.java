@@ -4,6 +4,7 @@ import com.pmrodrigues.commons.exceptions.KeycloakIntegrationFailed;
 import com.pmrodrigues.users.clients.UserClient;
 import com.pmrodrigues.users.keycloak.UserFactory;
 import com.pmrodrigues.users.model.User;
+import io.micrometer.core.annotation.Timed;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -23,6 +24,7 @@ import java.util.stream.Collectors;
 @Slf4j
 public class KeycloakUserRepository {
     private final UserClient userClient;
+    @Timed(histogram = true, value = "KeycloakUserRepository.insert")
     public UUID insert(@NonNull final User user) {
         log.info("saving user {} into Keycloak", user);
 
@@ -36,6 +38,7 @@ public class KeycloakUserRepository {
         return UUID.fromString(response.getHeaders().getLocation().getPath().split("/auth/admin/realms/master/users/")[1]);
     }
 
+    @Timed(histogram = true, value = "KeycloakUserRepository.getUserIdByEmail")
     public Map<String, String> getUserIdByEmail(@NonNull final String email) {
         log.info("searching into keycloak users with this email {}", email);
         var response = userClient.getByEmail(email);
@@ -49,6 +52,7 @@ public class KeycloakUserRepository {
         }
     }
 
+    @Timed(histogram = true, value = "KeycloakUserRepository.delete")
     public void delete(@NonNull final UUID userId){
         log.info("delete user by {} into keycloak", userId);
         val response = userClient.delete(userId);
@@ -58,6 +62,7 @@ public class KeycloakUserRepository {
         }
     }
 
+    @Timed(histogram = true, value = "KeycloakUserRepository.update")
     public void update(@NonNull final User user) {
         log.info("updating the user {} in keycloack", user);
         val keycloackUser = UserFactory.createUser(user);

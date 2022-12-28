@@ -66,7 +66,7 @@ keycloak:
     secret: gNjirmWqaUiP4NWREgRDpbzJpnq7WSZD
   ssl-required: none
   bearer-only: true
-  principal-attribute: preferred_username
+  principal-attribute: id
   public-client: true
   confidential-port: 0
 

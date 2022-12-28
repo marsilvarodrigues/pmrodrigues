@@ -27,8 +27,8 @@ public class Address {
     private UUID id;
 
     @JoinColumn(name = "user_id", referencedColumnName = "id")
-    @ManyToOne(optional = false,targetEntity = User.class)
-    private User user;
+    @ManyToOne(optional = false,targetEntity = User.class,fetch = FetchType.LAZY)
+    private User owner;
 
     @Enumerated(EnumType.ORDINAL)
     @Column(name = "address_type", nullable = false)
