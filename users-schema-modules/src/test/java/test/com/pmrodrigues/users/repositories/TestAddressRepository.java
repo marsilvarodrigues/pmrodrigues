@@ -10,6 +10,7 @@ import com.pmrodrigues.users.repositories.UserRepository;
 import lombok.val;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.keycloak.KeycloakPrincipal;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.domain.EntityScan;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
@@ -64,7 +65,8 @@ class TestAddressRepository {
         SecurityContextHolder
                 .getContext()
                 .setAuthentication(
-                        new UsernamePasswordAuthenticationToken(user.getId(), user.getExternalId(), Collections.emptyList())
+                        new UsernamePasswordAuthenticationToken(new KeycloakPrincipal(user.getExternalId().toString(), null)
+                                , user.getExternalId(), Collections.emptyList())
                 );
 
 
@@ -72,7 +74,7 @@ class TestAddressRepository {
 
 
     @Test
-    public void shouldSaveAddress() {
+    void shouldSaveAddress() {
 
         val state = stateRepository.findByCode("RJ").get();
         val address = Address.builder()
@@ -94,7 +96,7 @@ class TestAddressRepository {
     }
 
     @Test
-    public void shouldListMyAddress() {
+    void shouldListMyAddress() {
         val state = stateRepository.findByCode("RJ").get();
         val address = Address.builder()
                 .state(state)

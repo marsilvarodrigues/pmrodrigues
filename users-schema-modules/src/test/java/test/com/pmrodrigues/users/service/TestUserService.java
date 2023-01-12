@@ -6,24 +6,29 @@ import com.pmrodrigues.commons.exceptions.KeycloakIntegrationFailed;
 import com.pmrodrigues.users.clients.EmailClient;
 import com.pmrodrigues.users.exceptions.UserNotFoundException;
 import com.pmrodrigues.users.model.User;
-import com.pmrodrigues.users.repositories.UserRepository;
 import com.pmrodrigues.users.repositories.KeycloakUserRepository;
+import com.pmrodrigues.users.repositories.UserRepository;
 import com.pmrodrigues.users.service.UserService;
 import lombok.SneakyThrows;
 import lombok.val;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.keycloak.KeycloakPrincipal;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.context.SecurityContextHolder;
 
+import java.util.Collections;
 import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.BDDMockito.*;
 import static org.mockito.Mockito.any;
@@ -47,7 +52,7 @@ class TestUserService {
     @Test
     @DisplayName("Should save a new user")
     @SneakyThrows
-    public void shouldSave() {
+    void shouldSave() {
 
         val user = User.builder().id(UUID.randomUUID()).firstName("teste")
                 .lastName("teste").email("test@test.com").build();
@@ -71,7 +76,7 @@ class TestUserService {
 
     @Test
     @DisplayName("Should not save a new user with existed other with the same email")
-    public void shouldNotSave() {
+     void shouldNotSave() {
         val user = User.builder().email("").build();
         Optional<User> optional = Optional.of(new User());
 
@@ -82,7 +87,7 @@ class TestUserService {
 
     @Test
     @DisplayName("Should not save a new user with existed other with the same email")
-    public void shouldNotSaveExistedOnKeyCloak() {
+    void shouldNotSaveExistedOnKeyCloak() {
         val user = User.builder().email("").build();
         Optional<User> optional = Optional.empty();
 
@@ -94,7 +99,7 @@ class TestUserService {
 
     @Test
     @DisplayName("Should delete user")
-    public void shouldDeleteUser() {
+    void shouldDeleteUser() {
         val user = User.builder().id(UUID.randomUUID()).build();
         given(repository.findById(any(UUID.class))).willReturn(Optional.of(user));
         willDoNothing().given(repository).delete(any(User.class));
@@ -106,7 +111,7 @@ class TestUserService {
 
     @Test
     @DisplayName("Should not delete user because he doesn't exist")
-    public void shouldNotDeleteUserNotFound(){
+    void shouldNotDeleteUserNotFound(){
         val user = User.builder().id(UUID.randomUUID()).build();
         given(repository.findById(any(UUID.class))).willReturn(Optional.empty());
 
@@ -119,7 +124,7 @@ class TestUserService {
 
     @Test
     @DisplayName("Should not delete user because integration failed")
-    public void shouldNotDeleteIntegrationFailed(){
+    void shouldNotDeleteIntegrationFailed(){
         val user = User.builder().id(UUID.randomUUID()).build();
         given(repository.findById(any(UUID.class))).willReturn(Optional.of(user));
         willDoNothing().given(repository).delete(any(User.class));
@@ -133,7 +138,7 @@ class TestUserService {
     }
 
     @Test
-    public void shouldUpdateUser(){
+    void shouldUpdateUser(){
 
         val id = UUID.randomUUID();
         val user = User.builder()
@@ -152,7 +157,7 @@ class TestUserService {
     }
 
     @Test
-    public void shouldNotUpdateUserNotFound() {
+    void shouldNotUpdateUserNotFound() {
 
         val id = UUID.randomUUID();
 
@@ -171,7 +176,7 @@ class TestUserService {
     }
 
     @Test
-    public void shouldNotUpdateUserKeycloackIntegrationFail(){
+    void shouldNotUpdateUserKeycloackIntegrationFail(){
 
         val id = UUID.randomUUID();
 
@@ -188,6 +193,25 @@ class TestUserService {
         willThrow(new KeycloakIntegrationFailed()).given(userClient).update(any(User.class));
 
         assertThrows(KeycloakIntegrationFailed.class, () -> userService.updateUser(id, user));
+    }
+
+
+    @Test
+    void shouldGetLoggedUser() {
+
+        val user = new User();
+
+        SecurityContextHolder
+                .getContext()
+                .setAuthentication(
+                        new UsernamePasswordAuthenticationToken(new KeycloakPrincipal(UUID.randomUUID().toString(), null)
+                                , UUID.randomUUID(), Collections.emptyList())
+                );
+
+        given(repository.findByExternalId(any(UUID.class))).willReturn(Optional.of(user));
+
+        assertNotNull(userService.getAuthenticatedUser());
+
     }
 
 }

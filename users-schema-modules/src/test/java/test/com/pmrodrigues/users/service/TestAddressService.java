@@ -3,11 +3,13 @@ package test.com.pmrodrigues.users.service;
 import com.pmrodrigues.security.exceptions.OperationNotAllowedException;
 import com.pmrodrigues.security.roles.Security;
 import com.pmrodrigues.security.utils.SecurityUtils;
+import com.pmrodrigues.users.exceptions.AddressNotFoundException;
 import com.pmrodrigues.users.model.Address;
 import com.pmrodrigues.users.model.User;
 import com.pmrodrigues.users.repositories.AddressRepository;
 import com.pmrodrigues.users.service.AddressService;
 import com.pmrodrigues.users.service.UserService;
+import lombok.SneakyThrows;
 import lombok.val;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -116,4 +118,70 @@ class TestAddressService {
 
 
     }
+
+
+    @Test
+    @SneakyThrows
+    void shouldUpdateAddress() {
+
+        val toUpdate = mock(Address.class);
+        given(toUpdate.getId()).willReturn(UUID.randomUUID());
+        given(toUpdate.getOwner()).willReturn(defaultOwner);
+        given(addressRepository.findById(any(UUID.class))).willReturn(
+                Optional.of(Address.builder().owner(defaultOwner).build())
+        );
+
+        service.updateAddress(toUpdate);
+
+        verify(addressRepository, times(1)).save(any(Address.class));
+
+    }
+
+    @Test
+    void shouldNotUpdateAddressNotFoundError() {
+
+        given(addressRepository.findById(any(UUID.class))).willReturn(Optional.empty());
+        val address = Address.builder().id(UUID.randomUUID()).build();
+        assertThrows(AddressNotFoundException.class, () ->
+           service.updateAddress(address)
+        );
+    }
+
+    @Test
+    @SneakyThrows
+    void shouldOnlyOwnerUpdateAddress() {
+        val toUpdate = mock(Address.class);
+        given(toUpdate.getId()).willReturn(UUID.randomUUID());
+        given(toUpdate.getOwner()).willReturn(defaultOwner);
+
+
+        given(addressRepository.findById(any(UUID.class)))
+                .willReturn(Optional.of(Address.builder().owner(defaultOwner).build()));
+
+        service.updateAddress(toUpdate);
+        verify(addressRepository, times(1)).save(any(Address.class));
+
+    }
+
+    @Test
+    void shouldNotSaveOwnerDifferent() {
+
+        val mockStatic = mockStatic(SecurityUtils.class);
+        mockStatic.when(() -> SecurityUtils.isUserInRole(Security.SYSTEM_ADMIN)).thenReturn(Boolean.FALSE);
+
+        val toUpdate = mock(Address.class);
+        val differentOwnser = User.builder().id(UUID.randomUUID()).build();
+
+        given(toUpdate.getId()).willReturn(UUID.randomUUID());
+        given(toUpdate.getOwner()).willReturn(differentOwnser);
+
+        given(addressRepository.findById(any(UUID.class)))
+                .willReturn(Optional.of(Address.builder().owner(defaultOwner).build()));
+
+        assertThrows(OperationNotAllowedException.class, () -> service.updateAddress(toUpdate));
+
+        mockStatic.close();
+    }
+
+
 }

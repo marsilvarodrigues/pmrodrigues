@@ -1,6 +1,8 @@
 package com.pmrodrigues.users.service;
 
 import com.pmrodrigues.commons.exceptions.NotCreateException;
+import com.pmrodrigues.commons.exceptions.NotFoundException;
+import com.pmrodrigues.security.utils.SecurityUtils;
 import com.pmrodrigues.users.clients.EmailClient;
 import com.pmrodrigues.users.exceptions.UserNotFoundException;
 import com.pmrodrigues.users.model.User;
@@ -12,12 +14,10 @@ import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
-import org.keycloak.KeycloakPrincipal;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
@@ -96,7 +96,7 @@ public class UserService {
     @Timed(histogram = true, value = "UserService.findAll")
     @SneakyThrows
     public Page<User> findAll(@NonNull User user, @NonNull PageRequest pageRequest){
-        log.info("list all users by {}", user);
+        log.info("list all users by sample {}", user);
         return repository.findAll(
                     where(firstName(user.getFirstName())).
                     and(lastName(user.getLastName())).
@@ -125,15 +125,7 @@ public class UserService {
 
     @Timed(histogram = true, value = "UserService.getAuthenticatedUser")
     public Optional<User> getAuthenticatedUser() {
-        val id = Optional.ofNullable((KeycloakPrincipal)SecurityContextHolder
-                        .getContext()
-                        .getAuthentication()
-                        .getPrincipal())
-                .stream()
-                .map(KeycloakPrincipal::getName)
-                .map(UUID::fromString)
-                .findFirst()
-                .get();
+        val id = SecurityUtils.getUserLoggedId().orElseThrow(NotFoundException::new);
         return repository.findByExternalId(id);
     }
 }

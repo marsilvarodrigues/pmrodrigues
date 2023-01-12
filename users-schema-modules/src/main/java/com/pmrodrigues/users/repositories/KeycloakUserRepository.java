@@ -67,7 +67,7 @@ public class KeycloakUserRepository {
         log.info("updating the user {} in keycloack", user);
         val keycloackUser = UserFactory.createUser(user);
         var response = userClient.update(user.getExternalId(),keycloackUser);
-        if(response.getStatusCode() != HttpStatus.NO_CONTENT || response.getStatusCode() != HttpStatus.OK){
+        if(response.getStatusCode() != HttpStatus.NO_CONTENT && response.getStatusCode() != HttpStatus.OK){
             log.error("error to update in user {} in Keycloack {} - {}", user, response.getStatusCode(), response.getBody());
             throw new KeycloakIntegrationFailed();
         }
