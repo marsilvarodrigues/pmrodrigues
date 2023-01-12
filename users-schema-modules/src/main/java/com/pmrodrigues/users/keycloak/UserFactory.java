@@ -17,15 +17,17 @@ public final class UserFactory {
         userRepresentation.setFirstName(user.getFirstName());
         userRepresentation.setLastName(user.getLastName());
         userRepresentation.setEmail(user.getEmail());
-        userRepresentation.setEmailVerified(true);
-        userRepresentation.setUsername(user.getEmail());
-        userRepresentation.setEnabled(true);
+        if( user.isNew() ) {
+            userRepresentation.setEmailVerified(true);
+            userRepresentation.setUsername(user.getEmail());
+            userRepresentation.setEnabled(true);
 
-        val credential = new CredentialRepresentation();
-        credential.setTemporary(true);
-        credential.setType(CredentialRepresentation.PASSWORD);
-        credential.setValue(user.getPassword());
-        userRepresentation.setCredentials(List.of(credential));
+            val credential = new CredentialRepresentation();
+            credential.setTemporary(true);
+            credential.setType(CredentialRepresentation.PASSWORD);
+            credential.setValue(user.getPassword());
+            userRepresentation.setCredentials(List.of(credential));
+        }
 
         return userRepresentation;
     }

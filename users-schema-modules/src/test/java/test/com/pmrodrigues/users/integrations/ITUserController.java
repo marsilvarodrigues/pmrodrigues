@@ -11,6 +11,9 @@ import org.keycloak.admin.client.KeycloakBuilder;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.web.client.RestTemplateBuilder;
+import org.springframework.data.domain.Page;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.client.ClientHttpRequestInterceptor;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
@@ -23,7 +26,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 @ExtendWith(SpringExtension.class)
 @SpringBootTest( webEnvironment = SpringBootTest.WebEnvironment.MOCK,
         classes = UserApplication.class)
-public class ITUserController {
+class ITUserController {
     @Value("${KEYCLOAK_LOCATION:http://localhost:8080/auth}")
     private String SERVER_URL;
     @Value("${KEYCLOAK_REALM:master}")
@@ -62,9 +65,9 @@ public class ITUserController {
     @Test
     void testAddUser() {
         val user = User.builder()
-                .firstName("test")
-                .lastName("test")
-                .email("test@test.com")
+                .firstName("new_user")
+                .lastName("insert")
+                .email("to_insert@test.com")
                 .build();
         val response = rest.postForLocation("/users", user);
         assertNotNull(response);
@@ -73,7 +76,52 @@ public class ITUserController {
         assertEquals(HttpStatus.OK, returned.getStatusCode());
         assertEquals(user.getEmail(), returned.getBody().getEmail());
         assertNotNull(returned.getBody().getExternalId());
+    }
 
+
+    @Test
+    void testUpdateUser() {
+
+        val user = User.builder()
+                .firstName("to_update")
+                .lastName("to_update")
+                .email("to_update@test.com")
+                .build();
+
+        val response = rest.postForLocation("/users", user);
+        assertNotNull(response);
+
+        user.setFirstName("changed_user");
+        val entity = new HttpEntity(user);
+        val returned = rest.exchange(USER_API_URL + response, HttpMethod.PUT, entity, User.class);
+        assertEquals(HttpStatus.OK, returned.getStatusCode());
+
+    }
+
+    @Test
+    void testFindUserById() {
+
+        val user = User.builder()
+                .firstName("to_get")
+                .lastName("to_get")
+                .email("to_get@test.com")
+                .build();
+
+        val response = rest.postForLocation("/users", user);
+        assertNotNull(response);
+
+        val returned = rest.getForEntity(USER_API_URL + response, User.class);
+        assertEquals(HttpStatus.OK, returned.getStatusCode());
+        assertEquals(user.getEmail(), returned.getBody().getEmail());
+        assertEquals(user.getFirstName(), returned.getBody().getFirstName());
+        assertEquals(user.getLastName(), returned.getBody().getLastName());
+        assertNotNull(returned.getBody().getExternalId());
+    }
+
+    @Test
+    void testListUsers() {
+        val returned = rest.getForEntity(USER_API_URL + "/users", Page.class);
+        assertEquals(HttpStatus.OK, returned.getStatusCode());
     }
 
 }

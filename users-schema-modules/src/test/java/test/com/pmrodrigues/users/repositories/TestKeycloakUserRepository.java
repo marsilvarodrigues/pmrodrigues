@@ -26,7 +26,6 @@ import java.util.stream.IntStream;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
-import static org.mockito.Mockito.mock;
 
 @ExtendWith(MockitoExtension.class)
 @MockitoSettings(strictness = Strictness.LENIENT)
@@ -58,7 +57,7 @@ class TestKeycloakUserRepository {
 
     @Test
     void shouldUpdate() {
-        given(userClient.update(any(UUID.class),any(UserRepresentation.class))).willReturn(ResponseEntity.ok().build());
+        given(userClient.update(any(UUID.class),any(UserRepresentation.class))).willReturn(ResponseEntity.noContent().build());
         val user = User.builder()
                             .email("teste")
                             .firstName("teste")
