@@ -46,7 +46,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
         DuplicatedKeyControllerAdvice.class} )
 @AutoConfigureMockMvc(addFilters = false)
 @ActiveProfiles("dev")
-public class TestUserController {
+class TestUserController {
 
     private final ObjectMapper objectMapper = new ObjectMapper();
     @Autowired
@@ -57,7 +57,7 @@ public class TestUserController {
     @Test
     @SneakyThrows
     @DisplayName("Should get a user by id")
-    public void shouldGet()  {
+     void shouldGet()  {
 
         given(userService.findById(any(UUID.class))).willReturn(new User());
 
@@ -70,7 +70,7 @@ public class TestUserController {
     @Test
     @SneakyThrows
     @DisplayName("Should return 404 if don't found a user")
-    public void shouldNotGet() {
+     void shouldNotGet() {
         given(userService.findById(any(UUID.class))).willThrow(UserNotFoundException.class);
 
         mvc.perform(get(format("/users/%s",UUID.randomUUID()))
@@ -82,7 +82,7 @@ public class TestUserController {
     @Test
     @SneakyThrows
     @DisplayName("Should save a new user")
-    public void shouldSaveUser() {
+     void shouldSaveUser() {
         val user = User.builder().email("test@test.com").firstName("teste")
                 .lastName("teste").build();
         given(userService.createNewUser(any(User.class))).willReturn(user);
@@ -102,7 +102,7 @@ public class TestUserController {
     @Test
     @SneakyThrows
     @DisplayName("Should not save a new user. There is other saved with the same email")
-    public void shouldNotSaveUserExistOtherSaved() {
+     void shouldNotSaveUserExistOtherSaved() {
 
         willThrow(DuplicateKeyException.class).given(userService).createNewUser(any(User.class));
 
@@ -124,7 +124,7 @@ public class TestUserController {
     @Test
     @SneakyThrows
     @DisplayName("Should not save a new user. User not valid")
-    public void shouldNotSaveUserNotValid() {
+     void shouldNotSaveUserNotValid() {
 
         val user = User.builder().build();
         val json = objectMapper.writeValueAsString(user);
@@ -142,7 +142,7 @@ public class TestUserController {
     @Test
     @SneakyThrows
     @DisplayName("Should delete user by Id")
-    public void shouldDeleteUser(){
+     void shouldDeleteUser(){
         given(userService.findById(any(UUID.class))).willReturn(new User());
 
         mvc.perform(delete("/users/" + UUID.randomUUID())
@@ -154,7 +154,7 @@ public class TestUserController {
     @Test
     @SneakyThrows
     @DisplayName("Should not delete user by Id - User Not Found")
-    public void shouldNotDeleteUserNotFound(){
+     void shouldNotDeleteUserNotFound(){
         given(userService.findById(any(UUID.class))).willThrow(UserNotFoundException.class);
 
         mvc.perform(delete("/users/" + UUID.randomUUID())
@@ -166,7 +166,7 @@ public class TestUserController {
     @Test
     @SneakyThrows
     @DisplayName("Should List all Users")
-    public void shouldListAllUsers(){
+     void shouldListAllUsers(){
         given(userService.findAll(any(User.class), any(PageRequest.class))).willReturn(Page.empty());
 
         mvc.perform(get("/users")
@@ -178,7 +178,7 @@ public class TestUserController {
     @Test
     @SneakyThrows
     @DisplayName("Should List all Users")
-    public void shouldListAllUsersWithBody(){
+     void shouldListAllUsersWithBody(){
 
         given(userService.findAll(any(User.class), any(PageRequest.class))).willReturn(Page.empty());
 
@@ -195,7 +195,7 @@ public class TestUserController {
     @Test
     @SneakyThrows
     @DisplayName("Should List a page of all user")
-    public void shouldGetAPageOfAllUsers(){
+     void shouldGetAPageOfAllUsers(){
 
         given(userService.findAll(any(User.class),
                                   any(PageRequest.class))).willReturn(Page.empty());
@@ -214,7 +214,7 @@ public class TestUserController {
     @Test
     @SneakyThrows
     @DisplayName("Should List All user sorted")
-    public void shouldGetAllUsersSortedList(){
+     void shouldGetAllUsersSortedList(){
 
         given(userService.findAll(any(User.class),any(PageRequest.class))).willReturn(Page.empty());
 
@@ -234,7 +234,7 @@ public class TestUserController {
     @Test
     @SneakyThrows
     @DisplayName("Should List All user sorted")
-    public void shouldGetAllUsersSorted(){
+     void shouldGetAllUsersSorted(){
 
         given(userService.findAll(any(User.class),any(PageRequest.class))).willReturn(Page.empty());
 
@@ -248,7 +248,7 @@ public class TestUserController {
     @Test
     @SneakyThrows
     @DisplayName("Should not sort")
-    public void shouldNotSort(){
+     void shouldNotSort(){
 
         given(userService.findAll(any(User.class),any(PageRequest.class))).willReturn(Page.empty());
 
@@ -265,7 +265,7 @@ public class TestUserController {
 
     @Test
     @SneakyThrows
-    public void shouldUpdateUser(){
+     void shouldUpdateUser(){
         willDoNothing().given(userService).updateUser(any(UUID.class),any(User.class));
 
         val user = User.builder()
@@ -287,7 +287,7 @@ public class TestUserController {
 
     @Test
     @SneakyThrows
-    public void shouldNotUpdateUserUserNotFound(){
+     void shouldNotUpdateUserUserNotFound(){
 
         willThrow(UserNotFoundException.class).given(userService).updateUser(any(UUID.class),any(User.class));
 
@@ -310,7 +310,7 @@ public class TestUserController {
 
     @Test
     @SneakyThrows
-    public void shouldNotUpdateKeycloackIntegrationFailed(){
+     void shouldNotUpdateKeycloackIntegrationFailed(){
 
         willThrow(KeycloakIntegrationFailed.class).given(userService).updateUser(any(UUID.class),any(User.class));
 

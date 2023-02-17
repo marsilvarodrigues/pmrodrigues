@@ -5,10 +5,7 @@ import io.micrometer.core.annotation.Timed;
 import lombok.NonNull;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.*;
 
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 
@@ -18,11 +15,11 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 @Timed(histogram = true, value = "email-service")
 public interface EmailClient {
 
-    @RequestMapping(method = RequestMethod.POST, produces = APPLICATION_JSON_VALUE)
-    ResponseEntity send(@NonNull @RequestBody final Email email);
+    @PostMapping(produces = APPLICATION_JSON_VALUE)
+    ResponseEntity<String> send(@NonNull @RequestBody final Email email);
 
 
-    @RequestMapping(method = RequestMethod.GET ,path = "/{template}"
+    @GetMapping(path = "/{template}"
             , produces = APPLICATION_JSON_VALUE
             , consumes = APPLICATION_JSON_VALUE)
     ResponseEntity<Email> getEmailByName(@NonNull @PathVariable("template") final String template);

@@ -53,7 +53,7 @@ class TestAddressRepository {
 
 
     @BeforeEach
-    public void beforeEach() {
+     void beforeEach() {
         this.user = User.builder().firstName("teste")
                 .lastName("teste")
                 .email("teste@teste.com")
@@ -114,13 +114,13 @@ class TestAddressRepository {
         val saved = addressRepository.save(address);
 
 
-        val addresses = addressRepository.findByOwner(user, PageRequest.of(0, 10));
+        val addresses = addressRepository.findByOwner(user);
         assertFalse(addresses.isEmpty());
         assertTrue(addresses.stream().toList().contains(saved));
     }
 
     @Test
-    public void shouldFoundAll() {
+     void shouldFoundAll() {
 
         val state = stateRepository.findByCode("RJ").get();
 

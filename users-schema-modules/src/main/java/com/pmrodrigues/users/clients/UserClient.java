@@ -18,16 +18,16 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 @Timed(histogram = true, value = "keycloack-integration")
 public interface UserClient {
 
-    @RequestMapping(method = RequestMethod.POST,consumes = APPLICATION_JSON_VALUE, produces = APPLICATION_JSON_VALUE)
-    ResponseEntity add(@RequestBody @Valid UserRepresentation user);
+    @PostMapping(consumes = APPLICATION_JSON_VALUE, produces = APPLICATION_JSON_VALUE)
+    ResponseEntity<String> add(@RequestBody @Valid UserRepresentation user);
 
-    @RequestMapping(method = RequestMethod.GET,consumes = APPLICATION_JSON_VALUE, produces = APPLICATION_JSON_VALUE)
+    @GetMapping(consumes = APPLICATION_JSON_VALUE, produces = APPLICATION_JSON_VALUE)
     ResponseEntity<List<UserRepresentation>> getByEmail(@RequestParam("email") @NonNull String email);
 
-    @RequestMapping(method = RequestMethod.DELETE, path = "/{id}",consumes = APPLICATION_JSON_VALUE, produces = APPLICATION_JSON_VALUE)
-    ResponseEntity delete(@PathVariable("id") @NonNull UUID userId);
+    @DeleteMapping(path = "/{id}",consumes = APPLICATION_JSON_VALUE, produces = APPLICATION_JSON_VALUE)
+    ResponseEntity<String> delete(@PathVariable("id") @NonNull UUID userId);
 
 
-    @RequestMapping(method = RequestMethod.PUT, path="/{id}",consumes = APPLICATION_JSON_VALUE, produces = APPLICATION_JSON_VALUE)
-    ResponseEntity update(@PathVariable("id") @NonNull UUID userId, @RequestBody @Valid UserRepresentation user);
+    @PutMapping(path="/{id}",consumes = APPLICATION_JSON_VALUE, produces = APPLICATION_JSON_VALUE)
+    ResponseEntity<String> update(@PathVariable("id") @NonNull UUID userId, @RequestBody @Valid UserRepresentation user);
 }

@@ -15,7 +15,6 @@ import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -28,12 +27,10 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 public class EmailController {
 
     private final EmailService service;
-    @Autowired
-    private EmailTemplateService templateService;
-
+    private final EmailTemplateService templateService;
 
     @ExceptionHandler(JsonProcessingException.class)
-    public ResponseEntity exceptionHandler(JsonProcessingException ex) {
+    public ResponseEntity<String> exceptionHandler(JsonProcessingException ex) {
         return ResponseEntity.badRequest().body(ex.getMessage());
     }
 
@@ -44,7 +41,7 @@ public class EmailController {
             @ApiResponse(code = 200, message = "Push a email to be sent"),
             @ApiResponse(code = 400, message = "An error to send a email")})
     @RolesAllowed({Security.SYSTEM_ADMIN})
-    public ResponseEntity send(@NonNull @RequestBody final Email email) throws JsonProcessingException {
+    public ResponseEntity<String> send(@NonNull @RequestBody final Email email) throws JsonProcessingException {
         log.debug("send email to {}", email);
         service.send(email);
         return ResponseEntity.ok().build();

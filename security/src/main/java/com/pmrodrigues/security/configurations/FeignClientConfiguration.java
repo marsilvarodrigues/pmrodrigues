@@ -6,9 +6,9 @@ import com.pmrodrigues.security.oauthmanager.OAuthClientCredentialsFeignManager;
 import feign.RequestInterceptor;
 import feign.codec.Decoder;
 import feign.codec.Encoder;
+import lombok.RequiredArgsConstructor;
 import org.keycloak.adapters.springsecurity.token.KeycloakAuthenticationToken;
 import org.springframework.beans.factory.ObjectFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.http.HttpMessageConverters;
 import org.springframework.cloud.openfeign.support.ResponseEntityDecoder;
 import org.springframework.cloud.openfeign.support.SpringDecoder;
@@ -25,13 +25,13 @@ import org.springframework.security.oauth2.client.registration.ClientRegistratio
 import org.springframework.security.oauth2.client.registration.ClientRegistrationRepository;
 
 @Configuration
+@RequiredArgsConstructor
 public class FeignClientConfiguration {
     public static final String CLIENT_REGISTRATION_ID = "keycloak";
-    @Autowired
-    private OAuth2AuthorizedClientService oAuth2AuthorizedClientService;
 
-    @Autowired
-    private ClientRegistrationRepository clientRegistrationRepository;
+    private final OAuth2AuthorizedClientService oAuth2AuthorizedClientService;
+
+    private final ClientRegistrationRepository clientRegistrationRepository;
 
     @Bean
     public RequestInterceptor requestInterceptor() {

@@ -19,7 +19,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 @ContextConfiguration(initializers = ConfigDataApplicationContextInitializer.class)
 @EnableConfigurationProperties(value = EmailTemplateService.class)
 @TestPropertySource(properties = { "spring.config.location=classpath:emails.yaml" })
-public class TestTemplateService {
+ class TestTemplateService {
 
     @Autowired
     private EmailTemplateService templateService;

@@ -19,6 +19,8 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+
 import static com.pmrodrigues.users.specifications.SpecificationAddress.*;
 import static org.springframework.beans.BeanUtils.copyProperties;
 
@@ -64,13 +66,13 @@ public class AddressService {
     }
 
     @Timed(histogram = true, value= "AddressService.updateAddress")
-    public Page<Address> listMyAddress(@NonNull PageRequest pageRequest) {
+    public List<Address> listMyAddress() {
         val owner = userService.getAuthenticatedUser()
                 .orElseThrow(UserNotFoundException::new);
 
         log.info("list all addresses for {}" , owner);
 
-        return repository.findByOwner(owner, pageRequest);
+        return repository.findByOwner(owner);
     }
 
 
