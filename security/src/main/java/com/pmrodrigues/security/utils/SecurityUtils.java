@@ -33,7 +33,7 @@ public class SecurityUtils {
 
         return auth.getAuthorities()
                 .stream()
-                .allMatch(role -> expectedRoles.contains(role));
+                .anyMatch(role -> expectedRoles.contains(role));
     }
 
 }

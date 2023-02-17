@@ -43,8 +43,7 @@ public class UserController{
             @ApiResponse(code = 201, message = "User successful created", response = User.class),
             @ApiResponse(code = 400, message = "Failed to create a user"),
             @ApiResponse(code = 409, message = "Other user with the same email exist previously")})
-    @RequestMapping(
-            method = RequestMethod.POST,
+    @PostMapping(
             produces = { MediaType.APPLICATION_JSON_VALUE },
             consumes = { MediaType.APPLICATION_JSON_VALUE }
     )
@@ -62,12 +61,11 @@ public class UserController{
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "User successful updated"),
             @ApiResponse(code = 404, message = "User not found")})
-    @RequestMapping(value="/{id}",
-            method = RequestMethod.PUT,
+    @PutMapping(value="/{id}",
             produces = { MediaType.APPLICATION_JSON_VALUE },
             consumes = { MediaType.APPLICATION_JSON_VALUE }
     )
-    public ResponseEntity update(@ApiParam(required = true) @PathVariable("id") final UUID id,@ApiParam(required = true) @Valid @RequestBody final User user){
+    public ResponseEntity<String> update(@ApiParam(required = true) @PathVariable("id") final UUID id,@ApiParam(required = true) @Valid @RequestBody final User user){
         log.info("try to update a user {}", user);
         userService.updateUser(id, user);
         log.info("user {} saved", user);
@@ -80,8 +78,7 @@ public class UserController{
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "OK", response = User.class),
             @ApiResponse(code = 404, message = "User not found") })
-    @RequestMapping(
-            method = RequestMethod.GET,
+    @GetMapping(
             value = "/{id}",
             produces = { MediaType.APPLICATION_JSON_VALUE }
     )
@@ -96,8 +93,7 @@ public class UserController{
     @ApiOperation(value = "List all user by", nickname = "listAll", notes = "List all user by", response = User.class, tags={ "user", })
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "OK", response = User.class)})
-    @RequestMapping(
-            method = RequestMethod.GET,
+    @GetMapping(
             produces = { MediaType.APPLICATION_JSON_VALUE }
     )
     public ResponseEntity<Page<User>> listAll(
@@ -138,12 +134,11 @@ public class UserController{
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "OK"),
             @ApiResponse(code = 404, message = "User not found") })
-    @RequestMapping(
-            method = RequestMethod.DELETE,
+    @DeleteMapping(
             value = "/{id}",
             produces = { MediaType.APPLICATION_JSON_VALUE }
     )
-    public ResponseEntity deleteById(@ApiParam(required = true) @PathVariable("id") final UUID id) {
+    public ResponseEntity<String> deleteById(@ApiParam(required = true) @PathVariable("id") final UUID id) {
         log.info("deleting user with id {}", id);
         val user = userService.findById(id);
         userService.delete(user);

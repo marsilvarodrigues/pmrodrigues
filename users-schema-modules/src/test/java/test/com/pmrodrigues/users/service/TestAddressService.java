@@ -19,10 +19,13 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.mockito.junit.jupiter.MockitoSettings;
 import org.mockito.quality.Strictness;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 
 import java.util.Optional;
 import java.util.UUID;
 
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
@@ -181,7 +184,21 @@ class TestAddressService {
         assertThrows(OperationNotAllowedException.class, () -> service.updateAddress(toUpdate));
 
         mockStatic.close();
+
     }
 
+    @Test
+    void shouldListMyAddresses() {
+        val addresses = mock(Page.class);
+        val pageRequest = mock(PageRequest.class);
 
+        given(addressRepository.findByOwner(any(User.class), any(PageRequest.class)))
+                .willReturn(addresses);
+
+        val pages = service.listMyAddress(pageRequest);
+
+        assertNotNull(addresses);
+    }
+
+ 
 }

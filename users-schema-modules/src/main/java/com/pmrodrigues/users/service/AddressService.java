@@ -13,10 +13,13 @@ import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
+import static com.pmrodrigues.users.specifications.SpecificationAddress.*;
 import static org.springframework.beans.BeanUtils.copyProperties;
 
 @RequiredArgsConstructor
@@ -56,6 +59,43 @@ public class AddressService {
             repository.save(existed);
         } else {
             throw new OperationNotAllowedException("User not allowed for this operation");
+        }
+
+    }
+
+    @Timed(histogram = true, value= "AddressService.updateAddress")
+    public Page<Address> listMyAddress(@NonNull PageRequest pageRequest) {
+        val owner = userService.getAuthenticatedUser()
+                .orElseThrow(UserNotFoundException::new);
+
+        log.info("list all addresses for {}" , owner);
+
+        return repository.findByOwner(owner, pageRequest);
+    }
+
+
+    @Timed(histogram = true, value = "Address.findAll")
+    @SneakyThrows
+    public Page<Address> findAll(@NonNull Address address, @NonNull PageRequest pageRequest){
+        log.info("list all addresses by sample {}", address);
+        var loggedUser = userService.getAuthenticatedUser()
+                .orElseThrow(UserNotFoundException::new);
+
+        if( SecurityUtils.isUserInRole(Security.SYSTEM_ADMIN) ){
+            return repository.findAll(
+                            state(address.getState())
+                            .and(zipcode(address.getZipcode()))
+                            .and(city(address.getCity()))
+                            .and(neightboor(address.getNeightboor()))
+                            .and(address(address.getAddress1())), pageRequest);
+        } else {
+            return repository.findAll(
+                    owner(loggedUser)
+                    .and(state(address.getState()))
+                    .and(zipcode(address.getZipcode()))
+                    .and(city(address.getCity()))
+                    .and(neightboor(address.getNeightboor()))
+                    .and(address(address.getAddress1())), pageRequest);
         }
 
     }

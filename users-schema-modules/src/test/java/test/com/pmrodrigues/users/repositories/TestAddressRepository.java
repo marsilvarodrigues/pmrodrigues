@@ -15,6 +15,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.domain.EntityScan;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -25,9 +26,11 @@ import java.time.Instant;
 import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.UUID;
+import java.util.stream.IntStream;
 
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static com.pmrodrigues.users.specifications.SpecificationAddress.owner;
+import static com.pmrodrigues.users.specifications.SpecificationAddress.state;
+import static org.junit.jupiter.api.Assertions.*;
 
 @DataJpaTest()
 @ContextConfiguration(classes = { AddressRepository.class, StateRepository.class, UserRepository.class, SpringSecurityAuditAwareImpl.class})
@@ -111,8 +114,35 @@ class TestAddressRepository {
         val saved = addressRepository.save(address);
 
 
-        val addresses = addressRepository.findByOwner(user);
-        assertTrue(addresses.contains(saved));
+        val addresses = addressRepository.findByOwner(user, PageRequest.of(0, 10));
+        assertFalse(addresses.isEmpty());
+        assertTrue(addresses.stream().toList().contains(saved));
     }
+
+    @Test
+    public void shouldFoundAll() {
+
+        val state = stateRepository.findByCode("RJ").get();
+
+        IntStream.range(1, 11).forEach( i -> {
+            val address = Address.builder()
+                    .state(state)
+                    .owner(user)
+                    .address1("TESTE_%s")
+                    .neightboor("TESTE_%")
+                    .city("TESTE")
+                    .zipcode("TESTE")
+                    .addressType(AddressType.STREET)
+                    .build();
+
+            addressRepository.save(address);
+        });
+
+        val addresses = addressRepository.findAll(state(state).and(owner(user)), PageRequest.of(0, 10));
+        assertFalse(addresses.isEmpty());
+        assertEquals(10, addresses.getTotalElements());
+
+    }
+
 
 }
