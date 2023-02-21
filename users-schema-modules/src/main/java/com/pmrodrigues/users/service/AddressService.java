@@ -104,7 +104,7 @@ public class AddressService {
 
     }
 
-    @Timed(histogram = true, value = "Address.findAll")
+    @Timed(histogram = true, value = "Address.getByID")
     @SneakyThrows
     public Address getByID(UUID id) {
         log.info("try to get address by id {}",id);

@@ -218,7 +218,7 @@ class TestUserController {
 
         given(userService.findAll(any(User.class), any(PageRequest.class))).willReturn(Page.empty());
 
-        mvc.perform(get("/users?sort=email.desc&sort=firstName.asc&sort=lastName.desc")
+        mvc.perform(get("/users?sort=email|desc&sort=firstName|asc&sort=lastName|desc")
                         .contentType(MediaType.APPLICATION_JSON))
                 .andDo(print())
                 .andExpect(status().isOk());
@@ -238,7 +238,7 @@ class TestUserController {
 
         given(userService.findAll(any(User.class), any(PageRequest.class))).willReturn(Page.empty());
 
-        mvc.perform(get("/users?sort=email.desc")
+        mvc.perform(get("/users?sort=email|desc")
                         .contentType(MediaType.APPLICATION_JSON))
                 .andDo(print())
                 .andExpect(status().isOk());

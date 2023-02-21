@@ -6,6 +6,7 @@ import com.pmrodrigues.commons.controlleradvices.ValidationErrorControllerAdvice
 import com.pmrodrigues.commons.exceptions.NotFoundException;
 import com.pmrodrigues.security.configurations.WebSecurityConfiguration;
 import com.pmrodrigues.security.exceptions.OperationNotAllowedException;
+import com.pmrodrigues.users.dtos.AddressDTO;
 import com.pmrodrigues.users.model.Address;
 import com.pmrodrigues.users.model.State;
 import com.pmrodrigues.users.model.enums.AddressType;
@@ -13,12 +14,16 @@ import com.pmrodrigues.users.rest.AddressController;
 import com.pmrodrigues.users.service.AddressService;
 import lombok.SneakyThrows;
 import lombok.val;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
@@ -216,6 +221,62 @@ class TestAddressController {
                 )
                 .andDo(print())
                 .andExpect(status().isForbidden());
+
+    }
+
+
+    @Test
+    @SneakyThrows
+    void shouldSearchAddress() {
+
+
+        val state = State.builder().id(UUID.randomUUID()).build();
+        val address = AddressDTO.builder()
+                .state(state)
+                .address1("TESTE")
+                .addressType(AddressType.STREET)
+                .city("TESTE")
+                .zipcode("TESTE")
+                .neightboor("TESTE")
+                .build();
+
+        val message = objectMapper.writeValueAsString(address);
+
+        mvc.perform(get("/addresses?page=1&size=10")
+                        .content(message)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andDo(print())
+                .andExpect(status().isOk());
+
+    }
+
+    @Test
+    @SneakyThrows
+    void shouldSearchAddressBodyEmpty() {
+
+        mvc.perform(get("/addresses?page=1&size=10")
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andDo(print())
+                .andExpect(status().isOk());
+    }
+
+    @Test
+    @SneakyThrows
+    @DisplayName("Should List All Addresses sorted")
+    void shouldGetAllUsersSortedList() {
+
+        given(service.findAll(any(Address.class), any(PageRequest.class))).willReturn(Page.empty());
+
+        mvc.perform(get("/addresses?sort=city|desc&sort=state.name|asc&sort=zipcode|desc")
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andDo(print())
+                .andExpect(status().isOk());
+
+        Sort sort = Sort.by(Sort.Order.desc("city"),
+                Sort.Order.asc("state.name"),
+                Sort.Order.desc("zipcode"));
+
+        verify(service).findAll(any(Address.class), eq(PageRequest.of(0, 50, sort)));
 
     }
 

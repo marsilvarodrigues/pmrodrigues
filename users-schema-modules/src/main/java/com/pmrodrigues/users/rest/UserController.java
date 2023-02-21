@@ -103,14 +103,14 @@ public class UserController{
                 @Min(value = 1 , message = "page size is invalid")
                 @Max(value = 100, message = "page size is bigger than expected")
                 @Valid Integer size,
-            @RequestParam(name = "sort", defaultValue = "id.desc", required = false)
+            @RequestParam(name = "sort", defaultValue = "id|desc", required = false)
             @ValuesAllowed(propName = "sort", message = "sort parameter is invalid") @Valid String[] sort,
             @RequestBody(required = false) final UserDTO user){
         log.info("List all users by {}", user);
 
         var sortBy = Stream.of(sort)
                     .map(s -> {
-                        var sortRule = s.split("\\.");
+                        var sortRule = s.split("\\|");
                         if( sortRule.length == 1) return Sort.Order.asc(sortRule[0]);
                         if(Sort.Direction.ASC == Sort.Direction.valueOf(sortRule[1].toUpperCase())){
                             return Sort.Order.asc(sortRule[0]);
