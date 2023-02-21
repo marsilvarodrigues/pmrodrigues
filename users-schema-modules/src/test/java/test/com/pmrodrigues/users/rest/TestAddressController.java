@@ -62,7 +62,7 @@ class TestAddressController {
     @SneakyThrows
     void shouldGetAddressById(){
 
-        given(service.getByID(any(UUID.class))).willReturn(Address.builder().build());
+        given(service.findById(any(UUID.class))).willReturn(Address.builder().build());
 
         mvc.perform(get(format("/addresses/%s",UUID.randomUUID()))
                 )
@@ -74,7 +74,7 @@ class TestAddressController {
     @Test
     @SneakyThrows
     void shouldntGetAddressById() {
-        given(service.getByID(any(UUID.class))).willThrow(new NotFoundException());
+        given(service.findById(any(UUID.class))).willThrow(new NotFoundException());
 
         mvc.perform(get(format("/addresses/%s",UUID.randomUUID()))
                 )
@@ -278,6 +278,30 @@ class TestAddressController {
 
         verify(service).findAll(any(Address.class), eq(PageRequest.of(0, 50, sort)));
 
+    }
+
+    @Test
+    @SneakyThrows
+    @DisplayName("Should delete address by Id")
+    void shouldDeleteUser() {
+        given(service.findById(any(UUID.class))).willReturn(new Address());
+
+        mvc.perform(delete("/addresses/" + UUID.randomUUID())
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andDo(print())
+                .andExpect(status().isOk());
+    }
+
+    @Test
+    @SneakyThrows
+    @DisplayName("Should not delete user by Id - Address Not Found")
+    void shouldNotDeleteUserNotFound() {
+        given(service.findById(any(UUID.class))).willThrow(NotFoundException.class);
+
+        mvc.perform(delete("/addresses/" + UUID.randomUUID())
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andDo(print())
+                .andExpect(status().isNotFound());
     }
 
 }

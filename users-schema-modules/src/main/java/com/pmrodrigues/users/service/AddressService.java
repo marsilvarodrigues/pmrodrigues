@@ -1,6 +1,5 @@
 package com.pmrodrigues.users.service;
 
-import com.pmrodrigues.commons.exceptions.NotFoundException;
 import com.pmrodrigues.security.exceptions.OperationNotAllowedException;
 import com.pmrodrigues.security.roles.Security;
 import com.pmrodrigues.security.utils.SecurityUtils;
@@ -56,7 +55,8 @@ public class AddressService {
     public void updateAddress(@NonNull UUID id, @NonNull Address address) throws OperationNotAllowedException {
         log.info("update the address {}", address);
 
-        val existed = repository.findById(id).orElseThrow(AddressNotFoundException::new);
+        val existed = repository.findById(id)
+                .orElseThrow(AddressNotFoundException::new);
 
         if(existed.getOwner().equals(address.getOwner()) || SecurityUtils.isUserInRole(Security.SYSTEM_ADMIN)) {
             copyProperties(existed, address, "id", "createdAt", "updateAt", "createdBy", "updateBy");
@@ -106,19 +106,42 @@ public class AddressService {
 
     @Timed(histogram = true, value = "Address.getByID")
     @SneakyThrows
-    public Address getByID(UUID id) {
+    public Address findById(UUID id) {
         log.info("try to get address by id {}",id);
         var loggedUser = userService.getAuthenticatedUser()
                 .orElseThrow(UserNotFoundException::new);
         if( SecurityUtils.isUserInRole(Security.SYSTEM_ADMIN) ) {
             return repository.findById(id)
-                    .orElseThrow(NotFoundException::new);
+                    .orElseThrow(AddressNotFoundException::new);
         }else{
             val address =  repository.findById(id)
-                    .orElseThrow(NotFoundException::new);
+                    .orElseThrow(AddressNotFoundException::new);
 
             if( address.getOwner().equals(loggedUser) ) return address;
-            else throw new NotFoundException();
+            else throw new AddressNotFoundException();
         }
+    }
+
+    @Timed(histogram = true, value = "Address.getByID")
+    @SneakyThrows
+    public void delete(Address address) {
+        log.info("try to delete address {}",address);
+
+        val toDelete = repository.findById(address.getId())
+                .orElseThrow(AddressNotFoundException::new);
+
+        if( SecurityUtils.isUserInRole(Security.SYSTEM_ADMIN) ) {
+            repository.delete(toDelete);
+        }else{
+            val loggedUser = userService.getAuthenticatedUser()
+                    .orElseThrow(UserNotFoundException::new);
+
+            if( toDelete.getOwner().equals(loggedUser) ){
+                repository.delete(toDelete);
+            }else{
+                throw new OperationNotAllowedException("User not allowed for this operation");
+            }
+        }
+
     }
 }

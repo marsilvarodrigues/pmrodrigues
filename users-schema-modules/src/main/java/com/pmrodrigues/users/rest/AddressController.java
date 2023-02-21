@@ -49,7 +49,7 @@ public class AddressController {
     )
     public ResponseEntity<Address> getAddressById(@NonNull @ApiParam(required = true) @PathVariable(name = "id") UUID id) {
         log.info("try to read address by id {}", id);
-        val address = addressService.getByID(id);
+        val address = addressService.findById(id);
         return ResponseEntity.ok(address);
     }
 
@@ -127,6 +127,24 @@ public class AddressController {
         addressService.updateAddress(id, address);
         log.info("address {} saved", address);
         return ResponseEntity.ok().build();
+    }
+
+    @Timed(histogram = true)
+    @ApiOperation(value = "Delete Address By Id", nickname = "deleteById", notes = "Delete a address by a specific id", response = Address.class, tags={ "address", })
+    @ApiResponses(value = {
+            @ApiResponse(code = 200, message = "OK"),
+            @ApiResponse(code = 404, message = "Address not found") })
+    @DeleteMapping(
+            value = "/{id}",
+            produces = { MediaType.APPLICATION_JSON_VALUE }
+    )
+    public ResponseEntity<String> deleteById(@ApiParam(required = true) @PathVariable("id") final UUID id) {
+        log.info("deleting user with id {}", id);
+        val address = addressService.findById(id);
+        addressService.delete(address);
+
+        return ResponseEntity.ok()
+                .build();
     }
 
 }
