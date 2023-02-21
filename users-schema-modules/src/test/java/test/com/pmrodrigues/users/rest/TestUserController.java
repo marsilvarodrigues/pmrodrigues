@@ -39,11 +39,11 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @ExtendWith(SpringExtension.class)
-@WebMvcTest(excludeAutoConfiguration = { WebSecurityConfiguration.class })
+@WebMvcTest(excludeAutoConfiguration = {WebSecurityConfiguration.class})
 @ContextConfiguration(classes = {
         UserController.class,
         ValidationErrorControllerAdvice.class,
-        DuplicatedKeyControllerAdvice.class} )
+        DuplicatedKeyControllerAdvice.class})
 @AutoConfigureMockMvc(addFilters = false)
 @ActiveProfiles("dev")
 class TestUserController {
@@ -57,12 +57,12 @@ class TestUserController {
     @Test
     @SneakyThrows
     @DisplayName("Should get a user by id")
-     void shouldGet()  {
+    void shouldGet() {
 
         given(userService.findById(any(UUID.class))).willReturn(new User());
 
-        mvc.perform(get(format("/users/%s",UUID.randomUUID()))
-                        )
+        mvc.perform(get(format("/users/%s", UUID.randomUUID()))
+                )
                 .andDo(print())
                 .andExpect(status().isOk());
     }
@@ -70,11 +70,11 @@ class TestUserController {
     @Test
     @SneakyThrows
     @DisplayName("Should return 404 if don't found a user")
-     void shouldNotGet() {
+    void shouldNotGet() {
         given(userService.findById(any(UUID.class))).willThrow(UserNotFoundException.class);
 
-        mvc.perform(get(format("/users/%s",UUID.randomUUID()))
-                        )
+        mvc.perform(get(format("/users/%s", UUID.randomUUID()))
+                )
                 .andDo(print())
                 .andExpect(status().isNotFound());
     }
@@ -82,7 +82,7 @@ class TestUserController {
     @Test
     @SneakyThrows
     @DisplayName("Should save a new user")
-     void shouldSaveUser() {
+    void shouldSaveUser() {
         val user = User.builder().email("test@test.com").firstName("teste")
                 .lastName("teste").build();
         given(userService.createNewUser(any(User.class))).willReturn(user);
@@ -102,7 +102,7 @@ class TestUserController {
     @Test
     @SneakyThrows
     @DisplayName("Should not save a new user. There is other saved with the same email")
-     void shouldNotSaveUserExistOtherSaved() {
+    void shouldNotSaveUserExistOtherSaved() {
 
         willThrow(DuplicateKeyException.class).given(userService).createNewUser(any(User.class));
 
@@ -124,7 +124,7 @@ class TestUserController {
     @Test
     @SneakyThrows
     @DisplayName("Should not save a new user. User not valid")
-     void shouldNotSaveUserNotValid() {
+    void shouldNotSaveUserNotValid() {
 
         val user = User.builder().build();
         val json = objectMapper.writeValueAsString(user);
@@ -142,11 +142,11 @@ class TestUserController {
     @Test
     @SneakyThrows
     @DisplayName("Should delete user by Id")
-     void shouldDeleteUser(){
+    void shouldDeleteUser() {
         given(userService.findById(any(UUID.class))).willReturn(new User());
 
         mvc.perform(delete("/users/" + UUID.randomUUID())
-                .contentType(MediaType.APPLICATION_JSON))
+                        .contentType(MediaType.APPLICATION_JSON))
                 .andDo(print())
                 .andExpect(status().isOk());
     }
@@ -154,7 +154,7 @@ class TestUserController {
     @Test
     @SneakyThrows
     @DisplayName("Should not delete user by Id - User Not Found")
-     void shouldNotDeleteUserNotFound(){
+    void shouldNotDeleteUserNotFound() {
         given(userService.findById(any(UUID.class))).willThrow(UserNotFoundException.class);
 
         mvc.perform(delete("/users/" + UUID.randomUUID())
@@ -166,7 +166,7 @@ class TestUserController {
     @Test
     @SneakyThrows
     @DisplayName("Should List all Users")
-     void shouldListAllUsers(){
+    void shouldListAllUsers() {
         given(userService.findAll(any(User.class), any(PageRequest.class))).willReturn(Page.empty());
 
         mvc.perform(get("/users")
@@ -178,7 +178,7 @@ class TestUserController {
     @Test
     @SneakyThrows
     @DisplayName("Should List all Users")
-     void shouldListAllUsersWithBody(){
+    void shouldListAllUsersWithBody() {
 
         given(userService.findAll(any(User.class), any(PageRequest.class))).willReturn(Page.empty());
 
@@ -195,10 +195,10 @@ class TestUserController {
     @Test
     @SneakyThrows
     @DisplayName("Should List a page of all user")
-     void shouldGetAPageOfAllUsers(){
+    void shouldGetAPageOfAllUsers() {
 
         given(userService.findAll(any(User.class),
-                                  any(PageRequest.class))).willReturn(Page.empty());
+                any(PageRequest.class))).willReturn(Page.empty());
 
         mvc.perform(get("/users?page=1&size=10")
                         .contentType(MediaType.APPLICATION_JSON))
@@ -207,16 +207,16 @@ class TestUserController {
 
         Sort sort = Sort.by(Sort.Order.desc("id"));
 
-        verify(userService).findAll(new User(),PageRequest.of(1, 10, sort));
+        verify(userService).findAll(new User(), PageRequest.of(1, 10, sort));
 
     }
 
     @Test
     @SneakyThrows
     @DisplayName("Should List All user sorted")
-     void shouldGetAllUsersSortedList(){
+    void shouldGetAllUsersSortedList() {
 
-        given(userService.findAll(any(User.class),any(PageRequest.class))).willReturn(Page.empty());
+        given(userService.findAll(any(User.class), any(PageRequest.class))).willReturn(Page.empty());
 
         mvc.perform(get("/users?sort=email.desc&sort=firstName.asc&sort=lastName.desc")
                         .contentType(MediaType.APPLICATION_JSON))
@@ -224,19 +224,19 @@ class TestUserController {
                 .andExpect(status().isOk());
 
         Sort sort = Sort.by(Sort.Order.desc("email"),
-                            Sort.Order.asc("firstName"),
-                            Sort.Order.desc("lastName"));
+                Sort.Order.asc("firstName"),
+                Sort.Order.desc("lastName"));
 
-        verify(userService).findAll(any(User.class),eq(PageRequest.of(0, 50, sort)));
+        verify(userService).findAll(any(User.class), eq(PageRequest.of(0, 50, sort)));
 
     }
 
     @Test
     @SneakyThrows
     @DisplayName("Should List All user sorted")
-     void shouldGetAllUsersSorted(){
+    void shouldGetAllUsersSorted() {
 
-        given(userService.findAll(any(User.class),any(PageRequest.class))).willReturn(Page.empty());
+        given(userService.findAll(any(User.class), any(PageRequest.class))).willReturn(Page.empty());
 
         mvc.perform(get("/users?sort=email.desc")
                         .contentType(MediaType.APPLICATION_JSON))
@@ -248,9 +248,9 @@ class TestUserController {
     @Test
     @SneakyThrows
     @DisplayName("Should not sort")
-     void shouldNotSort(){
+    void shouldNotSort() {
 
-        given(userService.findAll(any(User.class),any(PageRequest.class))).willReturn(Page.empty());
+        given(userService.findAll(any(User.class), any(PageRequest.class))).willReturn(Page.empty());
 
         mvc.perform(get("/users?sort=desc")
                         .contentType(MediaType.APPLICATION_JSON))
@@ -259,14 +259,13 @@ class TestUserController {
                 .andExpect(jsonPath("$.sort=desc").hasJsonPath());
 
 
-
     }
 
 
     @Test
     @SneakyThrows
-     void shouldUpdateUser(){
-        willDoNothing().given(userService).updateUser(any(UUID.class),any(User.class));
+    void shouldUpdateUser() {
+        willDoNothing().given(userService).updateUser(any(UUID.class), any(User.class));
 
         val user = User.builder()
                 .email("test@test.com")
@@ -279,17 +278,17 @@ class TestUserController {
         val json = objectMapper.writeValueAsString(user);
 
         mvc.perform(put("/users/" + user.getId())
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(json))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(json))
                 .andDo(print())
                 .andExpect(status().isOk());
     }
 
     @Test
     @SneakyThrows
-     void shouldNotUpdateUserUserNotFound(){
+    void shouldNotUpdateUserUserNotFound() {
 
-        willThrow(UserNotFoundException.class).given(userService).updateUser(any(UUID.class),any(User.class));
+        willThrow(UserNotFoundException.class).given(userService).updateUser(any(UUID.class), any(User.class));
 
         val user = User.builder()
                 .email("test@test.com")
@@ -310,9 +309,9 @@ class TestUserController {
 
     @Test
     @SneakyThrows
-     void shouldNotUpdateKeycloackIntegrationFailed(){
+    void shouldNotUpdateKeycloackIntegrationFailed() {
 
-        willThrow(KeycloakIntegrationFailed.class).given(userService).updateUser(any(UUID.class),any(User.class));
+        willThrow(KeycloakIntegrationFailed.class).given(userService).updateUser(any(UUID.class), any(User.class));
 
         val user = User.builder()
                 .email("test@test.com")

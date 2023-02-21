@@ -1,5 +1,6 @@
 package test.com.pmrodrigues.users.service;
 
+import com.pmrodrigues.commons.exceptions.NotFoundException;
 import com.pmrodrigues.security.exceptions.OperationNotAllowedException;
 import com.pmrodrigues.security.roles.Security;
 import com.pmrodrigues.security.utils.SecurityUtils;
@@ -19,7 +20,6 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.mockito.junit.jupiter.MockitoSettings;
 import org.mockito.quality.Strictness;
-import org.springframework.data.domain.PageRequest;
 
 import java.util.List;
 import java.util.Optional;
@@ -134,7 +134,7 @@ class TestAddressService {
                 Optional.of(Address.builder().owner(defaultOwner).build())
         );
 
-        service.updateAddress(toUpdate);
+        service.updateAddress(UUID.randomUUID(),toUpdate);
 
         verify(addressRepository, times(1)).save(any(Address.class));
 
@@ -146,7 +146,7 @@ class TestAddressService {
         given(addressRepository.findById(any(UUID.class))).willReturn(Optional.empty());
         val address = Address.builder().id(UUID.randomUUID()).build();
         assertThrows(AddressNotFoundException.class, () ->
-           service.updateAddress(address)
+           service.updateAddress(UUID.randomUUID(), address)
         );
     }
 
@@ -161,7 +161,7 @@ class TestAddressService {
         given(addressRepository.findById(any(UUID.class)))
                 .willReturn(Optional.of(Address.builder().owner(defaultOwner).build()));
 
-        service.updateAddress(toUpdate);
+        service.updateAddress(UUID.randomUUID(),toUpdate);
         verify(addressRepository, times(1)).save(any(Address.class));
 
     }
@@ -181,7 +181,7 @@ class TestAddressService {
         given(addressRepository.findById(any(UUID.class)))
                 .willReturn(Optional.of(Address.builder().owner(defaultOwner).build()));
 
-        assertThrows(OperationNotAllowedException.class, () -> service.updateAddress(toUpdate));
+        assertThrows(OperationNotAllowedException.class, () -> service.updateAddress(UUID.randomUUID(), toUpdate));
 
         mockStatic.close();
 
@@ -190,14 +190,62 @@ class TestAddressService {
     @Test
     void shouldListMyAddresses() {
         val addresses = mock(List.class);
-        val pageRequest = mock(PageRequest.class);
 
         given(addressRepository.findByOwner(any(User.class)))
                 .willReturn(addresses);
 
-        val pages = service.listMyAddress();
 
         assertNotNull(addresses);
+    }
+
+    @Test
+    void shouldGetAddressById() {
+
+        val mockStatic = mockStatic(SecurityUtils.class);
+        mockStatic.when(() -> SecurityUtils.isUserInRole(Security.SYSTEM_ADMIN)).thenReturn(Boolean.TRUE);
+
+        given(addressRepository.findById(any(UUID.class))).willReturn(Optional.of(new Address()));
+        assertNotNull(service.getByID(UUID.randomUUID()));
+
+        mockStatic.close();
+    }
+
+    @Test
+    void shouldGetAddressByIdOnlyMyAddress() {
+
+        val mockStatic = mockStatic(SecurityUtils.class);
+        mockStatic.when(() -> SecurityUtils.isUserInRole(Security.SYSTEM_ADMIN)).thenReturn(Boolean.FALSE);
+        val address = Address.builder().owner(defaultOwner).build();
+        given(addressRepository.findById(any(UUID.class))).willReturn(Optional.of(address));
+        assertNotNull(service.getByID(UUID.randomUUID()));
+
+        mockStatic.close();
+    }
+
+    @Test
+    void shouldntFindAddressById() {
+        val mockStatic = mockStatic(SecurityUtils.class);
+        mockStatic.when(() -> SecurityUtils.isUserInRole(Security.SYSTEM_ADMIN)).thenReturn(Boolean.TRUE);
+
+        given(addressRepository.findById(any(UUID.class))).willReturn(Optional.empty());
+
+        assertThrows(NotFoundException.class, () -> service.getByID(UUID.randomUUID()));
+
+        mockStatic.close();
+    }
+
+    @Test
+    void shouldntFindAddressByIdDifferentOwner() {
+        val mockStatic = mockStatic(SecurityUtils.class);
+        mockStatic.when(() -> SecurityUtils.isUserInRole(Security.SYSTEM_ADMIN)).thenReturn(Boolean.FALSE);
+        val otherOwner = User.builder().id(UUID.randomUUID()).build();
+        val address = Address.builder().owner(otherOwner).build();
+
+        given(addressRepository.findById(any(UUID.class))).willReturn(Optional.of(address));
+
+        assertThrows(NotFoundException.class, () -> service.getByID(UUID.randomUUID()));
+
+        mockStatic.close();
     }
 
  

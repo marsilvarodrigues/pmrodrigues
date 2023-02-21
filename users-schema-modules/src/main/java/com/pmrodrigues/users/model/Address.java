@@ -9,6 +9,8 @@ import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import javax.persistence.*;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 import java.time.Instant;
 import java.util.UUID;
 
@@ -32,25 +34,35 @@ public class Address {
 
     @Enumerated(EnumType.ORDINAL)
     @Column(name = "address_type", nullable = false)
+    @NotNull
     private AddressType addressType;
 
     @Column(name = "address1", nullable = false)
+    @NotNull
+    @NotBlank
     private String address1;
 
     @Column(name = "address2")
     private String address2;
 
     @Column(name = "zipcode", nullable = false)
+    @NotNull
+    @NotBlank
     private String zipcode;
 
     @Column(name = "neightboor", nullable = false)
+    @NotNull
+    @NotBlank
     private String neightboor;
 
     @Column(name = "city", nullable = false)
+    @NotNull
+    @NotBlank
     private String city;
 
     @ManyToOne(optional = false, targetEntity = State.class)
-    @JoinColumn(name = "state_id", referencedColumnName = "id")
+    @JoinColumn(name = "state_id", referencedColumnName = "id", nullable = false)
+    @NotNull
     private State state;
 
     @CreatedDate

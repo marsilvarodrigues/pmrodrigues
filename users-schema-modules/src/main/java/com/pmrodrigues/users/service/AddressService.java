@@ -1,5 +1,6 @@
 package com.pmrodrigues.users.service;
 
+import com.pmrodrigues.commons.exceptions.NotFoundException;
 import com.pmrodrigues.security.exceptions.OperationNotAllowedException;
 import com.pmrodrigues.security.roles.Security;
 import com.pmrodrigues.security.utils.SecurityUtils;
@@ -20,6 +21,7 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.UUID;
 
 import static com.pmrodrigues.users.specifications.SpecificationAddress.*;
 import static org.springframework.beans.BeanUtils.copyProperties;
@@ -51,10 +53,10 @@ public class AddressService {
     }
 
     @Timed(histogram = true, value= "AddressService.updateAddress")
-    public void updateAddress(@NonNull Address address) throws OperationNotAllowedException {
+    public void updateAddress(@NonNull UUID id, @NonNull Address address) throws OperationNotAllowedException {
         log.info("update the address {}", address);
 
-        val existed = repository.findById(address.getId()).orElseThrow(AddressNotFoundException::new);
+        val existed = repository.findById(id).orElseThrow(AddressNotFoundException::new);
 
         if(existed.getOwner().equals(address.getOwner()) || SecurityUtils.isUserInRole(Security.SYSTEM_ADMIN)) {
             copyProperties(existed, address, "id", "createdAt", "updateAt", "createdBy", "updateBy");
@@ -100,5 +102,23 @@ public class AddressService {
                     .and(address(address.getAddress1())), pageRequest);
         }
 
+    }
+
+    @Timed(histogram = true, value = "Address.findAll")
+    @SneakyThrows
+    public Address getByID(UUID id) {
+        log.info("try to get address by id {}",id);
+        var loggedUser = userService.getAuthenticatedUser()
+                .orElseThrow(UserNotFoundException::new);
+        if( SecurityUtils.isUserInRole(Security.SYSTEM_ADMIN) ) {
+            return repository.findById(id)
+                    .orElseThrow(NotFoundException::new);
+        }else{
+            val address =  repository.findById(id)
+                    .orElseThrow(NotFoundException::new);
+
+            if( address.getOwner().equals(loggedUser) ) return address;
+            else throw new NotFoundException();
+        }
     }
 }

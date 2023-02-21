@@ -13,3 +13,7 @@ spec:
       envFrom:
         - configMapRef:
             name: postgres-configmap
+      resources:
+        limits:
+          memory: 512Mi
+          cpu: "1"
