@@ -2,6 +2,7 @@ package com.pmrodrigues.users.model;
 
 import com.pmrodrigues.users.model.enums.AddressType;
 import lombok.*;
+import org.hibernate.validator.constraints.Length;
 import org.springframework.data.annotation.CreatedBy;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedBy;
@@ -11,6 +12,7 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Pattern;
 import java.time.Instant;
 import java.util.UUID;
 
@@ -48,6 +50,8 @@ public class Address {
     @Column(name = "zipcode", nullable = false)
     @NotNull
     @NotBlank
+    @Length(min = 9, max = 9)
+    @Pattern(regexp = "\\d{5}[-\\s]?\\d{3}")
     private String zipcode;
 
     @Column(name = "neightboor", nullable = false)

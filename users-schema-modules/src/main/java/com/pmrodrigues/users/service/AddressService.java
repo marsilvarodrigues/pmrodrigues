@@ -19,7 +19,6 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
 import java.util.UUID;
 
 import static com.pmrodrigues.users.specifications.SpecificationAddress.*;
@@ -66,17 +65,6 @@ public class AddressService {
         }
 
     }
-
-    @Timed(histogram = true, value= "AddressService.updateAddress")
-    public List<Address> listMyAddress() {
-        val owner = userService.getAuthenticatedUser()
-                .orElseThrow(UserNotFoundException::new);
-
-        log.info("list all addresses for {}" , owner);
-
-        return repository.findByOwner(owner);
-    }
-
 
     @Timed(histogram = true, value = "Address.findAll")
     @SneakyThrows

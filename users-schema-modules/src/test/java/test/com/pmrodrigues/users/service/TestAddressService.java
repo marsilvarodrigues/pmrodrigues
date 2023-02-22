@@ -21,7 +21,6 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.mockito.junit.jupiter.MockitoSettings;
 import org.mockito.quality.Strictness;
 
-import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -185,17 +184,6 @@ class TestAddressService {
 
         mockStatic.close();
 
-    }
-
-    @Test
-    void shouldListMyAddresses() {
-        val addresses = mock(List.class);
-
-        given(addressRepository.findByOwner(any(User.class)))
-                .willReturn(addresses);
-
-
-        assertNotNull(addresses);
     }
 
     @Test

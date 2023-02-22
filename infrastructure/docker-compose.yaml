@@ -25,7 +25,6 @@ services:
 
   mail:
     image: bytemark/smtp
-    restart: always
     container_name: email
     ports:
       - "25:25"
@@ -33,7 +32,6 @@ services:
   db:
     image: postgres:latest
     container_name: postgres
-    restart: always
     environment:
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=postgres
@@ -72,3 +70,4 @@ volumes:
   db:
     driver: local
   prometheus-data:
+    driver: local
