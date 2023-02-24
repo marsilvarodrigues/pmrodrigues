@@ -38,7 +38,7 @@ public class AddressController {
 
     private final AddressService addressService;
 
-    @Timed(histogram = true)
+    @Timed(value = "AddressController.getAddressById", histogram = true)
     @ApiOperation(value = "Get a address by a specific id", nickname = "getAddressById", notes = "Get a address by a specific id", response = Address.class, tags={ "address", })
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "OK", response = User.class),
@@ -53,10 +53,12 @@ public class AddressController {
         return ResponseEntity.ok(address);
     }
 
-    @Timed(histogram = true)
-    @ApiOperation(value = "List all address by", nickname = "listAll", notes = "List all addresses by", response = Address.class, tags={ "address", })
+    @Timed(value = "AddressController.listAll", histogram = true)
+    @ApiOperation(value = "List all address by", nickname = "listAll",
+            notes = "List all addresses by",
+            response = Address.class, tags={ "address", })
     @ApiResponses(value = {
-            @ApiResponse(code = 200, message = "OK", response = User.class)})
+            @ApiResponse(code = 200, message = "OK", response = Address.class)})
     @GetMapping(
             produces = { MediaType.APPLICATION_JSON_VALUE }
     )
@@ -93,7 +95,7 @@ public class AddressController {
 
     }
 
-    @Timed(histogram = true)
+    @Timed(value = "AddressController.add", histogram = true)
     @ApiOperation(value = "Create a new address", nickname = "add", response = Address.class, tags={ "address"})
     @ApiResponses(value = {
             @ApiResponse(code = 201, message = "Address successful created", response = Address.class),
@@ -112,7 +114,7 @@ public class AddressController {
                 .body(saved);
     }
 
-    @Timed(histogram = true)
+    @Timed(value = "AddressController.update", histogram = true)
     @ApiOperation(value = "Update a existed address", nickname = "update", tags={"address"})
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "Address successful updated"),
@@ -129,7 +131,7 @@ public class AddressController {
         return ResponseEntity.ok().build();
     }
 
-    @Timed(histogram = true)
+    @Timed(value = "AddressController.deleteById", histogram = true)
     @ApiOperation(value = "Delete Address By Id", nickname = "deleteById", notes = "Delete a address by a specific id", response = Address.class, tags={ "address", })
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "OK"),

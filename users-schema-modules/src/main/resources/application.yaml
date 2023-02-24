@@ -86,6 +86,11 @@ management:
     export:
       simple:
         enabled=true:
+      prometheus:
+        pushgateway:
+          enabled: true
+          base-url: http://localhost:9091
+          shutdown-operation: push
   endpoints:
     web:
       exposure:

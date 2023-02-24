@@ -6,9 +6,13 @@ rule_files:
   - alert.yml
 
 scrape_configs:
+  - job_name: 'prometheusJob'
+    scrape_interval: 5s
+    static_configs:
+      - targets: [ 'localhost:9090' ] #Servidor prometheus
   - job_name: services
     metrics_path: /actuator/prometheus
     static_configs:
       - targets:
-          - 'host.docker.internal:8143'
-          - 'host.docker.internal:8144'
+          - 'host.docker.internal:1491'
+          - 'host.docker.internal:1492'

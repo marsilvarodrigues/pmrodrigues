@@ -37,7 +37,7 @@ public class UserController{
 
     private final UserService userService;
 
-    @Timed(histogram = true)
+    @Timed(value = "UserController.add", histogram = true)
     @ApiOperation(value = "Create a new user", nickname = "add", response = User.class, tags={ "user"})
     @ApiResponses(value = {
             @ApiResponse(code = 201, message = "User successful created", response = User.class),
@@ -56,7 +56,7 @@ public class UserController{
                 .body(saved);
     }
 
-    @Timed(histogram = true)
+    @Timed(value = "UserController.update", histogram = true)
     @ApiOperation(value = "Update a existed user", nickname = "update", tags={"user"})
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "User successful updated"),
@@ -73,7 +73,7 @@ public class UserController{
     }
 
 
-    @Timed(histogram = true)
+    @Timed(value = "UserController.getUserById", histogram = true)
     @ApiOperation(value = "Get a user by a specific id", nickname = "getUserById", notes = "Get a user by a specific id", response = User.class, tags={ "user", })
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "OK", response = User.class),
@@ -89,7 +89,7 @@ public class UserController{
 
     }
 
-    @Timed(histogram = true)
+    @Timed(value = "UserController.listAll", histogram = true)
     @ApiOperation(value = "List all user by", nickname = "listAll", notes = "List all user by", response = User.class, tags={ "user", })
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "OK", response = User.class)})
@@ -129,7 +129,7 @@ public class UserController{
 
     }
 
-    @Timed(histogram = true)
+    @Timed(value = "UserController.deleteById", histogram = true)
     @ApiOperation(value = "Delete User By Id", nickname = "deleteById", notes = "Delete a user by a specific id", response = User.class, tags={ "user", })
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "OK"),

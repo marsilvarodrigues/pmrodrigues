@@ -43,7 +43,7 @@ public class KeycloakUserRepository {
         log.info("searching into keycloak users with this email {}", email);
         var response = userClient.getByEmail(email);
         if (response.getStatusCode() == HttpStatus.OK) {
-                return Optional.ofNullable(userClient.getByEmail(email).getBody())
+                return Optional.ofNullable(response.getBody())
                         .orElse(List.of())
                         .stream()
                         .collect(Collectors.toMap(UserRepresentation::getEmail, UserRepresentation::getId));

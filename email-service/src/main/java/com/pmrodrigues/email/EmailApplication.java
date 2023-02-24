@@ -9,11 +9,15 @@ import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.EnableAspectJAutoProxy;
+import org.springframework.web.servlet.config.annotation.EnableWebMvc;
+import springfox.documentation.swagger2.annotations.EnableSwagger2;
 
 @SpringBootApplication
 @EnableAspectJAutoProxy
 @ComponentScan(basePackages = "com.pmrodrigues")
 @EnableConfigurationProperties(value = EmailTemplateService.class)
+@EnableSwagger2
+@EnableWebMvc
 public class EmailApplication {
 
     public static void main(String[] args) {

@@ -15,7 +15,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.client.ClientHttpRequestInterceptor;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.web.client.RestTemplate;
 
@@ -51,15 +50,15 @@ class ITUserController {
                 .password(PASSWORD)
                 .clientId(CLIENT_ID)
                 .clientSecret(CLIENT_SECRET)
+                .scope("openid")
+                .grantType("client_credentials")
                 .resteasyClient(new ResteasyClientBuilder().connectionPoolSize(10).build())
                 .build();
         val token = keycloak.tokenManager().getAccessTokenString();
 
         this.rest = new RestTemplateBuilder().rootUri(USER_API_URL)
-                .additionalInterceptors((ClientHttpRequestInterceptor) (request, body, execution) -> {
-                    request.getHeaders().add("Authorization", "Bearer " + token);
-                    return execution.execute(request, body);
-                }).build();
+                        .defaultHeader("Authorization", "Bearer " + token)
+                        .build();
     }
 
     @Test

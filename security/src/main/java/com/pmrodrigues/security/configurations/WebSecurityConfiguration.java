@@ -60,16 +60,20 @@ public class WebSecurityConfiguration extends KeycloakWebSecurityConfigurerAdapt
         return new KeycloakSpringBootConfigResolver();
     }
 
-
     @Override
     protected void configure(HttpSecurity http) throws Exception {
         super.configure(http);
         http.cors()
             .disable()
+            .csrf()
+            .disable()
             .authorizeRequests()
+            .antMatchers("/actuator/**","/swagger-ui/**","/v2/api-docs","/configuration/ui","/swagger-resources/**","/configuration/security","/webjars/**")
+            .permitAll()
             .anyRequest()
             .authenticated();
 
     }
+
 
 }
