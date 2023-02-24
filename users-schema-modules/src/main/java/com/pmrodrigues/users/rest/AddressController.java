@@ -78,7 +78,9 @@ public class AddressController {
         var sortBy = Stream.of(sort)
                 .map(s -> {
                     var sortRule = s.split("\\|");
-                    if( sortRule.length == 1) return Sort.Order.asc(sortRule[0]);
+                    if( sortRule.length == 1) {
+                        return Sort.Order.asc(sortRule[0]);
+                    }
                     if(Sort.Direction.ASC == Sort.Direction.valueOf(sortRule[1].toUpperCase())){
                         return Sort.Order.asc(sortRule[0]);
                     }else{
@@ -88,7 +90,9 @@ public class AddressController {
                 .toList();
 
         var sample = new Address();
-        if( address != null ) sample = address.toAddress();
+        if( address != null ) {
+            sample = address.toAddress();
+        }
 
         val response = addressService.findAll(sample, PageRequest.of(page, size, Sort.by(sortBy)));
         return ResponseEntity.ok(response);

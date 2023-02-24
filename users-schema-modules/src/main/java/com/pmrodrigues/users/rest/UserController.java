@@ -111,7 +111,9 @@ public class UserController{
         var sortBy = Stream.of(sort)
                     .map(s -> {
                         var sortRule = s.split("\\|");
-                        if( sortRule.length == 1) return Sort.Order.asc(sortRule[0]);
+                        if( sortRule.length == 1) {
+                            return Sort.Order.asc(sortRule[0]);
+                        }
                         if(Sort.Direction.ASC == Sort.Direction.valueOf(sortRule[1].toUpperCase())){
                             return Sort.Order.asc(sortRule[0]);
                         }else{
@@ -122,7 +124,9 @@ public class UserController{
 
 
         var sample = new User();
-        if( user != null ) sample = user.toUser();
+        if( user != null ) {
+            sample = user.toUser();
+        }
 
         val response = userService.findAll(sample, PageRequest.of(page, size, Sort.by(sortBy)));
         return ResponseEntity.ok(response);

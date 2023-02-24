@@ -55,8 +55,9 @@ public class UserService {
         val existed = repository.findByEmail(user.getEmail());
         val existedInKeyCloak = keycloakUserRepository.getUserIdByEmail(user.getEmail());
 
-        if( existed.isPresent() || !existedInKeyCloak.isEmpty() )
+        if( existed.isPresent() || !existedInKeyCloak.isEmpty() ) {
             throw new DuplicateKeyException("I´m sorry but this was used before");
+        }
 
         user = repository.save(user);
 

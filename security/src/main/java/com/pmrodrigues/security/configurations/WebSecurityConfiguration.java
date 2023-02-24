@@ -28,7 +28,7 @@ public class WebSecurityConfiguration extends KeycloakWebSecurityConfigurerAdapt
      * Registers the KeycloakAuthenticationProvider with the authentication manager.
      */
     @Autowired
-    public void configureGlobal(AuthenticationManagerBuilder auth) throws Exception {
+    public void configureGlobal(AuthenticationManagerBuilder auth) {
         var keycloakAuthenticationProvider= keycloakAuthenticationProvider();
         keycloakAuthenticationProvider.setGrantedAuthoritiesMapper(new SimpleAuthorityMapper());
         auth.authenticationProvider(keycloakAuthenticationProvider);

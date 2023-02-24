@@ -16,11 +16,11 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 public interface EmailClient {
 
     @PostMapping(produces = APPLICATION_JSON_VALUE)
-    ResponseEntity<String> send(@NonNull @RequestBody final Email email);
+    ResponseEntity<String> send(@NonNull @RequestBody Email email);
 
 
     @GetMapping(path = "/{template}"
             , produces = APPLICATION_JSON_VALUE
             , consumes = APPLICATION_JSON_VALUE)
-    ResponseEntity<Email> getEmailByName(@NonNull @PathVariable("template") final String template);
+    ResponseEntity<Email> getEmailByName(@NonNull @PathVariable("template") String template);
 }

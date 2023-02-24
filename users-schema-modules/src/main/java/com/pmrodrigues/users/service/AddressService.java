@@ -105,8 +105,11 @@ public class AddressService {
             val address =  repository.findById(id)
                     .orElseThrow(AddressNotFoundException::new);
 
-            if( address.getOwner().equals(loggedUser) ) return address;
-            else throw new AddressNotFoundException();
+            if( address.getOwner().equals(loggedUser) ) {
+                return address;
+            }else{
+                throw new AddressNotFoundException();
+            }
         }
     }
 
