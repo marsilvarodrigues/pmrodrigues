@@ -88,8 +88,8 @@ public class UserService {
         val toDelete = repository.findById(user.getId())
                 .orElseThrow(UserNotFoundException::new);
 
+        keycloakUserRepository.delete(toDelete.getExternalId());
         repository.delete(toDelete);
-        keycloakUserRepository.delete(toDelete.getId());
         log.info("user {} deleted from database", user);
 
     }

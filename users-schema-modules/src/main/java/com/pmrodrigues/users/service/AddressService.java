@@ -51,6 +51,8 @@ public class AddressService {
     }
 
     @Timed(histogram = true, value= "AddressService.updateAddress")
+    @Transactional(propagation = Propagation.REQUIRED)
+    @SneakyThrows
     public void updateAddress(@NonNull UUID id, @NonNull Address address) throws OperationNotAllowedException {
         log.info("update the address {}", address);
 
@@ -66,7 +68,7 @@ public class AddressService {
 
     }
 
-    @Timed(histogram = true, value = "Address.findAll")
+    @Timed(histogram = true, value = "AddressService.findAll")
     @SneakyThrows
     public Page<Address> findAll(@NonNull Address address, @NonNull PageRequest pageRequest){
         log.info("list all addresses by sample {}", address);
@@ -92,7 +94,7 @@ public class AddressService {
 
     }
 
-    @Timed(histogram = true, value = "Address.getByID")
+    @Timed(histogram = true, value = "AddressService.findById")
     @SneakyThrows
     public Address findById(UUID id) {
         log.info("try to get address by id {}",id);
@@ -113,7 +115,8 @@ public class AddressService {
         }
     }
 
-    @Timed(histogram = true, value = "Address.getByID")
+    @Transactional(propagation = Propagation.REQUIRED)
+    @Timed(histogram = true, value = "AddressService.delete")
     @SneakyThrows
     public void delete(Address address) {
         log.info("try to delete address {}",address);

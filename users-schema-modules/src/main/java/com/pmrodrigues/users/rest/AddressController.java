@@ -27,7 +27,8 @@ import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
 import java.net.URI;
 import java.util.UUID;
-import java.util.stream.Stream;
+
+import static com.pmrodrigues.commons.utils.SortUtils.createSortForString;
 
 @RestController
 @Slf4j
@@ -75,19 +76,7 @@ public class AddressController {
 
         log.info("search all addresses based on page {}, size {}, sort {}, sample {}", page, size, sort, address );
 
-        var sortBy = Stream.of(sort)
-                .map(s -> {
-                    var sortRule = s.split("\\|");
-                    if( sortRule.length == 1) {
-                        return Sort.Order.asc(sortRule[0]);
-                    }
-                    if(Sort.Direction.ASC == Sort.Direction.valueOf(sortRule[1].toUpperCase())){
-                        return Sort.Order.asc(sortRule[0]);
-                    }else{
-                        return  Sort.Order.desc(sortRule[0]);
-                    }
-                })
-                .toList();
+        var sortBy = createSortForString(sort);
 
         var sample = new Address();
         if( address != null ) {
@@ -114,7 +103,7 @@ public class AddressController {
         val saved = addressService.createNewAddress(address);
         log.info("address {} saved into database",saved);
 
-        return ResponseEntity.created(URI.create("/address/" + saved.getId()))
+        return ResponseEntity.created(URI.create("/addresses/" + saved.getId()))
                 .body(saved);
     }
 

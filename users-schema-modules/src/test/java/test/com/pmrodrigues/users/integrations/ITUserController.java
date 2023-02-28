@@ -2,12 +2,16 @@ package test.com.pmrodrigues.users.integrations;
 
 import com.pmrodrigues.users.UserApplication;
 import com.pmrodrigues.users.model.User;
+import com.pmrodrigues.users.service.UserService;
 import lombok.val;
 import org.jboss.resteasy.client.jaxrs.ResteasyClientBuilder;
+import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.keycloak.admin.client.KeycloakBuilder;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.web.client.RestTemplateBuilder;
@@ -16,7 +20,10 @@ import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.RestTemplate;
+
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -25,6 +32,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 @ExtendWith(SpringExtension.class)
 @SpringBootTest( webEnvironment = SpringBootTest.WebEnvironment.MOCK,
         classes = UserApplication.class)
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class ITUserController {
     @Value("${KEYCLOAK_LOCATION:http://localhost:8080/auth}")
     private String SERVER_URL;
@@ -39,6 +47,11 @@ class ITUserController {
 
     private String USER_API_URL = "http://localhost:8143";
     private RestTemplate rest;
+
+    @Autowired
+    private UserService userService;
+
+
 
     @BeforeEach
     public void beforeEach() {
@@ -121,6 +134,18 @@ class ITUserController {
     void testListUsers() {
         val returned = rest.getForEntity(USER_API_URL + "/users", Page.class);
         assertEquals(HttpStatus.OK, returned.getStatusCode());
+    }
+
+    @AfterAll
+    @Transactional
+    public void afterAll() {
+
+        val emails = List.of("to_insert@test.com", "to_get@test.com", "to_update@test.com");
+        emails.stream()
+                .map(email -> User.builder().email(email).build())
+                .forEach(user -> userService.delete(user));
+
+
     }
 
 }

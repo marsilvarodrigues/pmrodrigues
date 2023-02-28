@@ -2,6 +2,8 @@ package com.pmrodrigues.users.model;
 
 import com.pmrodrigues.users.model.enums.AddressType;
 import lombok.*;
+import org.hibernate.annotations.Fetch;
+import org.hibernate.annotations.FetchMode;
 import org.hibernate.validator.constraints.Length;
 import org.springframework.data.annotation.CreatedBy;
 import org.springframework.data.annotation.CreatedDate;
@@ -28,10 +30,12 @@ public class Address {
 
     @Id
     @Column(name = "id", nullable = false)
+    @EqualsAndHashCode.Exclude
     private UUID id;
 
     @JoinColumn(name = "user_id", referencedColumnName = "id")
-    @ManyToOne(optional = false,targetEntity = User.class,fetch = FetchType.LAZY)
+    @ManyToOne(optional = false,targetEntity = User.class,fetch = FetchType.EAGER)
+    @Fetch(FetchMode.JOIN)
     private User owner;
 
     @Enumerated(EnumType.ORDINAL)

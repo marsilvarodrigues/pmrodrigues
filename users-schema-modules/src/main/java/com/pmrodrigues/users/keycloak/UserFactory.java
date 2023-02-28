@@ -23,7 +23,7 @@ public final class UserFactory {
             userRepresentation.setEnabled(true);
 
             val credential = new CredentialRepresentation();
-            credential.setTemporary(true);
+            credential.setTemporary(false);
             credential.setType(CredentialRepresentation.PASSWORD);
             credential.setValue(user.getPassword());
             userRepresentation.setCredentials(List.of(credential));

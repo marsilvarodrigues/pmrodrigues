@@ -92,7 +92,7 @@ class TestAddressController {
                 .address1("TESTE")
                 .addressType(AddressType.STREET)
                 .city("TESTE")
-                .zipcode("TESTE")
+                .zipcode("12345-123")
                 .neightboor("TESTE")
                 .build();
         val json = objectMapper.writeValueAsString(address);
@@ -121,7 +121,7 @@ class TestAddressController {
                 .address1("TESTE")
                 .addressType(AddressType.STREET)
                 .city("TESTE")
-                .zipcode("TESTE")
+                .zipcode("12345-123")
                 .neightboor("TESTE")
                 .build();
         val json = objectMapper.writeValueAsString(address);
@@ -147,7 +147,7 @@ class TestAddressController {
                 .address1("TESTE")
                 .addressType(AddressType.STREET)
                 .city("TESTE")
-                .zipcode("TESTE")
+                .zipcode("12345-123")
                 .neightboor("TESTE")
                 .id(UUID.randomUUID())
                 .build();
@@ -176,7 +176,7 @@ class TestAddressController {
                 .address1("TESTE")
                 .addressType(AddressType.STREET)
                 .city("TESTE")
-                .zipcode("TESTE")
+                .zipcode("12345-123")
                 .neightboor("TESTE")
                 .id(UUID.randomUUID())
                 .build();
@@ -205,7 +205,7 @@ class TestAddressController {
                 .address1("TESTE")
                 .addressType(AddressType.STREET)
                 .city("TESTE")
-                .zipcode("TESTE")
+                .zipcode("12345-123")
                 .neightboor("TESTE")
                 .id(UUID.randomUUID())
                 .build();

@@ -25,7 +25,8 @@ import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
 import java.net.URI;
 import java.util.UUID;
-import java.util.stream.Stream;
+
+import static com.pmrodrigues.commons.utils.SortUtils.createSortForString;
 
 
 @RestController
@@ -108,20 +109,7 @@ public class UserController{
             @RequestBody(required = false) final UserDTO user){
         log.info("List all users by {}", user);
 
-        var sortBy = Stream.of(sort)
-                    .map(s -> {
-                        var sortRule = s.split("\\|");
-                        if( sortRule.length == 1) {
-                            return Sort.Order.asc(sortRule[0]);
-                        }
-                        if(Sort.Direction.ASC == Sort.Direction.valueOf(sortRule[1].toUpperCase())){
-                            return Sort.Order.asc(sortRule[0]);
-                        }else{
-                            return  Sort.Order.desc(sortRule[0]);
-                        }
-                    })
-                    .toList();
-
+        var sortBy = createSortForString(sort);
 
         var sample = new User();
         if( user != null ) {

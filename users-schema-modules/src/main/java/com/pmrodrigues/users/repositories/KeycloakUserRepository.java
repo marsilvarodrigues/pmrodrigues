@@ -56,7 +56,7 @@ public class KeycloakUserRepository {
     public void delete(@NonNull final UUID userId){
         log.info("delete user by {} into keycloak", userId);
         val response = userClient.delete(userId);
-        if(response.getStatusCode() != HttpStatus.OK){
+        if(response.getStatusCode() != HttpStatus.OK && response.getStatusCode() != HttpStatus.NO_CONTENT){
             log.error("error to delete in user {} in Keycloack {} - {}", userId, response.getStatusCode(), response.getBody());
             throw new KeycloakIntegrationFailed();
         }

@@ -110,7 +110,7 @@ class TestAddressRepository {
                     .address1("TESTE_%s")
                     .neightboor("TESTE_%")
                     .city("TESTE")
-                    .zipcode("TESTE")
+                    .zipcode("12345-123")
                     .addressType(AddressType.STREET)
                     .build();
 
