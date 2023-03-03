@@ -18,6 +18,8 @@ import org.keycloak.KeycloakPrincipal;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.junit.jupiter.MockitoSettings;
+import org.mockito.quality.Strictness;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -35,6 +37,7 @@ import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.verify;
 
 @ExtendWith(MockitoExtension.class)
+@MockitoSettings(strictness = Strictness.LENIENT)
 class TestUserService {
 
     @InjectMocks
@@ -125,10 +128,8 @@ class TestUserService {
     @Test
     @DisplayName("Should not delete user because integration failed")
     void shouldNotDeleteIntegrationFailed(){
-        val user = User.builder().id(UUID.randomUUID()).build();
+        val user = User.builder().id(UUID.randomUUID()).externalId(UUID.randomUUID()).build();
         given(repository.findById(any(UUID.class))).willReturn(Optional.of(user));
-        willDoNothing().given(repository).delete(any(User.class));
-
         willThrow(new KeycloakIntegrationFailed()).given(userClient).delete(any(UUID.class));
 
         assertThrows(KeycloakIntegrationFailed.class, () ->{

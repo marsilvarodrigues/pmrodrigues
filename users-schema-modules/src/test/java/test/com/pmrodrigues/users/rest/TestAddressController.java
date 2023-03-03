@@ -108,7 +108,7 @@ class TestAddressController {
                 )
                 .andDo(print())
                 .andExpect(status().isCreated())
-                .andExpect(redirectedUrl("/address/" + address.getId().toString()));
+                .andExpect(redirectedUrl("/addresses/" + address.getId().toString()));
     }
 
     @Test

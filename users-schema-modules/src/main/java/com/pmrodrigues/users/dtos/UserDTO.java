@@ -1,5 +1,6 @@
 package com.pmrodrigues.users.dtos;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.pmrodrigues.users.model.User;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -13,6 +14,7 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
+@JsonInclude(JsonInclude.Include.NON_EMPTY)
 public class UserDTO implements Serializable {
 
     private String firstName;
