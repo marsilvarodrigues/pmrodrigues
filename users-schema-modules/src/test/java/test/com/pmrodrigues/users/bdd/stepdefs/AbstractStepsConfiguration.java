@@ -1,6 +1,7 @@
-package test.com.pmrodrigues.users.bdd;
+package test.com.pmrodrigues.users.bdd.stepdefs;
 
 import lombok.NonNull;
+import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 import org.apache.http.HttpHeaders;
@@ -19,7 +20,7 @@ import org.springframework.web.client.RestTemplate;
 import java.net.URI;
 
 @Slf4j
-abstract class AbstractIntegrationService {
+abstract class AbstractStepsConfiguration {
     protected String API_URL = "http://localhost:8143";
 
     @Value("${KEYCLOAK_LOCATION:http://localhost:8080/auth}")
@@ -77,5 +78,20 @@ abstract class AbstractIntegrationService {
         });
 
         return rest;
+    }
+
+    @SneakyThrows
+    protected void setValue(String propertyName, String newValue, Object o) {
+        val property = o.getClass().getDeclaredField(propertyName);
+        property.setAccessible(true);
+        property.set(o, newValue);
+    }
+
+    @SneakyThrows
+    protected Object getValue(String propertyName, Object o) {
+        val property = o.getClass().getDeclaredField(propertyName);
+        property.setAccessible(true);
+        return property.get(o);
+
     }
 }

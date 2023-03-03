@@ -17,41 +17,22 @@ Feature: Management Users
       | email                | firstName   | lastName     | propertyName | change_value   |
       | "to_update@test.com" | "to_update" | "to_update"  | "firstName"  | "change_value" |
 
-  Scenario: Search user by email
+  Scenario Outline: Search user by field
     Given the following users
         | email              | firstName                      | lastName       |
         | to_get@test.com    | to_get_firstName               | to_get         |
         | to_update@test.com | to_update_firstName            | to_update      |
         | to_insert@test.com | new_user_firstName             | insert         |
     And An "admin" user
-    When I filter by "email" as "to_get@test.com"
+    When I filter by "<propertyName>" as "<value>"
     Then returned users list as
         | email                | firstName              | lastName         |
         | to_get@test.com      | to_get_firstName       | to_get           |
-
-  Scenario: Search user by firstName
-    Given the following users
-      | email              | firstName                      | lastName       |
-      | to_get@test.com    | to_get_firstName               | to_get         |
-      | to_update@test.com | to_update_firstName            | to_update      |
-      | to_insert@test.com | new_user_firstName             | insert         |
-    And An "admin" user
-    When I filter by "firstName" as "to_get"
-    Then returned users list as
-      | email                | firstName              | lastName         |
-      | to_get@test.com      | to_get_firstName       | to_get           |
-
-  Scenario: Search user by lastName
-    Given the following users
-      | email              | firstName                      | lastName       |
-      | to_get@test.com    | to_get_firstName               | to_get         |
-      | to_update@test.com | to_update_firstName            | to_update      |
-      | to_insert@test.com | new_user_firstName             | insert         |
-    And An "admin" user
-    When I filter by "lastName" as "to_get"
-    Then returned users list as
-      | email                | firstName              | lastName         |
-      | to_get@test.com      | to_get_firstName       | to_get           |
+    Examples:
+      | propertyName                | value            |
+      | email                       | to_get@test.com  |
+      | firstName                   | to_get_firstName |
+      | lastName                    | to_get           |
 
   Scenario: List all user
     Given the following users
@@ -66,3 +47,32 @@ Feature: Management Users
       | to_insert@test.com   | new_user_firstName             | insert         |
       | to_get@test.com      | to_get_firstName               | to_get         |
       | to_update@test.com   | to_update_firstName            | to_update      |
+
+  Scenario: Delete User
+    Given the following users
+      | email              | firstName                      | lastName       |
+      | to_get@test.com    | to_get_firstName               | to_get         |
+      | to_update@test.com | to_update_firstName            | to_update      |
+      | to_insert@test.com | new_user_firstName             | insert         |
+    And An "admin" user
+    And Id by "email" of "to_get@test.com"
+    When Delete user
+    Then returned users list as
+      | email                | firstName                      | lastName       |
+      | to_insert@test.com   | new_user_firstName             | insert         |
+      | to_update@test.com   | to_update_firstName            | to_update      |
+
+  Scenario Outline: Get User By Id
+    Given the following users
+      | email              | firstName                      | lastName       |
+      | to_get@test.com    | to_get_firstName               | to_get         |
+      | to_update@test.com | to_update_firstName            | to_update      |
+      | to_insert@test.com | new_user_firstName             | insert         |
+    And An "admin" user
+    When Id by "email" of "to_get@test.com"
+    Then User has "<propertyName>" equals to "<value>"
+    Examples:
+      | propertyName                | value                        |
+      | email                       | to_get@test.com              |
+      | firstName                   | to_get_firstName             |
+      | lastName                    | to_get                       |
