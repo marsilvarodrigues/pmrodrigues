@@ -11,4 +11,5 @@
     <include file="address/1_create_table_state.xml" relativeToChangelogFile="true"  />
     <include file="address/2_create_table_address.xml" relativeToChangelogFile="true"  />
     <include file="address/3_alter_table_state.xml" relativeToChangelogFile="true"  />
+    <include file="address/4_alter_table_address.xml" relativeToChangelogFile="true"  />
 </databaseChangeLog>

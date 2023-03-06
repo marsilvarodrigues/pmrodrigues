@@ -14,5 +14,5 @@ import org.springframework.boot.test.context.SpringBootTest;
 @SpringBootTest( webEnvironment = SpringBootTest.WebEnvironment.MOCK,
         classes = UserApplication.class)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-public class UserCucumberRunnerIT {
+public class ITUserCucumberRunner {
 }

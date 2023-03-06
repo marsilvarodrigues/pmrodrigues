@@ -1,7 +1,9 @@
 package test.com.pmrodrigues.users.bdd.stepdefs;
 
-import lombok.*;
+import lombok.NonNull;
+import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
+import lombok.val;
 import org.apache.http.HttpHeaders;
 import org.apache.http.client.methods.HttpEntityEnclosingRequestBase;
 import org.apache.http.client.methods.HttpUriRequest;
@@ -18,8 +20,12 @@ import test.com.pmrodrigues.users.helper.HelperPage;
 
 import java.lang.reflect.ParameterizedType;
 import java.net.URI;
+import java.util.HashMap;
 import java.util.List;
-import java.util.UUID;
+import java.util.Map;
+
+import static java.lang.ThreadLocal.withInitial;
+import static test.com.pmrodrigues.users.bdd.ContextAttribute.*;
 
 @Slf4j
 public abstract class AbstractStepsConfiguration<E> {
@@ -33,16 +39,13 @@ public abstract class AbstractStepsConfiguration<E> {
     @Value("${KEYCLOAK_CLIENT_SECRET:gNjirmWqaUiP4NWREgRDpbzJpnq7WSZD}")
     private String CLIENT_SECRET;
 
+    private static final ThreadLocal<Map<String, Object>> context = withInitial(HashMap::new);
+
     private RestTemplate rest;
 
-    private URI response;
-
     private ResponseEntity returned;
-    @Setter
-    @Getter
-    private UUID id;
 
-    public RestTemplate generateToken(@NonNull String username, @NonNull String password) {
+    protected RestTemplate generateToken(@NonNull String username, @NonNull String password) {
         val keycloak = KeycloakBuilder
                 .builder()
                 .serverUrl(SERVER_URL)
@@ -84,9 +87,18 @@ public abstract class AbstractStepsConfiguration<E> {
                 }
             }
         });
-
+        put(REST_TEMPLATE, rest);
         return rest;
     }
+
+    protected void put(String attribute, Object value) {
+        this.context.get().put(attribute, value);
+    }
+
+    protected Object get(String attribute) {
+        return this.context.get().get(attribute);
+    }
+
 
     @SneakyThrows
     protected void setValue(String propertyName, String newValue, Object o) {
@@ -103,24 +115,30 @@ public abstract class AbstractStepsConfiguration<E> {
 
     }
 
-    protected void postForLocation(String url, E e) {
-        this.response = this.rest.postForLocation(url, e);
-        getForEntity(API_URL + this.response);
+    protected ResponseEntity<E> postForLocation(String url, E e, String id, String entity) {
+        put(RESPONSE_URL, getRest().postForLocation(url, e));
+        return getForEntity(API_URL + get(RESPONSE_URL), id, entity);
     }
 
-    protected ResponseEntity<E> getForEntity(String url) {
-        this.returned = this.rest.getForEntity(url, this.getParameterizedType());
-        this.id = (UUID) getValue("id", this.returned.getBody());
-        return this.returned;
+    private RestTemplate getRest() {
+        if( this.rest == null ) this.rest = (RestTemplate) get(REST_TEMPLATE);
+        return rest;
     }
 
-    protected void updateEntity(E e) {
+    protected ResponseEntity<E> getForEntity(String url, String id, String entity) {
+        this.returned = getRest().getForEntity(url, this.getParameterizedType());
+        put(entity, returned.getBody());
+        put(id, getValue("id", returned.getBody()));
+        return returned;
+    }
+
+    protected void updateEntity(String url, E e) {
         val httpEntity = new HttpEntity<E>(e);
-        this.returned = rest.exchange(API_URL + response, HttpMethod.PUT, httpEntity, e.getClass());
+        this.returned = getRest().exchange(API_URL + url, HttpMethod.PUT, httpEntity, e.getClass());
     }
 
     protected void searchBySample(String api, HttpMethod httpMethod, HttpEntity httpEntity, ParameterizedTypeReference typeReference) {
-        this.returned = rest.exchange(API_URL + api, httpMethod, httpEntity, typeReference);
+        this.returned = getRest().exchange(API_URL + api, httpMethod, httpEntity, typeReference);
 
 
     }
@@ -136,7 +154,7 @@ public abstract class AbstractStepsConfiguration<E> {
     }
 
     protected void delete(String url) {
-        this.rest.delete(url);
+        getRest().delete(url);
     }
 
     protected List<E> listEntity() {

@@ -26,7 +26,7 @@ import static org.junit.jupiter.api.Assertions.*;
 @SpringBootTest( webEnvironment = SpringBootTest.WebEnvironment.MOCK,
         classes = UserApplication.class)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-class ITAddressController extends AbstractITController {
+class AddressController extends AbstractITController {
 
     @Autowired
     private StateRepository stateRepository;

@@ -7,6 +7,7 @@ import com.pmrodrigues.users.model.User;
 import com.pmrodrigues.users.service.UserService;
 import io.cucumber.java.After;
 import io.cucumber.java.DataTableType;
+import io.cucumber.java.ParameterType;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
@@ -29,6 +30,8 @@ import java.util.List;
 import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static test.com.pmrodrigues.users.bdd.ContextAttribute.USER;
+import static test.com.pmrodrigues.users.bdd.ContextAttribute.USER_ID;
 
 @ExtendWith({SpringExtension.class})
 @SpringBootTest( webEnvironment = SpringBootTest.WebEnvironment.MOCK,
@@ -49,6 +52,15 @@ public class UserStepsConfigurations extends AbstractStepsConfiguration<User> {
                 .build();
     }
 
+    @ParameterType(value = ".*", name = "email")
+    public User getByEmail(String email){
+        return userService.findAll(User.builder().email(email).build(), PageRequest.of(0,1))
+                .getContent()
+                .stream()
+                .findFirst()
+                .get();
+    }
+
     @Given("An {string} user")
     public void givenAnNewUserAsUserType(String userType) {
         generateToken("admin", "admin");
@@ -64,18 +76,21 @@ public class UserStepsConfigurations extends AbstractStepsConfiguration<User> {
     public void givenThenIdOfUserByPropertyValue(String propertyName, String value) {
         val user = new User();
         setValue(propertyName, value, user);
-
-        super.setId(userService.findAll(user, PageRequest.of(0,1))
+        val id = userService.findAll(user, PageRequest.of(0,1))
                 .stream()
                 .findFirst().map(User::getId)
-                .orElse(null));
+                .orElse(null);
+
+        super.put(USER_ID, id);
+
     }
 
     @Given("a new user as {string} , {string} and {string}")
     public void givenANewUserAs(String email, String firstName , String lastName) {
         var user = User.builder().firstName(firstName).lastName(lastName).email(email).build();
         user = userService.createNewUser(user);
-
+        put(USER , user);
+        put(USER_ID, user.getId());
         generateToken(user.getEmail(), user.getPassword());
 
     }
@@ -89,7 +104,7 @@ public class UserStepsConfigurations extends AbstractStepsConfiguration<User> {
                 .lastName(lastName)
                 .build();
 
-        super.postForLocation("/users", user);
+        super.postForLocation("/users", user, USER_ID, USER);
 
 
     }
@@ -97,14 +112,13 @@ public class UserStepsConfigurations extends AbstractStepsConfiguration<User> {
     @SneakyThrows
     @When("Update {string} to {string}")
     public void whenUpdatePropertyOfUser(String propertyName, String newValue) {
-        val returned = super.getForEntity("/users/" + super.getId());
+        val returned = super.getForEntity("/users/" + get(USER_ID), USER_ID, USER);
         assertEquals(HttpStatus.OK, returned.getStatusCode());
 
         val user = returned.getBody();
         setValue(propertyName, newValue, user);
 
-        val entity = new HttpEntity(user);
-        super.updateEntity(user);
+        super.updateEntity("/users/" + get(USER_ID), user);
 
     }
 
@@ -131,7 +145,7 @@ public class UserStepsConfigurations extends AbstractStepsConfiguration<User> {
 
     @When("Delete user")
     public void deleteUser() {
-        super.delete("/users/" + super.getId());
+        super.delete("/users/" + get(USER_ID));
         whenIListAllUser();
 
     }
@@ -141,9 +155,11 @@ public class UserStepsConfigurations extends AbstractStepsConfiguration<User> {
     @Then("User has a {string} defined")
     public void thenCheckIfThePropertyWasSet(String propertyName) {
 
-        getForEntity("/users/" + this.getEntity().getId());
+        var user = (User)get(USER);
+
+        getForEntity("/users/" + user.getId(), USER_ID, USER);
         checkIfStatusCodeIsStatusCode(200);
-        val user = super.getEntity();
+        user = super.getEntity();
 
         assertNotNull(getValue(propertyName, user));
     }
@@ -153,9 +169,9 @@ public class UserStepsConfigurations extends AbstractStepsConfiguration<User> {
     @Then("User has firstName equals to {string} and lastName equals to {string} and email equals to {string}")
     public void checkIfUserReturnedCorrectly(String firstName, String lastName, String email) {
 
-        getForEntity("/users/" + super.getId());
+        getForEntity("/users/" + get(USER_ID), USER_ID, USER);
         checkIfStatusCodeIsStatusCode(200);
-        val user = super.getEntity();
+        val user = (User)get(USER);
 
         assertEquals(user.getFirstName(), firstName);
         assertEquals(user.getLastName(), lastName);
@@ -174,7 +190,7 @@ public class UserStepsConfigurations extends AbstractStepsConfiguration<User> {
     @Then("User has {string} equals to {string}")
     public void checkValue(String propertyName, String value) {
 
-        super.getForEntity("/users/" + super.getId());
+        super.getForEntity("/users/" + get(USER_ID), USER_ID, USER);
         checkIfStatusCodeIsStatusCode(200);
         val user = super.getEntity();
 

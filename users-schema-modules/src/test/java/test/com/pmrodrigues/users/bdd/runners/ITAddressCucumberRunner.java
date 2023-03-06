@@ -17,5 +17,5 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 @SpringBootTest( webEnvironment = SpringBootTest.WebEnvironment.MOCK,
         classes = UserApplication.class)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-public class AddressCucumberRunnerIT {
+public class ITAddressCucumberRunner {
 }
