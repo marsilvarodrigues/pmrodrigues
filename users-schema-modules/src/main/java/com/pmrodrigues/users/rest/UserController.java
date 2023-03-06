@@ -26,7 +26,7 @@ import javax.validation.constraints.Min;
 import java.net.URI;
 import java.util.UUID;
 
-import static com.pmrodrigues.commons.utils.SortUtils.createSortForString;
+import static com.pmrodrigues.commons.data.utils.SortUtils.createSortForString;
 
 
 @RestController

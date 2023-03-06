@@ -1,4 +1,4 @@
-package com.pmrodrigues.commons.utils;
+package com.pmrodrigues.commons.data.utils;
 
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
@@ -11,7 +11,6 @@ import java.util.stream.Stream;
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class SortUtils {
 
-    //TODO move to specific project
     public static List<Sort.Order> createSortForString(@NonNull String... sort){
         return Stream.of(sort)
                 .map(s -> {
