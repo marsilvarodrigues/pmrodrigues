@@ -6,6 +6,7 @@ import com.pmrodrigues.users.model.User;
 import com.pmrodrigues.users.model.enums.AddressType;
 import com.pmrodrigues.users.repositories.StateRepository;
 import com.pmrodrigues.users.service.AddressService;
+import io.cucumber.java.DataTableType;
 import io.cucumber.java.ParameterType;
 import io.cucumber.java.en.And;
 import io.cucumber.java.en.Given;
@@ -13,9 +14,11 @@ import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
 import lombok.val;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
+import java.util.Map;
+
+import static org.junit.jupiter.api.Assertions.*;
 import static test.com.pmrodrigues.users.bdd.ContextAttribute.*;
 
 public class AddressStepsConfigurations  extends AbstractStepsConfiguration<Address> {
@@ -35,6 +38,16 @@ public class AddressStepsConfigurations  extends AbstractStepsConfiguration<Addr
     @ParameterType(value = ".*", name = "state")
     public State getState(String state) {
         return stateRepository.findByCode(state).get();
+    }
+
+    @DataTableType
+    public User addresEntry(Map<String, String> entry) {
+
+        return User.builder()
+                .email(entry.get("email"))
+                .firstName(entry.get("firstName"))
+                .lastName(entry.get("lastName"))
+                .build();
     }
 
 
@@ -70,13 +83,17 @@ public class AddressStepsConfigurations  extends AbstractStepsConfiguration<Addr
         assertEquals(expectedValue, value);
     }
 
-    @When("I delete my address by {string}")
-    public void whenIDeleteMyAddressByProperty(String propertyName) {
-
+    @When("I delete my address")
+    public void whenIDeleteMyAddressByProperty() {
+        delete(ADDRESSES + "/" + get(ADDRESS_ID));
     }
 
     @Then("My Address needs to be empty")
     public void thenIDontHaveAListOfAddress() {
+
+        val addresses = addressService.findAll(Address.builder().owner((User) get(USER)).build(), PageRequest.of(0,1000));
+        assertTrue(addresses.isEmpty());
+
     }
 
     @And("Owner is the who logged")
@@ -85,5 +102,10 @@ public class AddressStepsConfigurations  extends AbstractStepsConfiguration<Addr
         val logged = (User)get(USER);
 
         assertEquals(logged, address.getOwner());
+    }
+
+    @Given("a list of address as")
+    public void givenMyListOfAddress() {
+
     }
 }
