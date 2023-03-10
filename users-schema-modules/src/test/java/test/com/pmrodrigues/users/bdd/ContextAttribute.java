@@ -7,6 +7,5 @@ public interface ContextAttribute {
     String USER_ID = "user_id";
     String ADDRESS = "address";
     String ADDRESS_ID = "address_id";
-
     String REST_TEMPLATE = "rest";
 }

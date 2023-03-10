@@ -7,17 +7,20 @@ import com.pmrodrigues.users.model.User;
 import com.pmrodrigues.users.model.enums.AddressType;
 import com.pmrodrigues.users.repositories.AddressRepository;
 import com.pmrodrigues.users.repositories.StateRepository;
+import com.pmrodrigues.users.service.UserService;
+import io.cucumber.java.After;
 import io.cucumber.java.DataTableType;
 import io.cucumber.java.ParameterType;
 import io.cucumber.java.en.And;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
+import lombok.RequiredArgsConstructor;
 import lombok.val;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpMethod;
+import org.springframework.transaction.annotation.Transactional;
 import test.com.pmrodrigues.users.helper.HelperPage;
 
 import java.util.List;
@@ -27,14 +30,16 @@ import static com.pmrodrigues.users.specifications.SpecificationAddress.owner;
 import static org.junit.jupiter.api.Assertions.*;
 import static test.com.pmrodrigues.users.bdd.ContextAttribute.*;
 
+@RequiredArgsConstructor
 public class AddressStepsConfigurations  extends AbstractStepsConfiguration<Address> {
 
     public static final String ADDRESSES = "/addresses";
-    @Autowired
-    private AddressRepository addressRepository;
+    private final AddressRepository addressRepository;
 
-    @Autowired
-    private StateRepository stateRepository;
+
+    private final StateRepository stateRepository;
+
+    private final UserService userService;
 
     @ParameterType(value = ".*", name = "addressType")
     public AddressType getAddressType(String addressType) {
@@ -140,5 +145,16 @@ public class AddressStepsConfigurations  extends AbstractStepsConfiguration<Addr
 
         assertEquals(expectedAddress.size(), founded.size());
         assertTrue(founded.stream().allMatch(u -> expectedAddress.contains(u)));
+    }
+
+    @After
+    @Transactional
+    public void afterAll() {
+
+        val user = (User)get(USER);
+        val addresses = addressRepository.findAll(owner(user));
+        addressRepository.deleteAll(addresses);
+        userService.delete(user);
+
     }
 }
