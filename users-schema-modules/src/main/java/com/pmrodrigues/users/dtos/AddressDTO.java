@@ -1,5 +1,6 @@
 package com.pmrodrigues.users.dtos;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.pmrodrigues.users.model.Address;
 import com.pmrodrigues.users.model.State;
 import com.pmrodrigues.users.model.User;
@@ -13,8 +14,8 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
+@JsonInclude(JsonInclude.Include.NON_EMPTY)
 public class AddressDTO {
-
 
     private AddressType addressType;
     private String address1;
