@@ -1,11 +1,12 @@
 package test.com.pmrodrigues.users.bdd.stepdefs;
 
+import com.pmrodrigues.users.dtos.AddressDTO;
 import com.pmrodrigues.users.model.Address;
 import com.pmrodrigues.users.model.State;
 import com.pmrodrigues.users.model.User;
 import com.pmrodrigues.users.model.enums.AddressType;
+import com.pmrodrigues.users.repositories.AddressRepository;
 import com.pmrodrigues.users.repositories.StateRepository;
-import com.pmrodrigues.users.service.AddressService;
 import io.cucumber.java.DataTableType;
 import io.cucumber.java.ParameterType;
 import io.cucumber.java.en.And;
@@ -14,10 +15,15 @@ import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
 import lombok.val;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.PageRequest;
+import org.springframework.core.ParameterizedTypeReference;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpMethod;
+import test.com.pmrodrigues.users.helper.HelperPage;
 
+import java.util.List;
 import java.util.Map;
 
+import static com.pmrodrigues.users.specifications.SpecificationAddress.owner;
 import static org.junit.jupiter.api.Assertions.*;
 import static test.com.pmrodrigues.users.bdd.ContextAttribute.*;
 
@@ -25,7 +31,7 @@ public class AddressStepsConfigurations  extends AbstractStepsConfiguration<Addr
 
     public static final String ADDRESSES = "/addresses";
     @Autowired
-    private AddressService addressService;
+    private AddressRepository addressRepository;
 
     @Autowired
     private StateRepository stateRepository;
@@ -41,13 +47,15 @@ public class AddressStepsConfigurations  extends AbstractStepsConfiguration<Addr
     }
 
     @DataTableType
-    public User addresEntry(Map<String, String> entry) {
+    public Address addresEntry(Map<String, String> entry) {
 
-        return User.builder()
-                .email(entry.get("email"))
-                .firstName(entry.get("firstName"))
-                .lastName(entry.get("lastName"))
-                .build();
+            return Address.builder().state(this.getState(entry.get("state")))
+                    .addressType(this.getAddressType(entry.get("addressType")))
+                    .address1(entry.get("address"))
+                    .zipcode(entry.get("zipcode"))
+                    .neightboor(entry.get("neightboor"))
+                    .city(entry.get("city"))
+                    .build();
     }
 
 
@@ -91,7 +99,7 @@ public class AddressStepsConfigurations  extends AbstractStepsConfiguration<Addr
     @Then("My Address needs to be empty")
     public void thenIDontHaveAListOfAddress() {
 
-        val addresses = addressService.findAll(Address.builder().owner((User) get(USER)).build(), PageRequest.of(0,1000));
+        val addresses = addressRepository.findAll(owner((User) get(USER)));
         assertTrue(addresses.isEmpty());
 
     }
@@ -105,7 +113,32 @@ public class AddressStepsConfigurations  extends AbstractStepsConfiguration<Addr
     }
 
     @Given("a list of address as")
-    public void givenMyListOfAddress() {
+    public void givenMyListOfAddress(List<Address> addresses) {
+        addresses.stream()
+                .forEach(a -> {
+                    val user = (User) get(USER);
+                    a.setOwner(user);
+                    a.setCreatedBy(user.getId());
+                    a.setUpdatedBy(user.getId());
+                    addressRepository.save(a);
+                });
 
+    }
+
+    @When("I ask to list my address will return")
+    public void returnMyListOfAddress() {
+
+        val address = new AddressDTO();
+        val entity = new HttpEntity<>(address);
+        super.searchBySample("/addresses", HttpMethod.GET, entity, new ParameterizedTypeReference<HelperPage<Address>>(){});
+    }
+
+    @Then("my address list is")
+    public void willReturn(List<Address> expectedAddress) {
+
+        val founded = super.listEntity();
+
+        assertEquals(expectedAddress.size(), founded.size());
+        assertTrue(founded.stream().allMatch(u -> expectedAddress.contains(u)));
     }
 }
