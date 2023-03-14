@@ -6,8 +6,8 @@ Feature: Management Addresses
     Then Address has a "<propertyName>" defined
     And Owner is the who logged
     Examples:
-    | email         | firstName | lastName | state | addressType | address | zipcode   | neightboor | city  | propertyName |
-    | test@test.com | test      | test     | RJ    | STREET      | teste   | 22222-222 | teste      | teste | id           |
+    | email                 | firstName | lastName | state | addressType | address | zipcode   | neightboor | city  | propertyName |
+    | test@test_address.com | test      | test     | RJ    | STREET      | teste   | 22222-222 | teste      | teste | id           |
 
   Scenario Outline: Update my address
     Given a new user as "<email>" , "<firstName>" and "<lastName>"
@@ -15,9 +15,9 @@ Feature: Management Addresses
     When I change "<propertyName>" to "<newValue>"
     Then Address with "<propertyName>" is equals to "<newValue>"
     Examples:
-      | email         | firstName | lastName | state | addressType | address | zipcode   | neightboor | city  | propertyName   | newValue |
-      | test@test.com | test      | test     | RJ    | STREET      | teste   | 22222-222 | teste      | teste | city           | XPTO     |
-      | test@test.com | test      | test     | RJ    | STREET      | teste   | 22222-222 | teste      | teste | address        | XPTO     |
+      | email                 | firstName | lastName | state | addressType | address | zipcode   | neightboor | city  | propertyName   | newValue |
+      | test@test_address.com | test      | test     | RJ    | STREET      | teste   | 22222-222 | teste      | teste | city           | XPTO     |
+      | test@test_address.com | test      | test     | RJ    | STREET      | teste   | 22222-222 | teste      | teste | address1       | XPTO     |
 
   Scenario Outline: Delete my Address
     Given a new user as "<email>" , "<firstName>" and "<lastName>"
@@ -25,11 +25,11 @@ Feature: Management Addresses
     When I delete my address
     Then My Address needs to be empty
     Examples:
-      | email         | firstName | lastName | state | addressType | address | zipcode   | neightboor | city  |
-      | test@test.com | test      | test     | RJ    | STREET      | teste   | 22222-222 | teste      | teste |
+      | email                 | firstName | lastName | state | addressType | address | zipcode   | neightboor | city  |
+      | test@test_address.com | test      | test     | RJ    | STREET      | teste   | 22222-222 | teste      | teste |
 
   Scenario: List my users
-    Given a new user as "test@test.com" , "test" and "test"
+    Given a new user as "test@test_address.com" , "test" and "test"
     And a list of address as
       | state | addressType | address | zipcode   | neightboor | city  |
       | RJ    | STREET      | teste   | 22222-222 | teste      | teste |
@@ -46,4 +46,17 @@ Feature: Management Addresses
       | RS    | STREET      | teste   | 44444-444 | teste      | teste |
       | RN    | STREET      | teste   | 55555-555 | teste      | teste |
 
+  Scenario: Search by state from my address list
+    Given a new user as "test@test_address.com" , "test" and "test"
+    And a list of address as
+      | state | addressType | address | zipcode   | neightboor | city           |
+      | RJ    | STREET      | teste   | 22222-222 | teste      | Rio de Janeiro |
+      | AC    | AVENUE      | teste   | 11111-111 | teste      | Rio Branco     |
+      | SP    | ROAD        | teste   | 33333-333 | teste      | São Paulo      |
+      | RS    | SQUARE      | teste   | 44444-444 | teste      | Porto Alegre   |
+      | RN    | STREET      | teste   | 55555-555 | teste      | Natal          |
+    When I search by state RJ
+    Then my address list is
+      | state | addressType | address | zipcode   | neightboor | city           |
+      | RJ    | STREET      | teste   | 22222-222 | teste      | Rio de Janeiro |
 

@@ -10,7 +10,7 @@ import test.com.pmrodrigues.users.bdd.CucumberSpringConfiguration;
 
 
 @RunWith(Cucumber.class)
-@CucumberOptions(plugin = {"pretty", "html:target/cucumber-report.html", "summary"},
+@CucumberOptions(plugin = {"pretty", "html:target/cucumber-user-report.html", "summary"},
         dryRun = true,
         monochrome = true,
         features = "src/test/resources/features/users.feature",

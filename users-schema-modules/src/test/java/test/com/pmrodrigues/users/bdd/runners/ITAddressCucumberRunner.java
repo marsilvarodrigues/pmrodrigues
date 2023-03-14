@@ -11,7 +11,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 
 @RunWith(Cucumber.class)
-@CucumberOptions(plugin = {"pretty", "html:target/cucumber-report.html", "summary"},
+@CucumberOptions(plugin = {"pretty", "html:target/cucumber-address-report.html", "summary"},
         dryRun = true,
         monochrome = true,
         features = "src/test/resources/features/addresses.feature",

@@ -60,7 +60,7 @@ public class AddressService {
                 .orElseThrow(AddressNotFoundException::new);
 
         if(existed.getOwner().equals(address.getOwner()) || SecurityUtils.isUserInRole(Security.SYSTEM_ADMIN)) {
-            copyProperties(existed, address, "id", "createdAt", "updateAt", "createdBy", "updateBy");
+            copyProperties(address, existed, "id", "createdAt", "updateAt", "createdBy", "updateBy");
             repository.save(existed);
         } else {
             throw new OperationNotAllowedException("User not allowed for this operation");

@@ -36,7 +36,6 @@ public class AddressStepsConfigurations  extends AbstractStepsConfiguration<Addr
     public static final String ADDRESSES = "/addresses";
     private final AddressRepository addressRepository;
 
-
     private final StateRepository stateRepository;
 
     private final UserService userService;
@@ -156,5 +155,12 @@ public class AddressStepsConfigurations  extends AbstractStepsConfiguration<Addr
         addressRepository.deleteAll(addresses);
         userService.delete(user);
 
+    }
+
+    @When("I search by state {state}")
+    public void iSearchByStateRJ(State state) {
+        val address = AddressDTO.builder().state(state).build();
+        val entity = new HttpEntity<>(address);
+        super.searchBySample("/addresses", HttpMethod.GET, entity, new ParameterizedTypeReference<HelperPage<Address>>(){});
     }
 }
