@@ -124,7 +124,7 @@ public class UserController{
     @Timed(value = "UserController.deleteById", histogram = true)
     @ApiOperation(value = "Delete User By Id", nickname = "deleteById", notes = "Delete a user by a specific id", response = User.class, tags={ "user", })
     @ApiResponses(value = {
-            @ApiResponse(code = 200, message = "OK"),
+            @ApiResponse(code = 204, message = "OK"),
             @ApiResponse(code = 404, message = "User not found") })
     @DeleteMapping(
             value = "/{id}",
@@ -135,7 +135,7 @@ public class UserController{
         val user = userService.findById(id);
         userService.delete(user);
 
-        return ResponseEntity.ok()
+        return ResponseEntity.noContent()
                 .build();
     }
 }

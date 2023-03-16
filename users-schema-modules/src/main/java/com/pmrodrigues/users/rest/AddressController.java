@@ -3,7 +3,6 @@ package com.pmrodrigues.users.rest;
 import com.pmrodrigues.commons.request.validates.ValuesAllowed;
 import com.pmrodrigues.users.dtos.AddressDTO;
 import com.pmrodrigues.users.model.Address;
-import com.pmrodrigues.users.model.User;
 import com.pmrodrigues.users.service.AddressService;
 import io.micrometer.core.annotation.Timed;
 import io.swagger.annotations.ApiOperation;
@@ -42,7 +41,7 @@ public class AddressController {
     @Timed(value = "AddressController.getAddressById", histogram = true)
     @ApiOperation(value = "Get a address by a specific id", nickname = "getAddressById", notes = "Get a address by a specific id", response = Address.class, tags={ "address", })
     @ApiResponses(value = {
-            @ApiResponse(code = 200, message = "OK", response = User.class),
+            @ApiResponse(code = 200, message = "OK", response = Address.class),
             @ApiResponse(code = 404, message = "Address not found") })
     @GetMapping(
             value = "/{id}",
@@ -127,7 +126,7 @@ public class AddressController {
     @Timed(value = "AddressController.deleteById", histogram = true)
     @ApiOperation(value = "Delete Address By Id", nickname = "deleteById", notes = "Delete a address by a specific id", response = Address.class, tags={ "address", })
     @ApiResponses(value = {
-            @ApiResponse(code = 200, message = "OK"),
+            @ApiResponse(code = 204, message = "No Content"),
             @ApiResponse(code = 404, message = "Address not found") })
     @DeleteMapping(
             value = "/{id}",
@@ -138,7 +137,7 @@ public class AddressController {
         val address = addressService.findById(id);
         addressService.delete(address);
 
-        return ResponseEntity.ok()
+        return ResponseEntity.noContent()
                 .build();
     }
 

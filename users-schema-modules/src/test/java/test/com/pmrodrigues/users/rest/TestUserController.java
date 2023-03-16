@@ -34,9 +34,9 @@ import java.util.UUID;
 import static java.lang.String.format;
 import static org.mockito.BDDMockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+
 
 @ExtendWith(SpringExtension.class)
 @WebMvcTest(excludeAutoConfiguration = {WebSecurityConfiguration.class})
@@ -148,7 +148,7 @@ class TestUserController {
         mvc.perform(delete("/users/" + UUID.randomUUID())
                         .contentType(MediaType.APPLICATION_JSON))
                 .andDo(print())
-                .andExpect(status().isOk());
+                .andExpect(status().isNoContent());
     }
 
     @Test

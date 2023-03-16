@@ -163,4 +163,5 @@ public class AddressStepsConfigurations  extends AbstractStepsConfiguration<Addr
         val entity = new HttpEntity<>(address);
         super.searchBySample("/addresses", HttpMethod.GET, entity, new ParameterizedTypeReference<HelperPage<Address>>(){});
     }
+
 }
