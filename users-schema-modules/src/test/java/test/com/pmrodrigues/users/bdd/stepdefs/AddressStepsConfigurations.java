@@ -51,7 +51,7 @@ public class AddressStepsConfigurations  extends AbstractStepsConfiguration<Addr
     }
 
     @DataTableType
-    public Address addresEntry(Map<String, String> entry) {
+    public Address addressEntry(Map<String, String> entry) {
 
             return Address.builder().state(this.getState(entry.get("state")))
                     .addressType(this.getAddressType(entry.get("addressType")))
@@ -164,4 +164,17 @@ public class AddressStepsConfigurations  extends AbstractStepsConfiguration<Addr
         super.searchBySample("/addresses", HttpMethod.GET, entity, new ParameterizedTypeReference<HelperPage<Address>>(){});
     }
 
+    @When("I search by addressType {addressType}")
+    public void iSearchByAddressType(AddressType addressType) {
+        val address = AddressDTO.builder().addressType(addressType).build();
+        val entity = new HttpEntity<>(address);
+        super.searchBySample("/addresses", HttpMethod.GET, entity, new ParameterizedTypeReference<HelperPage<Address>>(){});
+    }
+
+    @When("I search by city {string}")
+    public void iSearchByCity(String city) {
+        val address = AddressDTO.builder().city(city).build();
+        val entity = new HttpEntity<>(address);
+        super.searchBySample("/addresses", HttpMethod.GET, entity, new ParameterizedTypeReference<HelperPage<Address>>(){});
+    }
 }

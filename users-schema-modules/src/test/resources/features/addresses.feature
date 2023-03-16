@@ -60,3 +60,32 @@ Feature: Management Addresses
       | state | addressType | address | zipcode   | neightboor | city           |
       | RJ    | STREET      | teste   | 22222-222 | teste      | Rio de Janeiro |
 
+  Scenario: Search by addressType from my address list
+    Given a new user as "test@test_address.com" , "test" and "test"
+    And a list of address as
+      | state | addressType | address | zipcode   | neightboor | city           |
+      | RJ    | STREET      | teste   | 22222-222 | teste      | Rio de Janeiro |
+      | AC    | AVENUE      | teste   | 11111-111 | teste      | Rio Branco     |
+      | SP    | ROAD        | teste   | 33333-333 | teste      | São Paulo      |
+      | RS    | SQUARE      | teste   | 44444-444 | teste      | Porto Alegre   |
+      | RN    | STREET      | teste   | 55555-555 | teste      | Natal          |
+    When I search by addressType STREET
+    Then my address list is
+      | state | addressType | address | zipcode   | neightboor | city           |
+      | RJ    | STREET      | teste   | 22222-222 | teste      | Rio de Janeiro |
+      | RN    | STREET      | teste   | 55555-555 | teste      | Natal          |
+
+  Scenario: Search by addressType from my address list
+    Given a new user as "test@test_address.com" , "test" and "test"
+    And a list of address as
+      | state | addressType | address | zipcode   | neightboor | city           |
+      | RJ    | STREET      | teste   | 22222-222 | teste      | Rio de Janeiro |
+      | AC    | AVENUE      | teste   | 11111-111 | teste      | Rio Branco     |
+      | SP    | ROAD        | teste   | 33333-333 | teste      | São Paulo      |
+      | RS    | SQUARE      | teste   | 44444-444 | teste      | Porto Alegre   |
+      | RN    | STREET      | teste   | 55555-555 | teste      | Natal          |
+    When I search by city "Porto Alegre"
+    Then my address list is
+      | state | addressType | address | zipcode   | neightboor | city           |
+      | RS    | SQUARE      | teste   | 44444-444 | teste      | Porto Alegre   |
+
