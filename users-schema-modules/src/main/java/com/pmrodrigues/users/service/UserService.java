@@ -52,31 +52,44 @@ public class UserService {
 
         log.info("creating a new user {}", user);
 
-        val existed = repository.findByEmail(user.getEmail());
-        val existedInKeyCloak = keycloakUserRepository.getUserIdByEmail(user.getEmail());
-
-        if( existed.isPresent() || !existedInKeyCloak.isEmpty() ) {
-            throw new DuplicateKeyException("I´m sorry but this was used before");
-        }
+        validateUserDoesNotExist(user.getEmail());
 
         user = repository.save(user);
 
         val keycloakId = keycloakUserRepository.insert(user);
 
-        val email = emailService.getEmailByName("newUser")
-                        .getBody()
-                        .to(user.getEmail())
-                        .subject(format("You are Welcome {0} ", user.getFullName()))
-                        .set("fullName",format("{0} ", user.getFullName()));
+        if(!sendWelcomeEmail(user) ){
 
-        val response = emailService.send(email);
-        if( response.getStatusCode() == HttpStatus.OK ) {
-            user.setExternalId(keycloakId);
-            return user;
-        }else{
-            log.error("Error to create a new user - HTTP Status {} - Reason {}", response.getStatusCode(), response.getBody());
             keycloakUserRepository.delete(keycloakId);
             throw new NotCreateException();
+        }
+        user.setExternalId(keycloakId);
+        return user;
+
+    }
+
+    private boolean sendWelcomeEmail(User user) {
+        val email = emailService.getEmailByName("newUser")
+                .getBody()
+                .to(user.getEmail())
+                .subject(format("You are Welcome {0} ", user.getFullName()))
+                .set("fullName", format("{0} ", user.getFullName()));
+
+        val response = emailService.send(email);
+        if (response.getStatusCode() == HttpStatus.OK) {
+            return true;
+        } else {
+            log.error("Error to create a new user - HTTP Status {} - Reason {}", response.getStatusCode(), response.getBody());
+            return false;
+        }
+    }
+
+    private void validateUserDoesNotExist(String email) {
+        val existed = repository.findByEmail(email);
+        val existedInKeyCloak = keycloakUserRepository.getUserIdByEmail(email);
+
+        if( existed.isPresent() || !existedInKeyCloak.isEmpty() ) {
+            throw new DuplicateKeyException("I´m sorry but this was used before");
         }
     }
 

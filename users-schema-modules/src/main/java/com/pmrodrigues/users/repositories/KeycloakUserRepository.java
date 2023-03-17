@@ -17,13 +17,28 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
 @Slf4j
 public class KeycloakUserRepository {
+
+    public static final String REGEX_PATTERN = "(?<=\\/)[^\\/]+$";
     private final UserClient userClient;
+
+    private UUID getUUID(String path){
+
+        val pattern = Pattern.compile(REGEX_PATTERN);
+        val matcher = pattern.matcher(path);
+
+        if(matcher.find()){
+            return UUID.fromString(matcher.group());
+        }
+        return null;
+    }
+
     @Timed(histogram = true, value = "KeycloakUserRepository.insert")
     public UUID insert(@NonNull final User user) {
         log.info("saving user {} into Keycloak", user);
@@ -35,7 +50,7 @@ public class KeycloakUserRepository {
         }
 
         log.debug("User {} saved {}", user, response.getHeaders().getLocation().getPath());
-        return UUID.fromString(response.getHeaders().getLocation().getPath().split("/auth/admin/realms/master/users/")[1]);
+        return this.getUUID(response.getHeaders().getLocation().getPath());
     }
 
     @Timed(histogram = true, value = "KeycloakUserRepository.getUserIdByEmail")
