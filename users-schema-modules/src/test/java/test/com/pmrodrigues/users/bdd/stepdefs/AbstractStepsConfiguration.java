@@ -60,14 +60,7 @@ public abstract class AbstractStepsConfiguration<E> {
 
 
         val token = keycloak.tokenManager().getAccessTokenString();
-        this.rest = new RestTemplateBuilder().rootUri(API_URL)
-                .defaultHeader(HttpHeaders.AUTHORIZATION, "Bearer " + token)
-                .defaultHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
-                .interceptors((request, body, execution) -> {
-                    log.info("request headers {} and body {}", request.getHeaders(), new String(body));
-                    return execution.execute(request, body);
-                })
-                .build();
+        initRestTemplate(token);
 
 
         rest.setRequestFactory(new HttpComponentsClientHttpRequestFactory() {
@@ -89,6 +82,17 @@ public abstract class AbstractStepsConfiguration<E> {
         });
         put(REST_TEMPLATE, rest);
         return rest;
+    }
+
+    private void initRestTemplate(String token) {
+        this.rest = new RestTemplateBuilder().rootUri(API_URL)
+                .defaultHeader(HttpHeaders.AUTHORIZATION, "Bearer " + token)
+                .defaultHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
+                .interceptors((request, body, execution) -> {
+                    log.info("request headers {} and body {}", request.getHeaders(), new String(body));
+                    return execution.execute(request, body);
+                })
+                .build();
     }
 
     protected void put(String attribute, Object value) {
