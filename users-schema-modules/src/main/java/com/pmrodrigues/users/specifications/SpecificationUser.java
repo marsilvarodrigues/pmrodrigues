@@ -6,6 +6,8 @@ import lombok.NoArgsConstructor;
 import org.springframework.data.jpa.domain.Specification;
 
 import java.time.LocalDateTime;
+import java.util.List;
+import java.util.UUID;
 
 import static org.apache.commons.lang3.StringUtils.isBlank;
 import static org.apache.commons.lang3.StringUtils.isEmpty;
@@ -49,6 +51,14 @@ public class SpecificationUser {
             else
                 return null;
         };
+    }
 
+    public static Specification<User> externalId(List<UUID> externalIds) {
+        return (root, criteriaQuery, criteriaBuilder) -> {
+            if( externalIds != null)
+                return criteriaBuilder.in(root.get("externalId")).value(externalIds);
+            else
+                return null;
+        };
     }
 }

@@ -142,4 +142,6 @@ public class UserService {
         val id = SecurityUtils.getUserLoggedId().orElseThrow(NotFoundException::new);
         return repository.findByExternalId(id);
     }
+
+
 }

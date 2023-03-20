@@ -16,6 +16,8 @@ import javax.persistence.EntityManager;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
+import java.util.ArrayList;
+import java.util.UUID;
 import java.util.stream.IntStream;
 
 import static com.pmrodrigues.users.specifications.SpecificationUser.*;
@@ -89,6 +91,31 @@ class TestUserRepository {
                 PageRequest.of(0, 10));
 
         assertEquals(100L, found.getTotalElements());
+
+    }
+
+    @Test
+    void shouldFindAllByExternalIds() {
+
+        val externalIds = new ArrayList<UUID>();
+
+        IntStream.range(1, 101).forEach(index -> {
+            val user = User.builder()
+                    .firstName("firstName_" + index)
+                    .lastName("lastName_" + index)
+                    .email("firstName_" + index + ".lastName_" + index + "@test.com")
+                    .externalId(UUID.randomUUID())
+                    .expiredDate(LocalDateTime.now().minus(1, ChronoUnit.MONTHS))
+                    .createdAt(Instant.now())
+                    .build();
+            externalIds.add(user.getExternalId());
+            entityManager.persist(user);
+        });
+
+        var found = userRepository.findAll(where(externalId(externalIds)), PageRequest.of(0, 10));
+        assertEquals(100L, found.getTotalElements());
+
+
 
     }
 }

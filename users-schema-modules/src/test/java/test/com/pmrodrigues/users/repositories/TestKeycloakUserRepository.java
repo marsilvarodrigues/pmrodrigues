@@ -1,12 +1,17 @@
 package test.com.pmrodrigues.users.repositories;
 
 import com.pmrodrigues.commons.exceptions.KeycloakIntegrationFailed;
+import com.pmrodrigues.security.roles.Security;
+import com.pmrodrigues.users.clients.RoleClient;
 import com.pmrodrigues.users.clients.UserClient;
+import com.pmrodrigues.users.exceptions.RoleNotFoundException;
+import com.pmrodrigues.users.exceptions.UserNotFoundException;
 import com.pmrodrigues.users.model.User;
 import com.pmrodrigues.users.repositories.KeycloakUserRepository;
 import lombok.val;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.keycloak.representations.idm.RoleRepresentation;
 import org.keycloak.representations.idm.UserRepresentation;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
@@ -26,6 +31,7 @@ import java.util.stream.IntStream;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.verify;
 
 @ExtendWith(MockitoExtension.class)
 @MockitoSettings(strictness = Strictness.LENIENT)
@@ -33,6 +39,9 @@ class TestKeycloakUserRepository {
 
     @Mock
     private UserClient userClient;
+
+    @Mock
+    private RoleClient roleClient;
 
     @InjectMocks
     private KeycloakUserRepository repository;
@@ -116,6 +125,47 @@ class TestKeycloakUserRepository {
         given(userClient.delete(any(UUID.class))).willReturn(ResponseEntity.badRequest().build());
         val uuid = UUID.randomUUID();
         assertThrows(KeycloakIntegrationFailed.class, () -> repository.delete(uuid));
+    }
+
+    @Test
+    void shouldAddUserOnRole() {
+
+
+        val user = new UserRepresentation();
+        user.setRealmRoles(new ArrayList<>());
+        user.setId(UUID.randomUUID().toString());
+
+        given(userClient.getById(any(UUID.class))).willReturn(ResponseEntity.of(Optional.of(user)));
+        given(roleClient.getRole(Security.SYSTEM_ADMIN)).willReturn(ResponseEntity.of(Optional.of(new RoleRepresentation())));
+
+        repository.applyRoleInUser(User.builder().externalId(UUID.fromString(user.getId())).build(), Security.SYSTEM_ADMIN);
+
+        verify(userClient).update(any(UUID.class), any(UserRepresentation.class));
+
+    }
+
+    @Test
+    void failedToTrySetARoleUserNotFound() {
+        given(userClient.getById(any(UUID.class))).willReturn(ResponseEntity.notFound().build());
+
+        assertThrows(UserNotFoundException.class, () -> repository.applyRoleInUser(User.builder()
+                .externalId(UUID.randomUUID())
+                .build(), Security.SYSTEM_ADMIN));
+
+    }
+
+    @Test
+    void failedToTrySetAInvalidRole() {
+        val user = new UserRepresentation();
+        user.setRealmRoles(new ArrayList<>());
+        user.setId(UUID.randomUUID().toString());
+
+        given(userClient.getById(any(UUID.class))).willReturn(ResponseEntity.of(Optional.of(user)));
+        given(roleClient.getRole(Security.SYSTEM_ADMIN)).willReturn(ResponseEntity.notFound().build());
+
+        assertThrows(RoleNotFoundException.class, () -> repository.applyRoleInUser(User.builder()
+                .externalId(UUID.randomUUID())
+                .build(), Security.SYSTEM_ADMIN));
     }
 
 }

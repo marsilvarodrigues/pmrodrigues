@@ -30,4 +30,7 @@ public interface UserClient {
 
     @PutMapping(path="/{id}",consumes = APPLICATION_JSON_VALUE, produces = APPLICATION_JSON_VALUE)
     ResponseEntity<String> update(@PathVariable("id") @NonNull UUID userId, @RequestBody @Valid UserRepresentation user);
+
+    @GetMapping(path="/{id}",consumes = APPLICATION_JSON_VALUE, produces = APPLICATION_JSON_VALUE)
+    ResponseEntity<UserRepresentation> getById(@PathVariable("id") @NonNull UUID userId);
 }

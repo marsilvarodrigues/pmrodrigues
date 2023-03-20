@@ -6,8 +6,15 @@ server:
 logging:
   level:
     root: INFO
+    app: DEBUG
+  group:
+    app:
+      - com.pmrodrigues
 
 spring:
+  output:
+    ansi:
+      enabled: DETECT
   kafka:
     bootstrapAddress: ${KAFKA_BOOTSTRAP_URL:localhost:29092}
   mail:
