@@ -88,7 +88,7 @@ public class KeycloakUserRepository {
     @Timed(histogram = true, value = "KeycloakUserRepository.update")
     public void update(@NonNull final User user) {
         log.info("updating the user {} in keycloack", user);
-        val keycloackUser = getUserById(user);
+        val keycloackUser = getUserById(user.getExternalId());
 
         log.debug("user found {}", user);
 
@@ -103,8 +103,8 @@ public class KeycloakUserRepository {
         }
     }
 
-    public UserRepresentation getUserById(User user) {
-        var response = userClient.getById(user.getExternalId());
+    public UserRepresentation getUserById(UUID id) {
+        var response = userClient.getById(id);
         if( response.getStatusCode() == HttpStatus.NOT_FOUND )
             throw new UserNotFoundException();
 
