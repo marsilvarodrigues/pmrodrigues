@@ -22,6 +22,8 @@ import org.springframework.web.bind.annotation.*;
 import javax.validation.Valid;
 import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
+import javax.validation.constraints.Positive;
+import javax.validation.constraints.PositiveOrZero;
 import java.util.UUID;
 
 import static com.pmrodrigues.commons.data.utils.SortUtils.createSortForString;
@@ -44,8 +46,10 @@ public class RoleController {
     )
     public ResponseEntity<Page<User>> getUserInRole(@RequestParam(name = "role") @NonNull String role,
                                                     @RequestParam(name = "page", defaultValue = "0", required = false)
+                                                    @PositiveOrZero(message = "Page number must be positive or zero")
                                                     @Min(value = 0, message = "page number is invalid") @Valid Integer page,
                                                     @RequestParam(name = "size", defaultValue = "50", required = false)
+                                                        @Positive(message = "Page size must be positive")
                                                         @Min(value = 1 , message = "page size is invalid")
                                                         @Max(value = 100, message = "page size is bigger than expected")
                                                         @Valid Integer size,
