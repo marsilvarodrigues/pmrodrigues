@@ -88,12 +88,27 @@ public class KeycloakUserRepository {
     @Timed(histogram = true, value = "KeycloakUserRepository.update")
     public void update(@NonNull final User user) {
         log.info("updating the user {} in keycloack", user);
-        val keycloackUser = UserFactory.createUser(user);
-        var response = userClient.update(user.getExternalId(),keycloackUser);
+        val keycloackUser = getUserById(user);
+
+        log.debug("user found {}", user);
+
+        keycloackUser.setFirstName(user.getFirstName());
+        keycloackUser.setLastName(user.getLastName());
+        keycloackUser.setEmail(user.getEmail());
+
+        val response = userClient.update(user.getExternalId(),keycloackUser);
         if(response.getStatusCode() != HttpStatus.NO_CONTENT && response.getStatusCode() != HttpStatus.OK){
             log.error("error to update in user {} in Keycloack {} - {}", user, response.getStatusCode(), response.getBody());
             throw new KeycloakIntegrationFailed();
         }
+    }
+
+    public UserRepresentation getUserById(User user) {
+        var response = userClient.getById(user.getExternalId());
+        if( response.getStatusCode() == HttpStatus.NOT_FOUND )
+            throw new UserNotFoundException();
+
+        return response.getBody();
     }
 
     @Timed(histogram = true, value = "KeycloakUserRepository.applyRoleInUser")

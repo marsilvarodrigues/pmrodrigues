@@ -66,6 +66,7 @@ class TestKeycloakUserRepository {
 
     @Test
     void shouldUpdate() {
+        given(userClient.getById(any(UUID.class))).willReturn(ResponseEntity.ok(new UserRepresentation()));
         given(userClient.update(any(UUID.class),any(UserRepresentation.class))).willReturn(ResponseEntity.noContent().build());
         val user = User.builder()
                             .email("teste")
@@ -78,7 +79,21 @@ class TestKeycloakUserRepository {
     }
 
     @Test
+    void shouldNotUpdateUserNotFound() {
+        given(userClient.getById(any(UUID.class))).willReturn(ResponseEntity.notFound().build());
+        val user = User.builder()
+                .email("teste")
+                .firstName("teste")
+                .lastName("teste")
+                .externalId(UUID.randomUUID())
+                .build();
+
+        assertThrows(UserNotFoundException.class, () -> repository.update(user));
+    }
+
+    @Test
     void shouldNotUpdate() {
+        given(userClient.getById(any(UUID.class))).willReturn(ResponseEntity.ok(new UserRepresentation()));
         given(userClient.update(any(UUID.class),any(UserRepresentation.class))).willReturn(ResponseEntity.badRequest().build());
         val user = User.builder()
                 .email("teste")
