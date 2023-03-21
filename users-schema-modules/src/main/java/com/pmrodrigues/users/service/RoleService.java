@@ -39,7 +39,7 @@ public class RoleService {
 
     @Timed(histogram = true, value = "RoleService.applyRoleToUser")
     public void applyRoleToUser(@NonNull User user, @NonNull String roleName) {
-        log.info("apply to user {} a role {}");
+        log.info("apply to user {} a role {}", user, roleName);
         keycloakUserRepository.applyRoleInUser(user, roleName);
     }
 
