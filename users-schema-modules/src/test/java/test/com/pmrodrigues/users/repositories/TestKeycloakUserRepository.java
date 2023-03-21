@@ -31,7 +31,7 @@ import java.util.stream.IntStream;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
-import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 @MockitoSettings(strictness = Strictness.LENIENT)
@@ -51,14 +51,26 @@ class TestKeycloakUserRepository {
         given(userClient.add(any(UserRepresentation.class)))
                 .willReturn(ResponseEntity.created(URI.create("http://localhost:8080/auth/admin/realms/master/users/" + UUID.randomUUID())).build());
 
-        val uuid = repository.insert(User.builder().email("teste").firstName("teste").lastName("teste").build());
+        val user = User.builder()
+                .email("teste")
+                .firstName("teste")
+                .lastName("teste")
+                .build();
+
+        val uuid = repository.insert(user);
         assertNotNull(uuid);
     }
 
     @Test
     void shouldNotCreateUser() {
         given(userClient.add(any(UserRepresentation.class))).willReturn(ResponseEntity.badRequest().build());
-        val user = User.builder().email("teste").firstName("teste").lastName("teste").build();
+
+        val user = User.builder()
+                .email("teste")
+                .firstName("teste")
+                .lastName("teste")
+                .build();
+
         assertThrows(KeycloakIntegrationFailed.class, () ->
             repository.insert(user)
         );
@@ -68,6 +80,7 @@ class TestKeycloakUserRepository {
     void shouldUpdate() {
         given(userClient.getById(any(UUID.class))).willReturn(ResponseEntity.ok(new UserRepresentation()));
         given(userClient.update(any(UUID.class),any(UserRepresentation.class))).willReturn(ResponseEntity.noContent().build());
+
         val user = User.builder()
                             .email("teste")
                             .firstName("teste")
@@ -76,11 +89,14 @@ class TestKeycloakUserRepository {
                             .build();
 
         repository.update(user);
+
+        verify(userClient, times(1)).update(any(UUID.class),any(UserRepresentation.class));
     }
 
     @Test
     void shouldNotUpdateUserNotFound() {
         given(userClient.getById(any(UUID.class))).willReturn(ResponseEntity.notFound().build());
+
         val user = User.builder()
                 .email("teste")
                 .firstName("teste")
@@ -95,6 +111,7 @@ class TestKeycloakUserRepository {
     void shouldNotUpdate() {
         given(userClient.getById(any(UUID.class))).willReturn(ResponseEntity.ok(new UserRepresentation()));
         given(userClient.update(any(UUID.class),any(UserRepresentation.class))).willReturn(ResponseEntity.badRequest().build());
+
         val user = User.builder()
                 .email("teste")
                 .firstName("teste")
@@ -133,6 +150,8 @@ class TestKeycloakUserRepository {
     void shouldDelete() {
         given(userClient.delete(any(UUID.class))).willReturn(ResponseEntity.ok().build());
         repository.delete(UUID.randomUUID());
+
+        verify(userClient, times(1)).delete(any(UUID.class));
     }
 
     @Test
@@ -162,25 +181,26 @@ class TestKeycloakUserRepository {
     @Test
     void failedToTrySetARoleUserNotFound() {
         given(userClient.getById(any(UUID.class))).willReturn(ResponseEntity.notFound().build());
-
-        assertThrows(UserNotFoundException.class, () -> repository.applyRoleInUser(User.builder()
+        val user = User.builder()
                 .externalId(UUID.randomUUID())
-                .build(), Security.SYSTEM_ADMIN));
+                .build();
+        assertThrows(UserNotFoundException.class, () -> repository.applyRoleInUser(user, Security.SYSTEM_ADMIN));
 
     }
 
     @Test
     void failedToTrySetAInvalidRole() {
-        val user = new UserRepresentation();
-        user.setRealmRoles(new ArrayList<>());
-        user.setId(UUID.randomUUID().toString());
+        val keycloakUser = new UserRepresentation();
+        keycloakUser.setRealmRoles(new ArrayList<>());
+        keycloakUser.setId(UUID.randomUUID().toString());
 
-        given(userClient.getById(any(UUID.class))).willReturn(ResponseEntity.of(Optional.of(user)));
+        given(userClient.getById(any(UUID.class))).willReturn(ResponseEntity.of(Optional.of(keycloakUser)));
         given(roleClient.getRole(Security.SYSTEM_ADMIN)).willReturn(ResponseEntity.notFound().build());
-
-        assertThrows(RoleNotFoundException.class, () -> repository.applyRoleInUser(User.builder()
+        val user = User.builder()
                 .externalId(UUID.randomUUID())
-                .build(), Security.SYSTEM_ADMIN));
+                .build();
+
+        assertThrows(RoleNotFoundException.class, () -> repository.applyRoleInUser(user, Security.SYSTEM_ADMIN));
     }
 
 }

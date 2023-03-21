@@ -2,7 +2,9 @@ package com.pmrodrigues.users.service;
 
 import com.pmrodrigues.security.roles.Security;
 import com.pmrodrigues.users.clients.RoleClient;
+import com.pmrodrigues.users.dtos.RoleDTO;
 import com.pmrodrigues.users.model.User;
+import com.pmrodrigues.users.repositories.KeycloakRoleRepository;
 import com.pmrodrigues.users.repositories.KeycloakUserRepository;
 import com.pmrodrigues.users.repositories.UserRepository;
 import io.micrometer.core.annotation.Timed;
@@ -32,6 +34,8 @@ public class RoleService {
 
     private final KeycloakUserRepository keycloakUserRepository;
 
+    private final KeycloakRoleRepository keycloakRoleRepository;
+
     private final RoleClient roleClient;
 
     private final UserRepository userRepository;
@@ -44,7 +48,7 @@ public class RoleService {
     }
 
     @Timed(histogram = true, value="RoleService.getUserInRole")
-    public Page<User> getUserInRole(@NonNull String roleName, @NonNull PageRequest pageRequest) {
+    public Page<User> getUsersInRole(@NonNull String roleName, @NonNull PageRequest pageRequest) {
         log.info("List all user in {}", roleName);
         val response = roleClient.getUsersInRole(roleName);
 
@@ -57,5 +61,10 @@ public class RoleService {
 
         return userRepository.findAll(where(externalId(externalsId)),pageRequest);
 
+    }
+
+    @Timed(histogram = true, value="RoleService.getRoles")
+    public List<RoleDTO> getRoles() {
+        return keycloakRoleRepository.getRoles();
     }
 }

@@ -23,13 +23,15 @@ import java.util.Optional;
 import java.util.UUID;
 
 import static com.pmrodrigues.users.specifications.SpecificationUser.externalId;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.BDDMockito.given;
-import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.*;
 import static org.springframework.data.jpa.domain.Specification.where;
 
 @ExtendWith(MockitoExtension.class)
 @MockitoSettings(strictness = Strictness.LENIENT)
-public class TestRoleService {
+class TestRoleService {
 
     @InjectMocks
     private RoleService roleService;
@@ -55,7 +57,8 @@ public class TestRoleService {
                 PageRequest.of(0,10))).willReturn(page);
 
 
-        roleService.getUserInRole(Security.SYSTEM_ADMIN, PageRequest.of(0,10));
+        val returned = roleService.getUsersInRole(Security.SYSTEM_ADMIN, PageRequest.of(0,10));
+        assertFalse(returned.isEmpty());
 
     }
 
@@ -67,7 +70,10 @@ public class TestRoleService {
                 PageRequest.of(0,10))).willReturn(Page.empty());
 
 
-        roleService.getUserInRole(Security.SYSTEM_ADMIN, PageRequest.of(0,10));
+        val returned =roleService.getUsersInRole(Security.SYSTEM_ADMIN, PageRequest.of(0,10));
+        assertTrue(returned.isEmpty());
+
+
     }
 
 

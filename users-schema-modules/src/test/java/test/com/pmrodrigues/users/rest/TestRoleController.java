@@ -5,12 +5,14 @@ import com.pmrodrigues.commons.controlleradvices.DuplicatedKeyControllerAdvice;
 import com.pmrodrigues.commons.controlleradvices.ValidationErrorControllerAdvice;
 import com.pmrodrigues.security.configurations.WebSecurityConfiguration;
 import com.pmrodrigues.security.roles.Security;
+import com.pmrodrigues.users.dtos.RoleDTO;
 import com.pmrodrigues.users.exceptions.RoleNotFoundException;
 import com.pmrodrigues.users.exceptions.UserNotFoundException;
 import com.pmrodrigues.users.model.User;
 import com.pmrodrigues.users.rest.RoleController;
 import com.pmrodrigues.users.service.RoleService;
 import lombok.SneakyThrows;
+import lombok.val;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,7 +29,10 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.util.UUID;
+import java.util.stream.IntStream;
 
+import static java.lang.String.format;
+import static java.util.stream.Collectors.toList;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.BDDMockito.*;
@@ -44,7 +49,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
         DuplicatedKeyControllerAdvice.class})
 @AutoConfigureMockMvc(addFilters = false)
 @ActiveProfiles("dev")
-public class TestRoleController {
+class TestRoleController {
 
     private final ObjectMapper objectMapper = new ObjectMapper();
     @Autowired
@@ -94,9 +99,9 @@ public class TestRoleController {
     @Test
     @SneakyThrows
     void shouldListRoleByRoleName() {
-        given(roleService.getUserInRole(any(String.class),any(PageRequest.class))).willReturn(Page.empty());
+        given(roleService.getUsersInRole(any(String.class),any(PageRequest.class))).willReturn(Page.empty());
 
-        mvc.perform(get("/roles?role=XXX"))
+        mvc.perform(get("/roles/XXX/users"))
                 .andDo(print())
                 .andExpect(status().isOk());
     }
@@ -104,14 +109,30 @@ public class TestRoleController {
     @Test
     @SneakyThrows
     void shouldListRoleByRoleNamePageable() {
-        given(roleService.getUserInRole(any(String.class),any(PageRequest.class))).willReturn(Page.empty());
+        given(roleService.getUsersInRole(any(String.class),any(PageRequest.class))).willReturn(Page.empty());
 
-        mvc.perform(get("/roles?role=XXX&page=1&size=10"))
+        mvc.perform(get("/roles/XXX/users?page=1&size=10"))
                 .andDo(print())
                 .andExpect(status().isOk());
 
         Sort sort = Sort.by(Sort.Order.desc("id"));
 
-        verify(roleService).getUserInRole("XXX", PageRequest.of(1, 10, sort));
+        verify(roleService).getUsersInRole("XXX", PageRequest.of(1, 10, sort));
+    }
+
+    @Test
+    @SneakyThrows
+    void shouldListAllRoles() {
+
+        val roles = IntStream.range(1,4).mapToObj(i ->
+            RoleDTO.builder().id(UUID.randomUUID().toString())
+                    .name(format("ROLE_%d",i))
+                    .build()).collect(toList());
+
+        given(roleService.getRoles()).willReturn(roles);
+
+        mvc.perform(get("/roles"))
+                .andDo(print())
+                .andExpect(status().isOk());
     }
 }

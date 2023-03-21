@@ -281,11 +281,6 @@
             </exclusions>
         </dependency>
         <dependency>
-            <groupId>com.pmrodrigues</groupId>
-            <artifactId>security</artifactId>
-            <version>1.0-SNAPSHOT</version>
-        </dependency>
-        <dependency>
             <groupId>org.mockito</groupId>
             <artifactId>mockito-inline</artifactId>
             <version>4.10.0</version>
@@ -377,6 +372,14 @@
                 <groupId>org.jacoco</groupId>
                 <artifactId>jacoco-maven-plugin</artifactId>
                 <version>0.8.8</version>
+                <configuration>
+                    <excludes>
+                        <exclude>com/pmrodrigues/users/dtos/*</exclude>
+                        <exclude>com/pmrodrigues/users/configurations/*</exclude>
+                        <exclude>com/pmrodrigues/users/exceptions/*</exclude>
+                        <exclude>com/pmrodrigues/users/UserApplication.class</exclude>
+                    </excludes>
+                </configuration>
                 <executions>
                     <execution>
                         <goals>
