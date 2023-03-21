@@ -45,6 +45,8 @@ public abstract class AbstractStepsConfiguration<E> {
 
     private ResponseEntity returned;
 
+    private Class<E> parameterizedType;
+
     protected RestTemplate generateToken(@NonNull String username, @NonNull String password) {
         val keycloak = KeycloakBuilder
                 .builder()
@@ -80,6 +82,7 @@ public abstract class AbstractStepsConfiguration<E> {
                 }
             }
         });
+
         put(REST_TEMPLATE, rest);
         return rest;
     }
@@ -96,11 +99,11 @@ public abstract class AbstractStepsConfiguration<E> {
     }
 
     protected void put(String attribute, Object value) {
-        this.context.get().put(attribute, value);
+        context.get().put(attribute, value);
     }
 
     protected Object get(String attribute) {
-        return this.context.get().get(attribute);
+        return context.get().get(attribute);
     }
 
 
@@ -148,8 +151,11 @@ public abstract class AbstractStepsConfiguration<E> {
     }
 
     protected Class<E> getParameterizedType() {
-        return (Class<E>) ((ParameterizedType) getClass()
-                .getGenericSuperclass()).getActualTypeArguments()[0];
+        if (parameterizedType == null) {
+            parameterizedType = (Class<E>) ((ParameterizedType) getClass()
+                    .getGenericSuperclass()).getActualTypeArguments()[0];
+        }
+        return parameterizedType;
     }
 
     protected E getEntity() {
