@@ -12,7 +12,6 @@ import java.util.UUID;
 @NoArgsConstructor
 @Builder
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
-@NamedQuery(name = "Category.findAll", query="select s from State s order by s.code ASC")
 public class State {
     @Id
     @Column(name = "id", nullable = false)

@@ -126,7 +126,7 @@ public class UserStepsConfigurations extends AbstractStepsConfiguration<User> {
     @When("I filter by {string} as {string}")
     public void whenISearchAnUserBy(String propertyName, String value) {
 
-        val user = new UserDTO();
+        val user = new UserDTO(null, null, null, null, null);
         setValue(propertyName, value, user);
         super.searchBySample("/users", HttpMethod.GET, new HttpEntity(user), new ParameterizedTypeReference<HelperPage<User>>(){});
 
@@ -136,7 +136,7 @@ public class UserStepsConfigurations extends AbstractStepsConfiguration<User> {
     @When("List all users")
     public void whenIListAllUser() {
 
-        val user = new UserDTO();
+        val user = new UserDTO(null, null, null, null, null);
         val entity = new HttpEntity<>(user);
         super.searchBySample("/users",HttpMethod.GET, new HttpEntity(user), new ParameterizedTypeReference<HelperPage<User>>(){});
     }

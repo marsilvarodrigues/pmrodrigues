@@ -1,6 +1,7 @@
 package test.com.pmrodrigues.users.bdd.stepdefs;
 
 import com.pmrodrigues.users.dtos.AddressDTO;
+import com.pmrodrigues.users.dtos.StateDTO;
 import com.pmrodrigues.users.model.Address;
 import com.pmrodrigues.users.model.State;
 import com.pmrodrigues.users.model.User;
@@ -132,7 +133,7 @@ public class AddressStepsConfigurations  extends AbstractStepsConfiguration<Addr
     @When("I ask to list my address will return")
     public void returnMyListOfAddress() {
 
-        val address = new AddressDTO();
+        val address = new AddressDTO(null, null, null, null, null, null, null, null);
         val entity = new HttpEntity<>(address);
         super.searchBySample("/addresses", HttpMethod.GET, entity, new ParameterizedTypeReference<HelperPage<Address>>(){});
     }
@@ -159,7 +160,12 @@ public class AddressStepsConfigurations  extends AbstractStepsConfiguration<Addr
 
     @When("I search by state {state}")
     public void iSearchByStateRJ(State state) {
-        val address = AddressDTO.builder().state(state).build();
+        val stateDTO = StateDTO.builder()
+                .id(state.getId())
+                .code(state.getCode())
+                .name(state.getName())
+                .build();
+        val address = AddressDTO.builder().state(stateDTO).build();
         val entity = new HttpEntity<>(address);
         super.searchBySample("/addresses", HttpMethod.GET, entity, new ParameterizedTypeReference<HelperPage<Address>>(){});
     }

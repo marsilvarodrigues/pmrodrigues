@@ -127,7 +127,7 @@ public abstract class AbstractStepsConfiguration<E> {
         return getForEntity(API_URL + get(RESPONSE_URL), id, entity);
     }
 
-    private RestTemplate getRest() {
+    protected RestTemplate getRest() {
         if( this.rest == null ) this.rest = (RestTemplate) get(REST_TEMPLATE);
         return rest;
     }
@@ -140,8 +140,16 @@ public abstract class AbstractStepsConfiguration<E> {
     }
 
     protected void updateEntity(String url, E e) {
+        saveTo(e, url, HttpMethod.PUT);
+    }
+
+    protected void insertEntity(String url , E e) {
+        saveTo(e, url, HttpMethod.POST);
+    }
+
+    private void saveTo(E e, String url, HttpMethod post) {
         val httpEntity = new HttpEntity<E>(e);
-        this.returned = getRest().exchange(API_URL + url, HttpMethod.PUT, httpEntity, e.getClass());
+        this.returned = getRest().exchange(API_URL + url, post, httpEntity, e.getClass());
     }
 
     protected void searchBySample(String api, HttpMethod httpMethod, HttpEntity httpEntity, ParameterizedTypeReference typeReference) {
@@ -174,5 +182,9 @@ public abstract class AbstractStepsConfiguration<E> {
     protected HttpStatus getStatusCode() {
         if (this.returned != null) return this.returned.getStatusCode();
         return null;
+    }
+
+    protected void setReturn(ResponseEntity returned) {
+        this.returned = returned;
     }
 }

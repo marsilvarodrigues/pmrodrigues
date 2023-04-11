@@ -7,6 +7,8 @@ import com.pmrodrigues.commons.exceptions.NotFoundException;
 import com.pmrodrigues.security.configurations.WebSecurityConfiguration;
 import com.pmrodrigues.security.exceptions.OperationNotAllowedException;
 import com.pmrodrigues.users.dtos.AddressDTO;
+import com.pmrodrigues.users.dtos.StateDTO;
+import com.pmrodrigues.users.dtos.UserDTO;
 import com.pmrodrigues.users.model.Address;
 import com.pmrodrigues.users.model.State;
 import com.pmrodrigues.users.model.enums.AddressType;
@@ -230,7 +232,8 @@ class TestAddressController {
     void shouldSearchAddress() {
 
 
-        val state = State.builder().id(UUID.randomUUID()).build();
+        val state = StateDTO.builder().id(UUID.randomUUID()).build();
+        val owner = UserDTO.builder().build();
         val address = AddressDTO.builder()
                 .state(state)
                 .address1("TESTE")
@@ -238,6 +241,7 @@ class TestAddressController {
                 .city("TESTE")
                 .zipcode("TESTE")
                 .neightboor("TESTE")
+                .owner(owner)
                 .build();
 
         val message = objectMapper.writeValueAsString(address);

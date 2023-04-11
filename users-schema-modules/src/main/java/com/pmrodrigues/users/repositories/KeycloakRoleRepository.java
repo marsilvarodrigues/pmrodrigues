@@ -23,16 +23,15 @@ public class KeycloakRoleRepository {
     
     public List<RoleDTO> getRoles() {
 
+
         log.info("list all roles from system");
         val response = roleClient.getRoles();
         if( response.getStatusCode().is2xxSuccessful() ){
             return response.getBody()
                     .stream()
-                    .map( roleRepresentation -> RoleDTO.builder()
-                            .id(roleRepresentation.getId())
-                            .name(roleRepresentation.getName())
-                            .build())
-                    .sorted(Comparator.comparing(RoleDTO::getName))
+                    .map( roleRepresentation -> new RoleDTO(roleRepresentation.getId(),
+                            roleRepresentation.getName()))
+                    .sorted(Comparator.comparing(RoleDTO::name))
                     .collect(Collectors.toList());
         }
         return List.of();

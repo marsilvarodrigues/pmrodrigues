@@ -2,43 +2,35 @@ package com.pmrodrigues.users.dtos;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.pmrodrigues.users.model.Address;
-import com.pmrodrigues.users.model.State;
-import com.pmrodrigues.users.model.User;
 import com.pmrodrigues.users.model.enums.AddressType;
-import lombok.AllArgsConstructor;
 import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
 
-@Data
-@AllArgsConstructor
-@NoArgsConstructor
 @Builder
 @JsonInclude(JsonInclude.Include.NON_EMPTY)
-public class AddressDTO {
+public record AddressDTO(
+        AddressType addressType,
+        String address1,
 
-    private AddressType addressType;
-    private String address1;
-
-    private String zipcode;
-
-    private String neightboor;
-
-    private String city;
-
-    private State state;
-
-    private User owner;
+        String address2,
+        String zipcode,
+        String neightboor,
+        String city,
+        StateDTO state,
+        UserDTO owner) {
 
     public Address toAddress() {
-        return Address.builder()
-                .address1(address1)
-                .addressType(addressType)
-                .zipcode(zipcode)
-                .neightboor(neightboor)
-                .city(city)
-                .state(state)
-                .owner(owner)
-                .build();
+
+            return Address.builder()
+                    .address1(address1)
+                    .addressType(addressType)
+                    .state(state.toState())
+                    .city(city)
+                    .zipcode(zipcode)
+                    .address2(address2)
+                    .neightboor(neightboor)
+                    .owner(owner.toUser())
+                    .build();
+
     }
+
 }

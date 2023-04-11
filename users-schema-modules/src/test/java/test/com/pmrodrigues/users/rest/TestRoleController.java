@@ -33,6 +33,7 @@ import java.util.stream.IntStream;
 
 import static java.lang.String.format;
 import static java.util.stream.Collectors.toList;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.BDDMockito.*;
@@ -109,6 +110,7 @@ class TestRoleController {
     @Test
     @SneakyThrows
     void shouldListRoleByRoleNamePageable() {
+
         given(roleService.getUsersInRole(any(String.class),any(PageRequest.class))).willReturn(Page.empty());
 
         mvc.perform(get("/roles/XXX/users?page=1&size=10"))
@@ -129,10 +131,15 @@ class TestRoleController {
                     .name(format("ROLE_%d",i))
                     .build()).collect(toList());
 
+        val expectedJson = objectMapper.writeValueAsString(roles);
+
         given(roleService.getRoles()).willReturn(roles);
 
-        mvc.perform(get("/roles"))
+        val response = mvc.perform(get("/roles"))
                 .andDo(print())
-                .andExpect(status().isOk());
+                .andExpect(status().isOk())
+                .andReturn();
+
+        assertEquals( expectedJson, response.getResponse().getContentAsString());
     }
 }
