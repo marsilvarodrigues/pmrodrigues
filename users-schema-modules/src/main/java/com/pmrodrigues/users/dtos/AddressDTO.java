@@ -13,7 +13,7 @@ public record AddressDTO(
 
         String address2,
         String zipcode,
-        String neightboor,
+        String neightbor,
         String city,
         StateDTO state,
         UserDTO owner) {
@@ -27,7 +27,7 @@ public record AddressDTO(
                     .city(city)
                     .zipcode(zipcode)
                     .address2(address2)
-                    .neightboor(neightboor)
+                    .neightboor(neightbor)
                     .owner(owner.toUser())
                     .build();
 

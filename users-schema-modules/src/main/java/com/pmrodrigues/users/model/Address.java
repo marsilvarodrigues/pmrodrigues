@@ -58,10 +58,10 @@ public class Address {
     @Pattern(regexp = "\\d{5}[-\\s]?\\d{3}")
     private String zipcode;
 
-    @Column(name = "neightboor", nullable = false)
+    @Column(name = "neightbor", nullable = false)
     @NotNull
     @NotBlank
-    private String neightboor;
+    private String neightbor;
 
     @Column(name = "city", nullable = false)
     @NotNull
