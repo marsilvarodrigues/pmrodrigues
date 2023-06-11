@@ -10,7 +10,6 @@ import lombok.Builder;
 public record AddressDTO(
         AddressType addressType,
         String address1,
-
         String address2,
         String zipcode,
         String neightbor,
@@ -32,5 +31,7 @@ public record AddressDTO(
                     .build();
 
     }
-
 }
+
+
+

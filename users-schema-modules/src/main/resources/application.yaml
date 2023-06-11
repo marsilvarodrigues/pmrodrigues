@@ -5,7 +5,7 @@ server:
 
 logging:
   level:
-    root: INFO
+    root: FATAL
     app: DEBUG
   group:
     app:
@@ -90,14 +90,18 @@ management:
     health:
       show-details: always
   metrics:
+    enable:
+      hibernate:
+        statistics: true
     export:
       simple:
-        enabled=true:
+        enabled: true
       prometheus:
         pushgateway:
           enabled: true
           base-url: http://localhost:9091
           shutdown-operation: push
+        step: 10s
   endpoints:
     web:
       exposure:
