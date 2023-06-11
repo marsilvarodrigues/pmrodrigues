@@ -40,5 +40,5 @@ spec:
           value: admin
       resources:
         limits:
-          memory: 512Mi
+          memory: 256Mi
           cpu: "1"

@@ -27,7 +27,7 @@ public record AddressDTO(
                     .city(city)
                     .zipcode(zipcode)
                     .address2(address2)
-                    .neightboor(neightbor)
+                    .neightbor(neightbor)
                     .owner(owner.toUser())
                     .build();
 
