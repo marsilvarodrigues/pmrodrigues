@@ -24,6 +24,7 @@ import javax.validation.Valid;
 import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
 import java.net.URI;
+import java.util.Optional;
 import java.util.UUID;
 
 import static com.pmrodrigues.commons.data.utils.SortUtils.createSortForString;
@@ -111,10 +112,9 @@ public class UserController{
 
         var sortBy = createSortForString(sort);
 
-        var sample = new User();
-        if( user != null ) {
-            sample = user.toUser();
-        }
+        var sample = Optional.ofNullable(user)
+                             .map(UserDTO::toUser)
+                              .orElse(new User());
 
         val response = userService.findAll(sample, PageRequest.of(page, size, Sort.by(sortBy))).map(UserDTO::fromUser);
         return ResponseEntity.ok(response);

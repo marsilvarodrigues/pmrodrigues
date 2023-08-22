@@ -14,7 +14,9 @@ public record StateDTO(
         String code) {
 
     public static StateDTO fromState(State state) {
-        return new StateDTO(state.getId(), state.getName(), state.getCode());
+        return new StateDTO(state.getId(),
+                state.getName(),
+                state.getCode());
     }
 
     public State toState() {

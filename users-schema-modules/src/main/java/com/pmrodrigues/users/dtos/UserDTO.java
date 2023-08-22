@@ -22,7 +22,8 @@ public record UserDTO(
         return new UserDTO(user.getId(),
                 user.getFirstName(),
                 user.getLastName(),
-                user.getEmail(), user.getExpiredDate());
+                user.getEmail(),
+                user.getExpiredDate());
 
     }
 

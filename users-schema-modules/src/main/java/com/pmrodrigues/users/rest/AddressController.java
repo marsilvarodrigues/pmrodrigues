@@ -25,6 +25,7 @@ import javax.validation.Valid;
 import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
 import java.net.URI;
+import java.util.Optional;
 import java.util.UUID;
 
 import static com.pmrodrigues.commons.data.utils.SortUtils.createSortForString;
@@ -77,10 +78,9 @@ public class AddressController {
 
         var sortBy = createSortForString(sort);
 
-        var sample = new Address();
-        if( address != null ) {
-            sample = address.toAddress();
-        }
+        var sample = Optional.ofNullable(address)
+                .map(AddressDTO::toAddress)
+                .orElse(new Address());
 
         val response = addressService.findAll(sample , PageRequest.of(page, size, Sort.by(sortBy))).map(AddressDTO::fromAddress);
         return ResponseEntity.ok(response);

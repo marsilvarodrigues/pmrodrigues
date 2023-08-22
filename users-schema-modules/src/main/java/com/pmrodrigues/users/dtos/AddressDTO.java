@@ -17,11 +17,17 @@ public record AddressDTO(
         StateDTO state,
         UserDTO owner) {
 
-    public static AddressDTO fromAddress(final Address address){
-        return new AddressDTO(address.getAddressType(), address.getAddress1(), address.getAddress2(),
-                address.getZipcode(), address.getNeighbor(), address.getCity(),
+    public static AddressDTO fromAddress(Address address) {
+        return new AddressDTO(
+                address.getAddressType(),
+                address.getAddress1(),
+                address.getAddress2(),
+                address.getZipcode(),
+                address.getNeighbor(),
+                address.getCity(),
                 StateDTO.fromState(address.getState()),
-                UserDTO.fromUser(address.getOwner()));
+                UserDTO.fromUser(address.getOwner())
+        );
     }
 
     public Address toAddress() {
