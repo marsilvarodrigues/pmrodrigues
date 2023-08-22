@@ -3,3 +3,6 @@
 /security/target/
 /users-schema-modules/target/
 /target/
+/.idea/
+/.jpb/
+pmrodrigues-project.iml
