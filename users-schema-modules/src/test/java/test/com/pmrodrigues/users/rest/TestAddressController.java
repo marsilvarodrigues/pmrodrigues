@@ -11,6 +11,7 @@ import com.pmrodrigues.users.dtos.StateDTO;
 import com.pmrodrigues.users.dtos.UserDTO;
 import com.pmrodrigues.users.model.Address;
 import com.pmrodrigues.users.model.State;
+import com.pmrodrigues.users.model.User;
 import com.pmrodrigues.users.model.enums.AddressType;
 import com.pmrodrigues.users.rest.AddressController;
 import com.pmrodrigues.users.service.AddressService;
@@ -64,7 +65,11 @@ class TestAddressController {
     @SneakyThrows
     void shouldGetAddressById(){
 
-        given(service.findById(any(UUID.class))).willReturn(Address.builder().build());
+        given(service.findById(any(UUID.class))).willReturn(Address.builder()
+                .state(State.builder()
+                        .build())
+                .owner(User.builder().build())
+                .build());
 
         mvc.perform(get(format("/addresses/%s",UUID.randomUUID()))
                 )
@@ -89,13 +94,22 @@ class TestAddressController {
     void shouldAddANewAddress() {
 
         val state = State.builder().id(UUID.randomUUID()).code("RJ").name("TESTE").build();
+        val owner = User.builder()
+                .email("test@test.com")
+                .firstName("teste")
+                .lastName("teste")
+                .externalId(UUID.randomUUID())
+                .id(UUID.randomUUID())
+                .build();
+
         val address = Address.builder()
                 .state(state)
                 .address1("TESTE")
                 .addressType(AddressType.STREET)
                 .city("TESTE")
                 .zipcode("12345-123")
-                .neightbor("TESTE")
+                .neighbor("TESTE")
+                .owner(owner)
                 .build();
         val json = objectMapper.writeValueAsString(address);
         address.setId(UUID.randomUUID());
@@ -118,13 +132,15 @@ class TestAddressController {
     void shouldntAddAddressUserNotAllowed() {
 
         val state = State.builder().id(UUID.randomUUID()).code("RJ").name("TESTE").build();
+        val owner = User.builder().build();
         val address = Address.builder()
                 .state(state)
                 .address1("TESTE")
                 .addressType(AddressType.STREET)
                 .city("TESTE")
                 .zipcode("12345-123")
-                .neightbor("TESTE")
+                .neighbor("TESTE")
+                .owner(owner)
                 .build();
         val json = objectMapper.writeValueAsString(address);
         address.setId(UUID.randomUUID());
@@ -144,14 +160,24 @@ class TestAddressController {
     void shouldUpdateAddress(){
 
         val state = State.builder().id(UUID.randomUUID()).code("RJ").name("TESTE").build();
+
+        val owner = User.builder()
+                .email("test@test.com")
+                .firstName("teste")
+                .lastName("teste")
+                .externalId(UUID.randomUUID())
+                .id(UUID.randomUUID())
+                .build();
+
         val address = Address.builder()
                 .state(state)
                 .address1("TESTE")
                 .addressType(AddressType.STREET)
                 .city("TESTE")
                 .zipcode("12345-123")
-                .neightbor("TESTE")
+                .neighbor("TESTE")
                 .id(UUID.randomUUID())
+                .owner(owner)
                 .build();
 
         willDoNothing().given(service).updateAddress(any(UUID.class), any(Address.class));
@@ -173,13 +199,23 @@ class TestAddressController {
     void shouldntUpdatAddressNotFound(){
 
         val state = State.builder().id(UUID.randomUUID()).code("RJ").name("TESTE").build();
+
+        val owner = User.builder()
+                .email("test@test.com")
+                .firstName("teste")
+                .lastName("teste")
+                .externalId(UUID.randomUUID())
+                .id(UUID.randomUUID())
+                .build();
+
         val address = Address.builder()
                 .state(state)
                 .address1("TESTE")
                 .addressType(AddressType.STREET)
                 .city("TESTE")
                 .zipcode("12345-123")
-                .neightbor("TESTE")
+                .neighbor("TESTE")
+                .owner(owner)
                 .id(UUID.randomUUID())
                 .build();
 
@@ -202,13 +238,22 @@ class TestAddressController {
     void shouldntUpdatAddressOperationNotAllowed(){
 
         val state = State.builder().id(UUID.randomUUID()).code("RJ").name("TESTE").build();
+        val owner = User.builder()
+                .email("test@test.com")
+                .firstName("teste")
+                .lastName("teste")
+                .externalId(UUID.randomUUID())
+                .id(UUID.randomUUID())
+                .build();
+
         val address = Address.builder()
                 .state(state)
                 .address1("TESTE")
                 .addressType(AddressType.STREET)
                 .city("TESTE")
                 .zipcode("12345-123")
-                .neightbor("TESTE")
+                .neighbor("TESTE")
+                .owner(owner)
                 .id(UUID.randomUUID())
                 .build();
 
@@ -240,11 +285,13 @@ class TestAddressController {
                 .addressType(AddressType.STREET)
                 .city("TESTE")
                 .zipcode("TESTE")
-                .neightbor("TESTE")
+                .neighbor("TESTE")
                 .owner(owner)
                 .build();
 
         val message = objectMapper.writeValueAsString(address);
+
+        when(service.findAll(any(Address.class), any(PageRequest.class))).thenReturn(Page.empty());
 
         mvc.perform(get("/addresses?page=1&size=10")
                         .content(message)
@@ -257,6 +304,8 @@ class TestAddressController {
     @Test
     @SneakyThrows
     void shouldSearchAddressBodyEmpty() {
+
+        when(service.findAll(any(Address.class), any(PageRequest.class))).thenReturn(Page.empty());
 
         mvc.perform(get("/addresses?page=1&size=10")
                         .contentType(MediaType.APPLICATION_JSON))

@@ -1,0 +1,49 @@
+server:
+  port: 8143
+  servlet:
+    context-path: /
+
+logging:
+  level:
+    root: INFO
+  group:
+    app:
+      - com.pmrodrigues
+
+spring:
+  autoconfigure:
+    exclude: org.keycloak.adapters.springboot.KeycloakAutoConfiguration
+  output:
+    ansi:
+      enabled: DETECT
+  jpa:
+    database: POSTGRESQL
+    hibernate:
+      ddl-auto: none
+    show-sql: true
+    properties:
+      hibernate:
+        jdbc:
+          batch_size: 15
+        order_inserts: true
+        order_updates: true
+        format_sql: true
+        generate_statistics: true
+      temp:
+        use_jdbc_metadata_defaults: false
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
+  datasource:
+    platform: postgresql
+    driver-class-name: org.postgresql.Driver
+    url: jdbc:postgresql://${POSTGRES_URL:localhost}:${POSTGRES_PORT:5432}/${POSTGRES_DB:pmrodrigues-test}
+    username: ${POSTGRES_USER:postgres}
+    password: ${POSTGRES_PASSWORD:postgres}
+  liquibase:
+    drop-first: true
+    default-schema: pmrodrigues-test
+    change-log: classpath:/db/changelog/changelog.xml
+    enabled: true
+    test-rollback-on-update: false
+    url: jdbc:postgresql://${POSTGRES_URL:localhost:5432}/${POSTGRES_DB:pmrodrigues-test}
+    user: ${POSTGRES_USER:postgres}
+    password: ${POSTGRES_PASSWORD:postgres}

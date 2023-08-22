@@ -47,10 +47,10 @@ public class AddressController {
             value = "/{id}",
             produces = { MediaType.APPLICATION_JSON_VALUE }
     )
-    public ResponseEntity<Address> getAddressById(@NonNull @ApiParam(required = true) @PathVariable(name = "id") UUID id) {
+    public ResponseEntity<AddressDTO> getAddressById(@NonNull @ApiParam(required = true) @PathVariable(name = "id") UUID id) {
         log.info("try to read address by id {}", id);
         val address = addressService.findById(id);
-        return ResponseEntity.ok(address);
+        return ResponseEntity.ok(AddressDTO.fromAddress(address));
     }
 
     @Timed(value = "AddressController.listAll", histogram = true)
@@ -62,7 +62,7 @@ public class AddressController {
     @GetMapping(
             produces = { MediaType.APPLICATION_JSON_VALUE }
     )
-    public ResponseEntity<Page<Address>> listAll(
+    public ResponseEntity<Page<AddressDTO>> listAll(
             @RequestParam(name = "page", defaultValue = "0", required = false)
             @Min(value = 0, message = "page number is invalid") @Valid Integer page,
             @RequestParam(name = "size", defaultValue = "50", required = false)
@@ -82,7 +82,7 @@ public class AddressController {
             sample = address.toAddress();
         }
 
-        val response = addressService.findAll(sample, PageRequest.of(page, size, Sort.by(sortBy)));
+        val response = addressService.findAll(sample , PageRequest.of(page, size, Sort.by(sortBy))).map(AddressDTO::fromAddress);
         return ResponseEntity.ok(response);
 
     }
@@ -97,13 +97,13 @@ public class AddressController {
             produces = { MediaType.APPLICATION_JSON_VALUE },
             consumes = { MediaType.APPLICATION_JSON_VALUE }
     )
-    public ResponseEntity<Address> add(@ApiParam(required = true) @Valid @RequestBody final Address address) {
+    public ResponseEntity<AddressDTO> add(@ApiParam(required = true) @Valid @RequestBody final AddressDTO address) {
         log.info("try to save a new address as {}",address);
-        val saved = addressService.createNewAddress(address);
+        val saved = addressService.createNewAddress(address.toAddress());
         log.info("address {} saved into database",saved);
 
         return ResponseEntity.created(URI.create("/addresses/" + saved.getId()))
-                .body(saved);
+                .body(AddressDTO.fromAddress(saved));
     }
 
     @Timed(value = "AddressController.update", histogram = true)
@@ -116,9 +116,9 @@ public class AddressController {
             produces = { MediaType.APPLICATION_JSON_VALUE },
             consumes = { MediaType.APPLICATION_JSON_VALUE }
     )
-    public ResponseEntity<String> update(@ApiParam(required = true) @PathVariable("id") final UUID id,@ApiParam(required = true) @Valid @RequestBody final Address address){
+    public ResponseEntity<String> update(@ApiParam(required = true) @PathVariable("id") final UUID id,@ApiParam(required = true) @Valid @RequestBody final AddressDTO address){
         log.info("try to update a address {}", address);
-        addressService.updateAddress(id, address);
+        addressService.updateAddress(id, address.toAddress());
         log.info("address {} saved", address);
         return ResponseEntity.ok().build();
     }

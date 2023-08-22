@@ -13,6 +13,10 @@ public record StateDTO(
         String name,
         String code) {
 
+    public static StateDTO fromState(State state) {
+        return new StateDTO(state.getId(), state.getName(), state.getCode());
+    }
+
     public State toState() {
         return State
                 .builder()

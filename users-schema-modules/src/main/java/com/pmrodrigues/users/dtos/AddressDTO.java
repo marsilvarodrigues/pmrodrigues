@@ -12,10 +12,17 @@ public record AddressDTO(
         String address1,
         String address2,
         String zipcode,
-        String neightbor,
+        String neighbor,
         String city,
         StateDTO state,
         UserDTO owner) {
+
+    public static AddressDTO fromAddress(final Address address){
+        return new AddressDTO(address.getAddressType(), address.getAddress1(), address.getAddress2(),
+                address.getZipcode(), address.getNeighbor(), address.getCity(),
+                StateDTO.fromState(address.getState()),
+                UserDTO.fromUser(address.getOwner()));
+    }
 
     public Address toAddress() {
 
@@ -26,12 +33,9 @@ public record AddressDTO(
                     .city(city)
                     .zipcode(zipcode)
                     .address2(address2)
-                    .neightbor(neightbor)
+                    .neighbor(neighbor)
                     .owner(owner.toUser())
                     .build();
 
     }
 }
-
-
-

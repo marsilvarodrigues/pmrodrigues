@@ -27,7 +27,7 @@ spring:
         registration:
           keycloak:
             client-id: ${KEYCLOAK_CLIENT_ID:4c815705-49c8-43cc-88e7-eb1e9b8fe253}
-            client-secret: ${IpaOmm2u8FVDCJbgUGnX80Yp3BTb7Kgg}
+            client-secret: ${KEYCLOAK_CLIENT_SECRET:N1v6yxmH05767mtUmx8o3fXpF6v7tBb3}
             scope: openid
             authorization-grant-type: client_credentials
         provider:
@@ -39,7 +39,7 @@ keycloak:
   realm: master
   resource: 4c815705-49c8-43cc-88e7-eb1e9b8fe253
   credentials:
-    secret: IpaOmm2u8FVDCJbgUGnX80Yp3BTb7Kgg
+    secret: N1v6yxmH05767mtUmx8o3fXpF6v7tBb3
   ssl-required: none
   bearer-only: true
   principal-attribute: preferred_username

@@ -26,7 +26,7 @@ class TestEmailService {
 
     @Test
     @SneakyThrows
-    public void shouldSend() {
+    void shouldSend() {
         val listenable = mock(ListenableFuture.class);
         given(kafkaTemplate.send(any(String.class), any(Email.class))).willReturn(listenable);
 

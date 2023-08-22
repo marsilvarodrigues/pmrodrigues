@@ -58,15 +58,15 @@ public class AddressStepsConfigurations  extends AbstractStepsConfiguration<Addr
                     .addressType(this.getAddressType(entry.get("addressType")))
                     .address1(entry.get("address"))
                     .zipcode(entry.get("zipcode"))
-                    .neightbor(entry.get("neightboor"))
+                    .neighbor(entry.get("neighbor"))
                     .city(entry.get("city"))
                     .build();
     }
 
 
     @Given("I save my address as {state}, {addressType}, {string}, {string}, {string}, {string}")
-    public void createMyAddress(State state, AddressType addressType, String street, String zipcode, String neightboor, String city) {
-        val address = Address.builder().state(state).addressType(addressType).address1(street).zipcode(zipcode).neightbor(neightboor).city(city).build();
+    public void createMyAddress(State state, AddressType addressType, String street, String zipcode, String neighbor, String city) {
+        val address = Address.builder().state(state).addressType(addressType).address1(street).zipcode(zipcode).neighbor(neighbor).city(city).build();
 
         postForLocation(ADDRESSES, address, ADDRESS_ID , ADDRESS);
 

@@ -2,6 +2,7 @@ package com.pmrodrigues.users.rest;
 
 import com.pmrodrigues.commons.request.validates.ValuesAllowed;
 import com.pmrodrigues.users.dtos.RoleDTO;
+import com.pmrodrigues.users.dtos.UserDTO;
 import com.pmrodrigues.users.model.User;
 import com.pmrodrigues.users.service.RoleService;
 import io.micrometer.core.annotation.Timed;
@@ -48,7 +49,7 @@ public class RoleController {
             value = "/{role}/users",
             produces = { MediaType.APPLICATION_JSON_VALUE }
     )
-    public ResponseEntity<Page<User>> getUsersInRole(@PathVariable(name = "role") @ApiParam(required = true) @NonNull String role,
+    public ResponseEntity<Page<UserDTO>> getUsersInRole(@PathVariable(name = "role") @ApiParam(required = true) @NonNull String role,
                                                      @RequestParam(name = "page", defaultValue = "0", required = false)
                                                     @PositiveOrZero(message = "Page number must be positive or zero")
                                                     @Min(value = 0, message = "page number is invalid") @Valid Integer page,
@@ -63,7 +64,7 @@ public class RoleController {
 
         var sortBy = createSortForString(sort);
 
-        val response = roleService.getUsersInRole(role, PageRequest.of(page, size, Sort.by(sortBy)));
+        val response = roleService.getUsersInRole(role, PageRequest.of(page, size, Sort.by(sortBy))).map(UserDTO::fromUser);
         return ResponseEntity.ok(response);
 
     }

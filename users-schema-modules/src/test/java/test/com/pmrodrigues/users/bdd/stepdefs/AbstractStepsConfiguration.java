@@ -36,7 +36,7 @@ public abstract class AbstractStepsConfiguration<E> {
     private String REALM;
     @Value("${KEYCLOAK_CLIENT_ID:94cf4fee-1b57-4e3c-8d97-195e7f7f1173}")
     private String CLIENT_ID;
-    @Value("${KEYCLOAK_CLIENT_SECRET:gNjirmWqaUiP4NWREgRDpbzJpnq7WSZD}")
+    @Value("${KEYCLOAK_CLIENT_SECRET:3FrxqjAubBRrKhn27cemzho7B4x3MIrN}")
     private String CLIENT_SECRET;
 
     private static final ThreadLocal<Map<String, Object>> context = withInitial(HashMap::new);

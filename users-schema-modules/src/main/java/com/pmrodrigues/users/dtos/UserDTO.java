@@ -17,6 +17,15 @@ public record UserDTO(
         String email,
         LocalDateTime expiredDate
 ){
+    public static UserDTO fromUser(User user) {
+
+        return new UserDTO(user.getId(),
+                user.getFirstName(),
+                user.getLastName(),
+                user.getEmail(), user.getExpiredDate());
+
+    }
+
     public User toUser(){
         return User.builder()
                 .firstName(firstName)

@@ -48,13 +48,13 @@ public class UserController{
             produces = { MediaType.APPLICATION_JSON_VALUE },
             consumes = { MediaType.APPLICATION_JSON_VALUE }
     )
-    public ResponseEntity<User> add(@ApiParam(required = true) @Valid @RequestBody final User user) {
+    public ResponseEntity<UserDTO> add(@ApiParam(required = true) @Valid @RequestBody final UserDTO user) {
         log.info("try to save a new user as {}",user);
-        val saved = userService.createNewUser(user);
+        val saved = userService.createNewUser(user.toUser());
         log.info("user {} saved into database",saved);
 
         return ResponseEntity.created(URI.create("/users/" + saved.getId()))
-                .body(saved);
+                .body(UserDTO.fromUser(saved));
     }
 
     @Timed(value = "UserController.update", histogram = true)
@@ -66,9 +66,9 @@ public class UserController{
             produces = { MediaType.APPLICATION_JSON_VALUE },
             consumes = { MediaType.APPLICATION_JSON_VALUE }
     )
-    public ResponseEntity<String> update(@ApiParam(required = true) @PathVariable("id") final UUID id,@ApiParam(required = true) @Valid @RequestBody final User user){
+    public ResponseEntity<String> update(@ApiParam(required = true) @PathVariable("id") final UUID id,@ApiParam(required = true) @Valid @RequestBody final UserDTO user){
         log.info("try to update a user {}", user);
-        userService.updateUser(id, user);
+        userService.updateUser(id, user.toUser());
         log.info("user {} saved", user);
         return ResponseEntity.ok().build();
     }
@@ -83,10 +83,10 @@ public class UserController{
             value = "/{id}",
             produces = { MediaType.APPLICATION_JSON_VALUE }
     )
-    public ResponseEntity<User> getUserById(@ApiParam(required = true) @PathVariable("id") final UUID id) {
+    public ResponseEntity<UserDTO> getUserById(@ApiParam(required = true) @PathVariable("id") final UUID id) {
         log.info("finding user with id {}", id);
         val user = userService.findById(id);
-        return ResponseEntity.ok(user);
+        return ResponseEntity.ok(UserDTO.fromUser(user));
 
     }
 
@@ -97,7 +97,7 @@ public class UserController{
     @GetMapping(
             produces = { MediaType.APPLICATION_JSON_VALUE }
     )
-    public ResponseEntity<Page<User>> listAll(
+    public ResponseEntity<Page<UserDTO>> listAll(
             @RequestParam(name = "page", defaultValue = "0", required = false)
                 @Min(value = 0, message = "page number is invalid") @Valid Integer page,
             @RequestParam(name = "size", defaultValue = "50", required = false)
@@ -116,7 +116,7 @@ public class UserController{
             sample = user.toUser();
         }
 
-        val response = userService.findAll(sample, PageRequest.of(page, size, Sort.by(sortBy)));
+        val response = userService.findAll(sample, PageRequest.of(page, size, Sort.by(sortBy))).map(UserDTO::fromUser);
         return ResponseEntity.ok(response);
 
     }

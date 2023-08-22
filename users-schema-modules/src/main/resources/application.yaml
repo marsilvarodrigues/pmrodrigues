@@ -5,7 +5,7 @@ server:
 
 logging:
   level:
-    root: FATAL
+    root: INFO
     app: DEBUG
   group:
     app:
@@ -50,9 +50,9 @@ spring:
         registration:
           keycloak:
             client-id: ${KEYCLOAK_CLIENT_ID:94cf4fee-1b57-4e3c-8d97-195e7f7f1173}
-            client-secret: ${KEYCLOAK_CLIENT_SECRET:gNjirmWqaUiP4NWREgRDpbzJpnq7WSZD}
+            client-secret: ${KEYCLOAK_CLIENT_SECRET:3FrxqjAubBRrKhn27cemzho7B4x3MIrN}
             scope: openid
-            authorization-grant-type: client_credentials
+            authorization-grant-type: password
         provider:
           keycloak:
             issuerUri: http://${KEYCLOAK_LOCATION:localhost:8080}/auth/realms/master
@@ -70,7 +70,7 @@ keycloak:
   realm: ${KEYCLOAK_REALM:master}
   resource: 94cf4fee-1b57-4e3c-8d97-195e7f7f1173
   credentials:
-    secret: gNjirmWqaUiP4NWREgRDpbzJpnq7WSZD
+    secret: 3FrxqjAubBRrKhn27cemzho7B4x3MIrN
   ssl-required: none
   bearer-only: true
   principal-attribute: id
