@@ -127,7 +127,7 @@ public class KeycloakUserRepository {
 
         val keycloakUser = userResponse.getBody();
 
-        keycloakUser.getRealmRoles().add(roleName);
+        keycloakUser.getRealmRoles().add(roleName.toString());
         userClient.update(user.getExternalId(), keycloakUser);
     }
 }

@@ -103,13 +103,12 @@ class TestUserService {
     @Test
     @DisplayName("Should delete user")
     void shouldDeleteUser() {
-        val user = User.builder().id(UUID.randomUUID()).build();
+        val user = User.builder().id(UUID.randomUUID()).externalId(UUID.randomUUID()).build();
         given(repository.findById(any(UUID.class))).willReturn(Optional.of(user));
-        willDoNothing().given(repository).delete(any(User.class));
-
-        willDoNothing().given(userClient).delete(any(UUID.class));
-
         userService.delete(user);
+
+        verify(repository).delete(any(User.class));
+        verify(userClient).delete(any(UUID.class));
     }
 
     @Test
@@ -151,10 +150,11 @@ class TestUserService {
                 .build();
 
         given(repository.findById(any(UUID.class))).willReturn(Optional.of(user));
-        given(repository.save(any(User.class))).willReturn(user);
-        willDoNothing().given(userClient).update(user);
 
         userService.updateUser(id, user);
+
+        verify(repository).save(any(User.class));
+        verify(userClient).update(any(User.class));
     }
 
     @Test

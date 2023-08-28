@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.pmrodrigues.commons.controlleradvices.DuplicatedKeyControllerAdvice;
 import com.pmrodrigues.commons.controlleradvices.ValidationErrorControllerAdvice;
 import com.pmrodrigues.commons.exceptions.KeycloakIntegrationFailed;
+import com.pmrodrigues.commons.exceptions.NotCreateException;
 import com.pmrodrigues.security.configurations.WebSecurityConfiguration;
 import com.pmrodrigues.users.dtos.UserDTO;
 import com.pmrodrigues.users.exceptions.UserNotFoundException;
@@ -126,8 +127,10 @@ class TestUserController {
     @DisplayName("Should not save a new user. User not valid")
     void shouldNotSaveUserNotValid() {
 
-        val user = User.builder().build();
+        val user = User.builder().id(UUID.randomUUID()).build();
         val json = objectMapper.writeValueAsString(user);
+
+        given(userService.createNewUser(any(User.class))).willThrow(new NotCreateException());
 
         mvc.perform(post("/users")
                         .content(json)
