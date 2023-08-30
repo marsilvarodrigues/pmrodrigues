@@ -40,9 +40,9 @@ public class UserController{
     private final UserService userService;
 
     @Timed(value = "UserController.add", histogram = true)
-    @ApiOperation(value = "Create a new user", nickname = "add", response = User.class, tags={ "user"})
+    @ApiOperation(value = "Create a new user", nickname = "add", response = UserDTO.class, tags={ "user"})
     @ApiResponses(value = {
-            @ApiResponse(code = 201, message = "User successful created", response = User.class),
+            @ApiResponse(code = 201, message = "User successful created", response = UserDTO.class),
             @ApiResponse(code = 400, message = "Failed to create a user"),
             @ApiResponse(code = 409, message = "Other user with the same email exist previously")})
     @PostMapping(
@@ -76,9 +76,9 @@ public class UserController{
 
 
     @Timed(value = "UserController.getUserById", histogram = true)
-    @ApiOperation(value = "Get a user by a specific id", nickname = "getUserById", notes = "Get a user by a specific id", response = User.class, tags={ "user", })
+    @ApiOperation(value = "Get a user by a specific id", nickname = "getUserById", notes = "Get a user by a specific id", response = UserDTO.class, tags={ "user", })
     @ApiResponses(value = {
-            @ApiResponse(code = 200, message = "OK", response = User.class),
+            @ApiResponse(code = 200, message = "OK", response = UserDTO.class),
             @ApiResponse(code = 404, message = "User not found") })
     @GetMapping(
             value = "/{id}",
@@ -92,9 +92,9 @@ public class UserController{
     }
 
     @Timed(value = "UserController.listAll", histogram = true)
-    @ApiOperation(value = "List all user by", nickname = "listAll", notes = "List all user by", response = User.class, tags={ "user", })
+    @ApiOperation(value = "List all user by", nickname = "listAll", notes = "List all user by", response = UserDTO.class, tags={ "user", })
     @ApiResponses(value = {
-            @ApiResponse(code = 200, message = "OK", response = User.class)})
+            @ApiResponse(code = 200, message = "OK", response = UserDTO.class)})
     @GetMapping(
             produces = { MediaType.APPLICATION_JSON_VALUE }
     )
@@ -122,7 +122,7 @@ public class UserController{
     }
 
     @Timed(value = "UserController.deleteById", histogram = true)
-    @ApiOperation(value = "Delete User By Id", nickname = "deleteById", notes = "Delete a user by a specific id", response = User.class, tags={ "user", })
+    @ApiOperation(value = "Delete User By Id", nickname = "deleteById", notes = "Delete a user by a specific id", response = UserDTO.class, tags={ "user", })
     @ApiResponses(value = {
             @ApiResponse(code = 204, message = "OK"),
             @ApiResponse(code = 404, message = "User not found") })

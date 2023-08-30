@@ -9,13 +9,13 @@ import org.apache.http.client.methods.HttpEntityEnclosingRequestBase;
 import org.apache.http.client.methods.HttpUriRequest;
 import org.jboss.resteasy.client.jaxrs.ResteasyClientBuilder;
 import org.keycloak.admin.client.KeycloakBuilder;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.*;
 import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
 import org.springframework.security.oauth2.core.AuthorizationGrantType;
 import org.springframework.web.client.RestTemplate;
+import test.com.pmrodrigues.users.bdd.integrations.UserRestClient;
 import test.com.pmrodrigues.users.helper.HelperPage;
 
 import java.lang.reflect.ParameterizedType;
@@ -25,19 +25,24 @@ import java.util.List;
 import java.util.Map;
 
 import static java.lang.ThreadLocal.withInitial;
-import static test.com.pmrodrigues.users.bdd.ContextAttribute.*;
+import static test.com.pmrodrigues.users.bdd.ContextAttribute.RESPONSE_URL;
+import static test.com.pmrodrigues.users.bdd.ContextAttribute.REST_TEMPLATE;
 
 @Slf4j
 public abstract class AbstractStepsConfiguration<E> {
     protected String API_URL = "http://localhost:8143";
-    @Value("${KEYCLOAK_LOCATION:http://localhost:8080/auth}")
-    private String SERVER_URL;
-    @Value("${KEYCLOAK_REALM:master}")
-    private String REALM;
-    @Value("${KEYCLOAK_CLIENT_ID:94cf4fee-1b57-4e3c-8d97-195e7f7f1173}")
-    private String CLIENT_ID;
-    @Value("${KEYCLOAK_CLIENT_SECRET:3FrxqjAubBRrKhn27cemzho7B4x3MIrN}")
-    private String CLIENT_SECRET;
+
+    private String SERVER_URL = "http://localhost:8080/auth";
+
+    private String REALM = "master";
+
+    private String CLIENT_ID = "94cf4fee-1b57-4e3c-8d97-195e7f7f1173";
+
+    private String CLIENT_SECRET = "3FrxqjAubBRrKhn27cemzho7B4x3MIrN";
+
+    public UserRestClient userRestClient(){
+        return new UserRestClient(SERVER_URL, REALM, CLIENT_ID, CLIENT_SECRET);
+    }
 
     private static final ThreadLocal<Map<String, Object>> context = withInitial(HashMap::new);
 
@@ -154,8 +159,6 @@ public abstract class AbstractStepsConfiguration<E> {
 
     protected void searchBySample(String api, HttpMethod httpMethod, HttpEntity httpEntity, ParameterizedTypeReference typeReference) {
         this.returned = getRest().exchange(API_URL + api, httpMethod, httpEntity, typeReference);
-
-
     }
 
     protected Class<E> getParameterizedType() {

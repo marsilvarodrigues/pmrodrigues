@@ -2,45 +2,37 @@ package test.com.pmrodrigues.users.bdd.stepdefs;
 
 
 import com.pmrodrigues.users.UserApplication;
-import com.pmrodrigues.users.dtos.UserDTO;
 import com.pmrodrigues.users.model.User;
-import com.pmrodrigues.users.service.UserService;
 import io.cucumber.java.After;
 import io.cucumber.java.DataTableType;
 import io.cucumber.java.ParameterType;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
+import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import lombok.val;
 import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.core.ParameterizedTypeReference;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.transaction.annotation.Transactional;
-import test.com.pmrodrigues.users.helper.HelperPage;
+import test.com.pmrodrigues.users.bdd.integrations.UserRestClient;
 
 import java.util.List;
 import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static test.com.pmrodrigues.users.bdd.ContextAttribute.USER;
-import static test.com.pmrodrigues.users.bdd.ContextAttribute.USER_ID;
 
 @ExtendWith({SpringExtension.class})
 @SpringBootTest( webEnvironment = SpringBootTest.WebEnvironment.MOCK,
-        classes = UserApplication.class)
+        classes = {UserApplication.class})
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-public class UserStepsConfigurations extends AbstractStepsConfiguration<User> {
+@RequiredArgsConstructor
+public class UserStepsConfigurations extends AbstractStepsConfiguration{
 
-    @Autowired
-    private UserService userService;
+    private final UserRestClient userRestClient = userRestClient();
 
     @DataTableType
     public User userEntry(Map<String, String> entry) {
@@ -54,71 +46,56 @@ public class UserStepsConfigurations extends AbstractStepsConfiguration<User> {
 
     @ParameterType(value = ".*", name = "email")
     public User getByEmail(String email){
-        return userService.findAll(User.builder().email(email).build(), PageRequest.of(0,1))
-                .getContent()
+        val user = User.builder().email(email).build();
+        return this.userRestClient.search(user)
+                .getUsers()
                 .stream()
                 .findFirst()
                 .get();
+
     }
 
     @Given("An {string} user")
     public void givenAnNewUserAsUserType(String userType) {
-        generateToken("admin", "admin");
+        userRestClient.auth(userType);
     }
 
     @Transactional
     @Given("the following users")
     public void givenAListOfUsers(List<User> users) {
-        users.stream().forEach(user -> userService.createNewUser(user));
+        users.stream().forEach(user -> userRestClient.create(user.getEmail(), user.getFirstName(), user.getLastName()));
     }
 
     @Given("Id by {string} of {string}")
     public void givenThenIdOfUserByPropertyValue(String propertyName, String value) {
-        val user = new User();
-        setValue(propertyName, value, user);
-        val id = userService.findAll(user, PageRequest.of(0,1))
+        var user = new User();
+        userRestClient.setValue(user, propertyName, value);
+        user = userRestClient.search(user).getUsers()
                 .stream()
-                .findFirst().map(User::getId)
-                .orElse(null);
+                .findFirst().orElse(new User());
 
-        super.put(USER_ID, id);
+        userRestClient.setEntity(user);
+        userRestClient.setId(user.getId());
 
     }
 
     @Given("a new user as {string} , {string} and {string}")
     public void givenANewUserAs(String email, String firstName , String lastName) {
-        var user = User.builder().firstName(firstName).lastName(lastName).email(email).build();
-        user = userService.createNewUser(user);
-        put(USER , user);
-        put(USER_ID, user.getId());
-        generateToken(user.getEmail(), user.getPassword());
+        userRestClient.create(email, firstName, lastName);
 
     }
 
     @When("Create a new user with email {string} firstName {string} and lastName {string}")
     public void whenCreateANewUserAs(String email, String firstName, String lastName) {
-
-        val user = User.builder()
-                .email(email)
-                .firstName(firstName)
-                .lastName(lastName)
-                .build();
-
-        super.postForLocation("/users", user, USER_ID, USER);
-
-
+        userRestClient.create(email, firstName, lastName);
     }
 
     @SneakyThrows
     @When("Update {string} to {string}")
     public void whenUpdatePropertyOfUser(String propertyName, String newValue) {
-        val returned = super.getForEntity("/users/" + get(USER_ID), USER_ID, USER);
-        assertEquals(HttpStatus.OK, returned.getStatusCode());
-
-        val user = returned.getBody();
-        setValue(propertyName, newValue, user);
-
-        super.updateEntity("/users/" + get(USER_ID), user);
+        this.userRestClient.getById(this.userRestClient.getId());
+        assertEquals(HttpStatus.OK, userRestClient.getHttpStatus());
+        userRestClient.update(propertyName, newValue);
 
     }
 
@@ -126,9 +103,9 @@ public class UserStepsConfigurations extends AbstractStepsConfiguration<User> {
     @When("I filter by {string} as {string}")
     public void whenISearchAnUserBy(String propertyName, String value) {
 
-        val user = new UserDTO(null, null, null, null, null);
-        setValue(propertyName, value, user);
-        super.searchBySample("/users", HttpMethod.GET, new HttpEntity(user), new ParameterizedTypeReference<HelperPage<User>>(){});
+        val user = new User();
+        userRestClient.setValue(user, propertyName, value);
+        userRestClient.search(user);
 
     }
 
@@ -136,16 +113,15 @@ public class UserStepsConfigurations extends AbstractStepsConfiguration<User> {
     @When("List all users")
     public void whenIListAllUser() {
 
-        val user = new UserDTO(null, null, null, null, null);
-        val entity = new HttpEntity<>(user);
-        super.searchBySample("/users",HttpMethod.GET, new HttpEntity(user), new ParameterizedTypeReference<HelperPage<User>>(){});
+        val user = new User();
+        userRestClient.search(user);
     }
 
 
 
     @When("Delete user")
     public void deleteUser() {
-        super.delete("/users/" + get(USER_ID));
+        this.userRestClient.delete();
         whenIListAllUser();
 
     }
@@ -154,14 +130,9 @@ public class UserStepsConfigurations extends AbstractStepsConfiguration<User> {
     @SneakyThrows
     @Then("User has a {string} defined")
     public void thenCheckIfThePropertyWasSet(String propertyName) {
-
-        var user = (User)get(USER);
-
-        getForEntity("/users/" + user.getId(), USER_ID, USER);
+        userRestClient.getById(userRestClient.getEntity().getId());
         checkIfStatusCodeIsStatusCode(200);
-        user = super.getEntity();
-
-        assertNotNull(getValue(propertyName, user));
+        assertNotNull(userRestClient.getValue(propertyName));
     }
 
 
@@ -169,10 +140,8 @@ public class UserStepsConfigurations extends AbstractStepsConfiguration<User> {
     @Then("User has firstName equals to {string} and lastName equals to {string} and email equals to {string}")
     public void checkIfUserReturnedCorrectly(String firstName, String lastName, String email) {
 
-        getForEntity("/users/" + get(USER_ID), USER_ID, USER);
         checkIfStatusCodeIsStatusCode(200);
-        val user = (User)get(USER);
-
+        val user = (User)this.userRestClient.getEntity();
         assertEquals(user.getFirstName(), firstName);
         assertEquals(user.getLastName(), lastName);
         assertEquals(user.getEmail(), email);
@@ -181,8 +150,7 @@ public class UserStepsConfigurations extends AbstractStepsConfiguration<User> {
     @Then("returned users list as")
     public void willReturn(List<User> expectedUsers) {
 
-        val founded = super.listEntity();
-
+        val founded = userRestClient.getUsers();
         assertTrue(founded.stream().allMatch(u -> expectedUsers.contains(u)));
     }
 
@@ -190,11 +158,7 @@ public class UserStepsConfigurations extends AbstractStepsConfiguration<User> {
     @Then("User has {string} equals to {string}")
     public void checkValue(String propertyName, String value) {
 
-        super.getForEntity("/users/" + get(USER_ID), USER_ID, USER);
-        checkIfStatusCodeIsStatusCode(200);
-        val user = super.getEntity();
-
-        val read = getValue(propertyName, user);
+        val read = userRestClient.getValue(propertyName);
         assertEquals(value, read);
     }
 
@@ -202,9 +166,10 @@ public class UserStepsConfigurations extends AbstractStepsConfiguration<User> {
     @Transactional
     public void afterAll() {
 
-        userService.findAll(User.builder().email("test.com").build(), PageRequest.of(0,1000))
-                .stream()
-                .forEach(user -> userService.delete(user));
+        val user = new User();
+        userRestClient.setValue(user, "email", "test.com");
+        val users = userRestClient.search(user).getUsers();
+        users.forEach( u -> userRestClient.delete(u));
 
 
     }
@@ -212,7 +177,7 @@ public class UserStepsConfigurations extends AbstractStepsConfiguration<User> {
     @Then("Check if statusCode is {int}")
     public void checkIfStatusCodeIsStatusCode(int statusCode) {
         HttpStatus httpStatus = HttpStatus.resolve(statusCode);
-        assertEquals(httpStatus, super.getStatusCode());
+        assertEquals(httpStatus, userRestClient.getHttpStatus());
     }
 
 }
