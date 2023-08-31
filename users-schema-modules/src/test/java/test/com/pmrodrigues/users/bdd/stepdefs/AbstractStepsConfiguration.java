@@ -15,6 +15,7 @@ import org.springframework.http.*;
 import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
 import org.springframework.security.oauth2.core.AuthorizationGrantType;
 import org.springframework.web.client.RestTemplate;
+import test.com.pmrodrigues.users.bdd.integrations.AddressRestClient;
 import test.com.pmrodrigues.users.bdd.integrations.UserRestClient;
 import test.com.pmrodrigues.users.helper.HelperPage;
 
@@ -43,6 +44,8 @@ public abstract class AbstractStepsConfiguration<E> {
     public UserRestClient userRestClient(){
         return new UserRestClient(SERVER_URL, REALM, CLIENT_ID, CLIENT_SECRET);
     }
+
+    public AddressRestClient addressRestClient(){ return new AddressRestClient(SERVER_URL, REALM, CLIENT_ID, CLIENT_SECRET);}
 
     private static final ThreadLocal<Map<String, Object>> context = withInitial(HashMap::new);
 

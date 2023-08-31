@@ -1,35 +1,35 @@
 Feature: Management Addresses
 
   Scenario Outline: Create my address
-    Given a new user as "<email>" , "<firstName>" and "<lastName>"
+    Given a new user as "<email>" , "<firstName>" and "<lastName>" with password "<password>"
     When I save my address as <state>, <addressType>, "<address>", "<zipcode>", "<neighbor>", "<city>"
     Then Address has a "<propertyName>" defined
     And Owner is the who logged
     Examples:
-    | email                 | firstName | lastName | state | addressType | address | zipcode   | neighbor   | city  | propertyName |
-    | test@test_address.com | test      | test     | RJ    | STREET      | teste   | 22222-222 | teste      | teste | id           |
+    | email                 | password | firstName | lastName | state | addressType | address | zipcode   | neighbor   | city  | propertyName |
+    | test@test_address.com | 12345678 | test      | test     | RJ    | STREET      | teste   | 22222-222 | teste      | teste | id           |
 
   Scenario Outline: Update my address
-    Given a new user as "<email>" , "<firstName>" and "<lastName>"
+    Given a new user as "<email>" , "<firstName>" and "<lastName>" with password "<password>"
     And I save my address as <state>, <addressType>, "<address>", "<zipcode>", "<neighbor>", "<city>"
     When I change "<propertyName>" to "<newValue>"
     Then Address with "<propertyName>" is equals to "<newValue>"
     Examples:
-      | email                 | firstName | lastName | state | addressType | address | zipcode   | neighbor   | city  | propertyName   | newValue |
-      | test@test_address.com | test      | test     | RJ    | STREET      | teste   | 22222-222 | teste      | teste | city           | XPTO     |
-      | test@test_address.com | test      | test     | RJ    | STREET      | teste   | 22222-222 | teste      | teste | address1       | XPTO     |
+      | email                 | password | firstName | lastName | state | addressType | address | zipcode   | neighbor   | city  | propertyName   | newValue |
+      | test@test_address.com | 12345678 | test      | test     | RJ    | STREET      | teste   | 22222-222 | teste      | teste | city           | XPTO     |
+      | test@test_address.com | 12345678 | test      | test     | RJ    | STREET      | teste   | 22222-222 | teste      | teste | address1       | XPTO     |
 
   Scenario Outline: Delete my Address
-    Given a new user as "<email>" , "<firstName>" and "<lastName>"
+    Given a new user as "<email>" , "<firstName>" and "<lastName>" with password "<password>"
     And I save my address as <state>, <addressType>, "<address>", "<zipcode>", "<neighbor>", "<city>"
     When I delete my address
     Then My Address needs to be empty
     Examples:
-      | email                 | firstName | lastName | state | addressType | address | zipcode   | neighbor   | city  |
-      | test@test_address.com | test      | test     | RJ    | STREET      | teste   | 22222-222 | teste      | teste |
+      | email                 | password | firstName | lastName | state | addressType | address | zipcode   | neighbor   | city  |
+      | test@test_address.com | 12345678 | test      | test     | RJ    | STREET      | teste   | 22222-222 | teste      | teste |
 
   Scenario: List my users
-    Given a new user as "test@test_address.com" , "test" and "test"
+    Given a new user as "test@test_address.com" , "test" and "test" with password "12345678"
     And a list of address as
       | state | addressType | address | zipcode   | neighbor | city  |
       | RJ    | STREET      | teste   | 22222-222 | teste      | teste |
@@ -47,7 +47,7 @@ Feature: Management Addresses
       | RN    | STREET      | teste   | 55555-555 | teste      | teste |
 
   Scenario: Search by state from my address list
-    Given a new user as "test@test_address.com" , "test" and "test"
+    Given a new user as "test@test_address.com" , "test" and "test" with password "12345678"
     And a list of address as
       | state | addressType | address | zipcode   | neighbor | city             |
       | RJ    | STREET      | teste   | 22222-222 | teste      | Rio de Janeiro |
@@ -61,7 +61,7 @@ Feature: Management Addresses
       | RJ    | STREET      | teste   | 22222-222 | teste      | Rio de Janeiro |
 
   Scenario: Search by addressType from my address list
-    Given a new user as "test@test_address.com" , "test" and "test"
+    Given a new user as "test@test_address.com" , "test" and "test" with password "12345678"
     And a list of address as
       | state | addressType | address | zipcode   | neighbor | city             |
       | RJ    | STREET      | teste   | 22222-222 | teste      | Rio de Janeiro |
@@ -76,7 +76,7 @@ Feature: Management Addresses
       | RN    | STREET      | teste   | 55555-555 | teste      | Natal          |
 
   Scenario: Search by addressType from my address list
-    Given a new user as "test@test_address.com" , "test" and "test"
+    Given a new user as "test@test_address.com" , "test" and "test" with password "12345678"
     And a list of address as
       | state | addressType | address | zipcode   | neighbor | city             |
       | RJ    | STREET      | teste   | 22222-222 | teste      | Rio de Janeiro |

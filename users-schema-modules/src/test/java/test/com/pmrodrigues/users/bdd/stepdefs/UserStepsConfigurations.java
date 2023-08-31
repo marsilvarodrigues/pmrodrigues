@@ -82,7 +82,12 @@ public class UserStepsConfigurations extends AbstractStepsConfiguration{
     @Given("a new user as {string} , {string} and {string}")
     public void givenANewUserAs(String email, String firstName , String lastName) {
         userRestClient.create(email, firstName, lastName);
+    }
 
+    @Given("a new user as {string} , {string} and {string} with password {string}")
+    public void givenANewUserAs(String email, String firstName , String lastName, String password) {
+        userRestClient.create(email, firstName, lastName, password);
+        userRestClient.auth(email, password);
     }
 
     @When("Create a new user with email {string} firstName {string} and lastName {string}")
@@ -151,7 +156,7 @@ public class UserStepsConfigurations extends AbstractStepsConfiguration{
     public void willReturn(List<User> expectedUsers) {
 
         val founded = userRestClient.getUsers();
-        assertTrue(founded.stream().allMatch(u -> expectedUsers.contains(u)));
+        assertTrue(founded.stream().allMatch(expectedUsers::contains));
     }
 
     @SneakyThrows
@@ -169,7 +174,7 @@ public class UserStepsConfigurations extends AbstractStepsConfiguration{
         val user = new User();
         userRestClient.setValue(user, "email", "test.com");
         val users = userRestClient.search(user).getUsers();
-        users.forEach( u -> userRestClient.delete(u));
+        users.forEach(userRestClient::delete);
 
 
     }

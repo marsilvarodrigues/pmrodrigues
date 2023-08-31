@@ -18,7 +18,8 @@ import static com.pmrodrigues.commons.stringutils.PasswordGenerator.generatePass
 
 @Entity
 @Table(name = "users")
-@Data
+@Getter
+@Setter
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder

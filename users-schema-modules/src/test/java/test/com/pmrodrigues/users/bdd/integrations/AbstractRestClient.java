@@ -53,7 +53,7 @@ abstract class AbstractRestClient<E> {
     private UUID id;
 
     @Getter
-    @Setter()
+    @Setter
     private E entity;
 
     public RestTemplate getRest() {
@@ -71,13 +71,15 @@ abstract class AbstractRestClient<E> {
                 .password(password)
                 .clientId(CLIENT_ID)
                 .clientSecret(CLIENT_SECRET)
-                .grantType(AuthorizationGrantType.PASSWORD.getValue())
+                .grantType(AuthorizationGrantType.CLIENT_CREDENTIALS.getValue())
                 .resteasyClient(new ResteasyClientBuilder().connectionPoolSize(10).build())
                 .build()) {
 
 
             val token = keycloak.tokenManager().getAccessTokenString();
             this.rest = initRestTemplate(token);
+
+            log.debug("auth token {}", token);
 
             rest.setRequestFactory(new HttpComponentsClientHttpRequestFactory() {
                 @Override

@@ -5,6 +5,8 @@ import com.pmrodrigues.users.model.Address;
 import com.pmrodrigues.users.model.enums.AddressType;
 import lombok.Builder;
 
+import java.util.Optional;
+
 @Builder
 @JsonInclude(JsonInclude.Include.NON_EMPTY)
 public record AddressDTO(
@@ -35,12 +37,16 @@ public record AddressDTO(
             return Address.builder()
                     .address1(address1)
                     .addressType(addressType)
-                    .state(state.toState())
+                    .state(Optional.ofNullable(state)
+                            .map(StateDTO::toState)
+                            .orElse(null))
                     .city(city)
                     .zipcode(zipcode)
                     .address2(address2)
                     .neighbor(neighbor)
-                    .owner(owner.toUser())
+                    .owner(Optional.ofNullable(owner)
+                            .map(UserDTO::toUser)
+                            .orElse(null))
                     .build();
 
     }

@@ -31,7 +31,13 @@ public class UserRestClient extends AbstractRestClient<User> {
                 .lastName(lastName)
                 .build();
 
-        this.setEntity(super.post(user));
+        return create(user);
+    }
+
+    private UserRestClient create(User user) {
+        val entity = super.post(user);
+        this.setEntity(entity);
+        this.setId(entity.getId());
         return this;
     }
 
@@ -72,4 +78,18 @@ public class UserRestClient extends AbstractRestClient<User> {
         }
     }
 
+    public UserRestClient create(String email, String firstName, String lastName, String password) {
+        val user = User.builder()
+                .email(email)
+                .firstName(firstName)
+                .lastName(lastName)
+                .password(password)
+                .build();
+
+        create(user);
+        val entity = this.getEntity();
+        entity.setPassword(user.getPassword());
+        this.setEntity(entity);
+        return this;
+    }
 }
