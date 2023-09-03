@@ -42,10 +42,19 @@ public abstract class AbstractStepsConfiguration<E> {
     private String CLIENT_SECRET = "3FrxqjAubBRrKhn27cemzho7B4x3MIrN";
 
     public UserRestClient userRestClient(){
-        return new UserRestClient(SERVER_URL, REALM, CLIENT_ID, CLIENT_SECRET);
+        if(!context.get().containsKey("USER_REST_CLIENT"))
+            context.get().put("USER_REST_CLIENT", new UserRestClient(SERVER_URL, REALM, CLIENT_ID, CLIENT_SECRET));
+
+        return (UserRestClient) context.get().get("USER_REST_CLIENT");
     }
 
-    public AddressRestClient addressRestClient(){ return new AddressRestClient(SERVER_URL, REALM, CLIENT_ID, CLIENT_SECRET);}
+    public AddressRestClient addressRestClient(){
+        if(!context.get().containsKey("ADDRESS_REST_CLIENT"))
+            context.get().put("ADDRESS_REST_CLIENT", new AddressRestClient(SERVER_URL, REALM, CLIENT_ID, CLIENT_SECRET));
+
+        return (AddressRestClient) context.get().get("ADDRESS_REST_CLIENT");
+        
+    }
 
     private static final ThreadLocal<Map<String, Object>> context = withInitial(HashMap::new);
 

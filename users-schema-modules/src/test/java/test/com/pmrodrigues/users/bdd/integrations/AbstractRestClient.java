@@ -22,9 +22,12 @@ import test.com.pmrodrigues.users.helper.HelperPage;
 
 import java.lang.reflect.ParameterizedType;
 import java.net.URI;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
+import static java.lang.ThreadLocal.withInitial;
 import static org.springframework.http.HttpMethod.GET;
 
 @Slf4j
@@ -56,14 +59,22 @@ abstract class AbstractRestClient<E> {
     @Setter
     private E entity;
 
+    private static final ThreadLocal<Map<String, Object>> context = withInitial(HashMap::new);
+
     public RestTemplate getRest() {
-        if( this.rest == null ) this.generateToken("admin", "admin");
+        val username = (String)context.get().getOrDefault("USERNAME", "admin");
+        val password = (String)context.get().getOrDefault("PASSWORD", "admin");
+        if( this.rest == null ) this.generateToken(username, password);
 
         return this.rest;
     }
 
     protected AbstractRestClient<E> generateToken(@NonNull String username, @NonNull String password) {
-        try(val keycloak = KeycloakBuilder
+
+        context.get().put("USERNAME", username);
+        context.get().put("PASSWORD", password);
+
+        val keycloak = KeycloakBuilder
                 .builder()
                 .serverUrl(SERVER_URL)
                 .realm(REALM)
@@ -73,7 +84,7 @@ abstract class AbstractRestClient<E> {
                 .clientSecret(CLIENT_SECRET)
                 .grantType(AuthorizationGrantType.CLIENT_CREDENTIALS.getValue())
                 .resteasyClient(new ResteasyClientBuilder().connectionPoolSize(10).build())
-                .build()) {
+                .build();
 
 
             val token = keycloak.tokenManager().getAccessTokenString();
@@ -98,7 +109,6 @@ abstract class AbstractRestClient<E> {
                     }
                 }
             });
-        }
 
         return this;
     }
