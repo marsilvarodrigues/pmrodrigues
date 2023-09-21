@@ -14,7 +14,7 @@ import org.springframework.util.concurrent.ListenableFuture;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
-import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 class TestEmailService {
@@ -35,6 +35,8 @@ class TestEmailService {
                 .subject("teste")
                 .message("teste");
         emailService.send(email);
+
+        verify(kafkaTemplate, times(1)).send(anyString(), any(Email.class));
 
     }
 }

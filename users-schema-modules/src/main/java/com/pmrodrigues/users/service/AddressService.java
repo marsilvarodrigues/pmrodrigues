@@ -43,7 +43,9 @@ public class AddressService {
         val connectedUser = userService.getAuthenticatedUser()
                 .orElseThrow(UserNotFoundException::new);
 
-        val state = stateRepository.findByCode(address.state()).orElseThrow(StateNotFoundException::new);
+        val state = stateRepository.findByCode(address.state())
+                .orElseThrow(StateNotFoundException::new);
+
         val toSave = address.toAddress().withState(state);
 
         log.info("create a new address {}", address);
@@ -51,7 +53,7 @@ public class AddressService {
         if(toSave.getOwner() == null ) {
             toSave.setOwner(connectedUser);
         } else if(!toSave.getOwner().equals(connectedUser) && !SecurityUtils.isUserInRole(Security.SYSTEM_ADMIN)) {
-            throw new OperationNotAllowedException("User not allowed for this operation");
+            throw new OperationNotAllowedException();
         }
         return repository.save(toSave);
     }
@@ -64,7 +66,10 @@ public class AddressService {
 
         var existed = repository.findById(id)
                 .orElseThrow(AddressNotFoundException::new);
-        val state = stateRepository.findByCode(address.state()).orElseThrow(StateNotFoundException::new);
+
+        val state = stateRepository.findByCode(address.state())
+                .orElseThrow(StateNotFoundException::new);
+
         val owner = address.owner().toUser();
         if(existed.getOwner().equals(owner) || SecurityUtils.isUserInRole(Security.SYSTEM_ADMIN)) {
 
@@ -78,7 +83,7 @@ public class AddressService {
 
             repository.save(existed);
         } else {
-            throw new OperationNotAllowedException("User not allowed for this operation");
+            throw new OperationNotAllowedException();
         }
 
     }
@@ -148,7 +153,7 @@ public class AddressService {
             if( toDelete.getOwner().equals(loggedUser) ){
                 repository.delete(toDelete);
             }else{
-                throw new OperationNotAllowedException("User not allowed for this operation");
+                throw new OperationNotAllowedException();
             }
         }
 
