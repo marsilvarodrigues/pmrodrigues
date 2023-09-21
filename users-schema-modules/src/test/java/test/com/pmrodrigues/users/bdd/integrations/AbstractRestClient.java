@@ -38,38 +38,30 @@ abstract class AbstractRestClient<E> {
     private final String REALM;
     private final String CLIENT_ID;
     private final String CLIENT_SECRET;
-
     private final ObjectMapper mapper = new ObjectMapper();
-
-    private RestTemplate rest;
 
     @Getter
     @Setter(AccessLevel.PROTECTED)
     private URI location;
     private Class<E> parameterizedType;
-
     @Getter
     private HttpStatus httpStatus;
-
     @Getter
-    @Setter()
+    @Setter
     private UUID id;
-
     @Getter
     @Setter
     private E entity;
-
     private static final ThreadLocal<Map<String, Object>> context = withInitial(HashMap::new);
 
     public RestTemplate getRest() {
         val username = (String)context.get().getOrDefault("USERNAME", "admin");
         val password = (String)context.get().getOrDefault("PASSWORD", "admin");
-        if( this.rest == null ) this.generateToken(username, password);
-
-        return this.rest;
+        val token = this.generateToken(username, password);
+        return initRestTemplate(token);
     }
 
-    protected AbstractRestClient<E> generateToken(@NonNull String username, @NonNull String password) {
+    protected String generateToken(@NonNull String username, @NonNull String password) {
 
         context.get().put("USERNAME", username);
         context.get().put("PASSWORD", password);
@@ -88,33 +80,12 @@ abstract class AbstractRestClient<E> {
 
 
             val token = keycloak.tokenManager().getAccessTokenString();
-            this.rest = initRestTemplate(token);
-
-            log.debug("auth token {}", token);
-
-            rest.setRequestFactory(new HttpComponentsClientHttpRequestFactory() {
-                @Override
-                public HttpUriRequest createHttpUriRequest(HttpMethod httpMethod, URI uri) {
-                    if (httpMethod.equals(GET)) {
-                        HttpEntityEnclosingRequestBase httpEntityEnclosingRequestBase = new HttpEntityEnclosingRequestBase() {
-                            @Override
-                            public String getMethod() {
-                                return GET.name();
-                            }
-                        };
-                        httpEntityEnclosingRequestBase.setURI(uri);
-                        return httpEntityEnclosingRequestBase;
-                    } else {
-                        return super.createHttpUriRequest(httpMethod, uri);
-                    }
-                }
-            });
-
-        return this;
+            context.get().put("BEARER_TOKEN", token);
+            return token;
     }
 
-    private RestTemplate initRestTemplate(String token) {
-        return new RestTemplateBuilder().rootUri(this.getURL())
+    protected RestTemplate initRestTemplate(String token) {
+        val rest = new RestTemplateBuilder().rootUri(this.getURL())
                 .defaultHeader(HttpHeaders.AUTHORIZATION, "Bearer " + token)
                 .defaultHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
                 .interceptors((request, body, execution) -> {
@@ -122,6 +93,28 @@ abstract class AbstractRestClient<E> {
                     return execution.execute(request, body);
                 })
                 .build();
+
+        log.debug("auth token {}", token);
+
+        rest.setRequestFactory(new HttpComponentsClientHttpRequestFactory() {
+            @Override
+            public HttpUriRequest createHttpUriRequest(HttpMethod httpMethod, URI uri) {
+                if (httpMethod.equals(GET)) {
+                    HttpEntityEnclosingRequestBase httpEntityEnclosingRequestBase = new HttpEntityEnclosingRequestBase() {
+                        @Override
+                        public String getMethod() {
+                            return GET.name();
+                        }
+                    };
+                    httpEntityEnclosingRequestBase.setURI(uri);
+                    return httpEntityEnclosingRequestBase;
+                } else {
+                    return super.createHttpUriRequest(httpMethod, uri);
+                }
+            }
+        });
+
+        return rest;
     }
 
     protected Class<E> getParameterizedType() {

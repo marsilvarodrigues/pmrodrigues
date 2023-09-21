@@ -3,10 +3,13 @@ package com.pmrodrigues.users.service;
 import com.pmrodrigues.security.exceptions.OperationNotAllowedException;
 import com.pmrodrigues.security.roles.Security;
 import com.pmrodrigues.security.utils.SecurityUtils;
+import com.pmrodrigues.users.dtos.AddressDTO;
 import com.pmrodrigues.users.exceptions.AddressNotFoundException;
+import com.pmrodrigues.users.exceptions.StateNotFoundException;
 import com.pmrodrigues.users.exceptions.UserNotFoundException;
 import com.pmrodrigues.users.model.Address;
 import com.pmrodrigues.users.repositories.AddressRepository;
+import com.pmrodrigues.users.repositories.StateRepository;
 import io.micrometer.core.annotation.Timed;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
@@ -22,13 +25,13 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.UUID;
 
 import static com.pmrodrigues.users.specifications.SpecificationAddress.*;
-import static org.springframework.beans.BeanUtils.copyProperties;
 
 @RequiredArgsConstructor
 @Slf4j
 @Transactional(propagation = Propagation.SUPPORTS)
 @Component
 public class AddressService {
+    private final StateRepository stateRepository;
     private final AddressRepository repository;
 
     private final UserService userService;
@@ -36,31 +39,43 @@ public class AddressService {
     @Timed(histogram = true, value = "AddressService.createNewAddress")
     @Transactional(propagation = Propagation.REQUIRED)
     @SneakyThrows
-    public Address createNewAddress(@NonNull Address address){
+    public Address createNewAddress(@NonNull AddressDTO address){
         val connectedUser = userService.getAuthenticatedUser()
                 .orElseThrow(UserNotFoundException::new);
 
+        val state = stateRepository.findByCode(address.state()).orElseThrow(StateNotFoundException::new);
+        val toSave = address.toAddress().withState(state);
+
         log.info("create a new address {}", address);
 
-        if(address.getOwner() == null ) {
-            address.setOwner(connectedUser);
-        } else if(!address.getOwner().equals(connectedUser) && !SecurityUtils.isUserInRole(Security.SYSTEM_ADMIN)) {
+        if(toSave.getOwner() == null ) {
+            toSave.setOwner(connectedUser);
+        } else if(!toSave.getOwner().equals(connectedUser) && !SecurityUtils.isUserInRole(Security.SYSTEM_ADMIN)) {
             throw new OperationNotAllowedException("User not allowed for this operation");
         }
-        return repository.save(address);
+        return repository.save(toSave);
     }
 
     @Timed(histogram = true, value= "AddressService.updateAddress")
     @Transactional(propagation = Propagation.REQUIRED)
     @SneakyThrows
-    public void updateAddress(@NonNull UUID id, @NonNull Address address) throws OperationNotAllowedException {
+    public void updateAddress(@NonNull UUID id, @NonNull AddressDTO address) throws OperationNotAllowedException {
         log.info("update the address {}", address);
 
-        val existed = repository.findById(id)
+        var existed = repository.findById(id)
                 .orElseThrow(AddressNotFoundException::new);
+        val state = stateRepository.findByCode(address.state()).orElseThrow(StateNotFoundException::new);
+        val owner = address.owner().toUser();
+        if(existed.getOwner().equals(owner) || SecurityUtils.isUserInRole(Security.SYSTEM_ADMIN)) {
 
-        if(existed.getOwner().equals(address.getOwner()) || SecurityUtils.isUserInRole(Security.SYSTEM_ADMIN)) {
-            copyProperties(address, existed, "id", "createdAt", "updateAt", "createdBy", "updateBy");
+            existed = existed.withOwner(owner)
+                             .withAddress1(address.address1())
+                             .withAddress2(address.address2())
+                             .withAddressType(address.addressType())
+                             .withState(state)
+                             .withCity(address.city())
+                             .withNeighbor(address.neighbor());
+
             repository.save(existed);
         } else {
             throw new OperationNotAllowedException("User not allowed for this operation");

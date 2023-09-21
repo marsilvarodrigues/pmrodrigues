@@ -9,6 +9,8 @@ import org.keycloak.representations.idm.UserRepresentation;
 
 import java.util.List;
 
+import static org.apache.commons.lang.StringUtils.isBlank;
+
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class UserFactory {
@@ -21,7 +23,9 @@ public final class UserFactory {
             userRepresentation.setEmailVerified(true);
             userRepresentation.setUsername(user.getEmail());
             userRepresentation.setEnabled(true);
+        }
 
+        if( !isBlank(user.getPassword()) ) {
             val credential = new CredentialRepresentation();
             credential.setTemporary(false);
             credential.setType(CredentialRepresentation.PASSWORD);

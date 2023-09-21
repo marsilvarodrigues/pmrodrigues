@@ -7,7 +7,6 @@ import com.pmrodrigues.commons.exceptions.NotFoundException;
 import com.pmrodrigues.security.configurations.WebSecurityConfiguration;
 import com.pmrodrigues.security.exceptions.OperationNotAllowedException;
 import com.pmrodrigues.users.dtos.AddressDTO;
-import com.pmrodrigues.users.dtos.StateDTO;
 import com.pmrodrigues.users.dtos.UserDTO;
 import com.pmrodrigues.users.model.Address;
 import com.pmrodrigues.users.model.State;
@@ -93,27 +92,14 @@ class TestAddressController {
     @SneakyThrows
     void shouldAddANewAddress() {
 
-        val state = State.builder().id(UUID.randomUUID()).code("RJ").name("TESTE").build();
-        val owner = User.builder()
-                .email("test@test.com")
-                .firstName("teste")
-                .lastName("teste")
-                .externalId(UUID.randomUUID())
-                .id(UUID.randomUUID())
-                .build();
 
-        val address = Address.builder()
-                .state(state)
-                .address1("TESTE")
-                .addressType(AddressType.STREET)
-                .city("TESTE")
-                .zipcode("12345-123")
-                .neighbor("TESTE")
-                .owner(owner)
-                .build();
+        val address = new AddressDTO(null, AddressType.STREET, "teste",null, "12345-123", "TESTE", "TESTE", "RJ",
+                new UserDTO(UUID.randomUUID(), "teste", "teste", "test@test.com"));
+
         val json = objectMapper.writeValueAsString(address);
-        address.setId(UUID.randomUUID());
-        given(service.createNewAddress(any(Address.class))).willReturn(address);
+        val returned = Address.builder().id(UUID.randomUUID()).build();
+
+        given(service.createNewAddress(any(AddressDTO.class))).willReturn(returned);
 
 
 
@@ -124,27 +110,19 @@ class TestAddressController {
                 )
                 .andDo(print())
                 .andExpect(status().isCreated())
-                .andExpect(redirectedUrl("/addresses/" + address.getId().toString()));
+                .andExpect(redirectedUrl("/addresses/" + returned.getId().toString()));
     }
 
     @Test
     @SneakyThrows
     void shouldntAddAddressUserNotAllowed() {
 
-        val state = State.builder().id(UUID.randomUUID()).code("RJ").name("TESTE").build();
-        val owner = User.builder().build();
-        val address = Address.builder()
-                .state(state)
-                .address1("TESTE")
-                .addressType(AddressType.STREET)
-                .city("TESTE")
-                .zipcode("12345-123")
-                .neighbor("TESTE")
-                .owner(owner)
-                .build();
+        val address = new AddressDTO(null, AddressType.STREET, "teste",null, "12345-123", "TESTE", "TESTE", "RJ",
+                new UserDTO(UUID.randomUUID(), "teste", "teste", "test@test.com"));
+
         val json = objectMapper.writeValueAsString(address);
-        address.setId(UUID.randomUUID());
-        given(service.createNewAddress(address)).willThrow(new OperationNotAllowedException("User not allowed for this operation"));
+
+        given(service.createNewAddress(any(AddressDTO.class))).willThrow(new OperationNotAllowedException("User not allowed for this operation"));
 
         mvc.perform(post("/addresses")
                         .content(json)
@@ -159,32 +137,14 @@ class TestAddressController {
     @SneakyThrows
     void shouldUpdateAddress(){
 
-        val state = State.builder().id(UUID.randomUUID()).code("RJ").name("TESTE").build();
+        val address = new AddressDTO(UUID.randomUUID(), AddressType.STREET, "teste",null, "12345-123", "TESTE", "TESTE", "RJ",
+                new UserDTO(UUID.randomUUID(), "teste", "teste", "test@test.com"));
 
-        val owner = User.builder()
-                .email("test@test.com")
-                .firstName("teste")
-                .lastName("teste")
-                .externalId(UUID.randomUUID())
-                .id(UUID.randomUUID())
-                .build();
-
-        val address = Address.builder()
-                .state(state)
-                .address1("TESTE")
-                .addressType(AddressType.STREET)
-                .city("TESTE")
-                .zipcode("12345-123")
-                .neighbor("TESTE")
-                .id(UUID.randomUUID())
-                .owner(owner)
-                .build();
-
-        willDoNothing().given(service).updateAddress(any(UUID.class), any(Address.class));
+        willDoNothing().given(service).updateAddress(any(UUID.class), any(AddressDTO.class));
 
         val json = objectMapper.writeValueAsString(address);
 
-        mvc.perform(put("/addresses/" + address.getId().toString())
+        mvc.perform(put("/addresses/" + address.id())
                         .content(json)
                         .contentType(MediaType.APPLICATION_JSON)
 
@@ -198,32 +158,14 @@ class TestAddressController {
     @SneakyThrows
     void shouldntUpdatAddressNotFound(){
 
-        val state = State.builder().id(UUID.randomUUID()).code("RJ").name("TESTE").build();
+        val address = new AddressDTO(UUID.randomUUID(), AddressType.STREET, "teste",null, "12345-123", "TESTE", "TESTE", "RJ",
+                new UserDTO(UUID.randomUUID(), "teste", "teste", "test@test.com"));
 
-        val owner = User.builder()
-                .email("test@test.com")
-                .firstName("teste")
-                .lastName("teste")
-                .externalId(UUID.randomUUID())
-                .id(UUID.randomUUID())
-                .build();
-
-        val address = Address.builder()
-                .state(state)
-                .address1("TESTE")
-                .addressType(AddressType.STREET)
-                .city("TESTE")
-                .zipcode("12345-123")
-                .neighbor("TESTE")
-                .owner(owner)
-                .id(UUID.randomUUID())
-                .build();
-
-        willThrow(new NotFoundException()).given(service).updateAddress(any(UUID.class), any(Address.class));
+        willThrow(new NotFoundException()).given(service).updateAddress(any(UUID.class), any(AddressDTO.class));
 
         val json = objectMapper.writeValueAsString(address);
 
-        mvc.perform(put("/addresses/" + address.getId().toString())
+        mvc.perform(put("/addresses/" + address.id().toString())
                         .content(json)
                         .contentType(MediaType.APPLICATION_JSON)
 
@@ -237,31 +179,14 @@ class TestAddressController {
     @SneakyThrows
     void shouldntUpdatAddressOperationNotAllowed(){
 
-        val state = State.builder().id(UUID.randomUUID()).code("RJ").name("TESTE").build();
-        val owner = User.builder()
-                .email("test@test.com")
-                .firstName("teste")
-                .lastName("teste")
-                .externalId(UUID.randomUUID())
-                .id(UUID.randomUUID())
-                .build();
+        val address = new AddressDTO(UUID.randomUUID(), AddressType.STREET, "teste",null, "12345-123", "TESTE", "TESTE", "RJ",
+                new UserDTO(UUID.randomUUID(), "teste", "teste", "test@test.com"));
 
-        val address = Address.builder()
-                .state(state)
-                .address1("TESTE")
-                .addressType(AddressType.STREET)
-                .city("TESTE")
-                .zipcode("12345-123")
-                .neighbor("TESTE")
-                .owner(owner)
-                .id(UUID.randomUUID())
-                .build();
-
-        willThrow(new OperationNotAllowedException("")).given(service).updateAddress(any(UUID.class), any(Address.class));
+        willThrow(new OperationNotAllowedException("")).given(service).updateAddress(any(UUID.class), any(AddressDTO.class));
 
         val json = objectMapper.writeValueAsString(address);
 
-        mvc.perform(put("/addresses/" + address.getId().toString())
+        mvc.perform(put("/addresses/" + address.id().toString())
                         .content(json)
                         .contentType(MediaType.APPLICATION_JSON)
 
@@ -276,18 +201,8 @@ class TestAddressController {
     @SneakyThrows
     void shouldSearchAddress() {
 
-
-        val state = StateDTO.builder().id(UUID.randomUUID()).build();
-        val owner = UserDTO.builder().build();
-        val address = AddressDTO.builder()
-                .state(state)
-                .address1("TESTE")
-                .addressType(AddressType.STREET)
-                .city("TESTE")
-                .zipcode("TESTE")
-                .neighbor("TESTE")
-                .owner(owner)
-                .build();
+        val address = new AddressDTO(UUID.randomUUID(), AddressType.STREET, "teste",null, "12345-123", "TESTE", "TESTE", "RJ",
+                new UserDTO(UUID.randomUUID(), "teste", "teste", "test@test.com"));
 
         val message = objectMapper.writeValueAsString(address);
 
