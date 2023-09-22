@@ -6,6 +6,7 @@ import com.pmrodrigues.security.exceptions.OperationNotAllowedException;
 import com.pmrodrigues.security.roles.Security;
 import com.pmrodrigues.security.utils.SecurityUtils;
 import com.pmrodrigues.users.clients.EmailClient;
+import com.pmrodrigues.users.dtos.UserDTO;
 import com.pmrodrigues.users.exceptions.UserNotFoundException;
 import com.pmrodrigues.users.model.User;
 import com.pmrodrigues.users.repositories.KeycloakUserRepository;
@@ -50,13 +51,13 @@ public class UserService {
     @Timed(histogram = true, value = "UserService.createNewUser")
     @Transactional(propagation = Propagation.REQUIRED)
     @SneakyThrows
-    public User createNewUser(@NonNull User user) {
+    public User createNewUser(@NonNull UserDTO toSave) {
 
-        log.info("creating a new user {}", user);
+        log.info("creating a new user {}", toSave);
 
-        validateUserDoesNotExist(user.getEmail());
+        validateUserDoesNotExist(toSave.email());
 
-        user = repository.save(user);
+        val user = repository.save(toSave.toUser());
 
         val keycloakId = keycloakUserRepository.insert(user);
 
@@ -123,14 +124,14 @@ public class UserService {
 
     @Timed(histogram = true, value = "UserService.updateUser")
     @Transactional(propagation = Propagation.REQUIRED)
-    public void updateUser(@NonNull final UUID id, @NonNull final User user) {
+    public void updateUser(@NonNull final UUID id, @NonNull final UserDTO user) {
         log.info("trying to update user {}",user);
         val existed = repository.findById(id)
                 .orElseThrow(UserNotFoundException::new);
 
-        existed.setEmail(user.getEmail());
-        existed.setFirstName(user.getFirstName());
-        existed.setLastName(user.getLastName());
+        existed.setEmail(user.email());
+        existed.setFirstName(user.firstName());
+        existed.setLastName(user.lastName());
 
         repository.save(existed);
         log.info("user {} updated in database",user);
