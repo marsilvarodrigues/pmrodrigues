@@ -2,6 +2,8 @@ package com.pmrodrigues.users.service;
 
 import com.pmrodrigues.commons.exceptions.NotCreateException;
 import com.pmrodrigues.commons.exceptions.NotFoundException;
+import com.pmrodrigues.security.exceptions.OperationNotAllowedException;
+import com.pmrodrigues.security.roles.Security;
 import com.pmrodrigues.security.utils.SecurityUtils;
 import com.pmrodrigues.users.clients.EmailClient;
 import com.pmrodrigues.users.exceptions.UserNotFoundException;
@@ -139,9 +141,29 @@ public class UserService {
 
     @Timed(histogram = true, value = "UserService.getAuthenticatedUser")
     public Optional<User> getAuthenticatedUser() {
-        val id = SecurityUtils.getUserLoggedId().orElseThrow(NotFoundException::new);
+
+        val id = SecurityUtils.getUserLoggedId()
+                .orElseThrow(NotFoundException::new);
         return repository.findByExternalId(id);
     }
 
 
+    @Timed(histogram = true, value = "UserService.changePassword")
+    public void changePassword(@NonNull final UUID id, @NonNull final String password) {
+
+        val user = repository.findById(id)
+                .orElseThrow(UserNotFoundException::new);
+        val userLoggedId = SecurityUtils.getUserLoggedId()
+                .orElseThrow(NotFoundException::new);
+
+        log.info("changing the password for the user {}", user);
+
+        if( user.getId().equals(userLoggedId) || SecurityUtils.isUserInRole(Security.SYSTEM_ADMIN)) {
+            user.setPassword(password);
+            keycloakUserRepository.changePassword(user);
+        } else {
+            throw new OperationNotAllowedException();
+        }
+
+    }
 }

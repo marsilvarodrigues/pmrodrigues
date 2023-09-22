@@ -12,6 +12,7 @@ import io.swagger.annotations.ApiResponses;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
+import org.apache.commons.codec.binary.Base64;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
@@ -24,6 +25,7 @@ import javax.validation.Valid;
 import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
 import java.net.URI;
+import java.nio.charset.StandardCharsets;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -134,6 +136,26 @@ public class UserController{
         log.info("deleting user with id {}", id);
         val user = userService.findById(id);
         userService.delete(user);
+
+        return ResponseEntity.noContent()
+                .build();
+    }
+
+    @Timed(value = "UserController.changePassword", histogram = true)
+    @ApiOperation(value = "Delete User By Id", nickname = "deleteById", notes = "Delete a user by a specific id", response = UserDTO.class, tags={ "user", })
+    @ApiResponses(value = {
+            @ApiResponse(code = 204, message = "OK"),
+            @ApiResponse(code = 404, message = "User not found") })
+    @PatchMapping(
+            value = "/{id}",
+            produces = { MediaType.TEXT_PLAIN_VALUE }
+    )
+    public ResponseEntity<String> changePassword(@ApiParam(required = true) @PathVariable("id") final UUID id, @RequestBody String password){
+        log.info("Trying to change the password for the user {}", id);
+
+        val decodedPassword = new String(Base64.decodeBase64(password), StandardCharsets.UTF_8);
+
+        userService.changePassword(id, decodedPassword);
 
         return ResponseEntity.noContent()
                 .build();

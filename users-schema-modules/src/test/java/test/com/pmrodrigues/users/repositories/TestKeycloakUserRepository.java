@@ -9,6 +9,7 @@ import com.pmrodrigues.users.exceptions.UserNotFoundException;
 import com.pmrodrigues.users.model.User;
 import com.pmrodrigues.users.repositories.KeycloakUserRepository;
 import lombok.val;
+import org.apache.commons.lang.RandomStringUtils;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.keycloak.representations.idm.RoleRepresentation;
@@ -201,6 +202,36 @@ class TestKeycloakUserRepository {
                 .build();
 
         assertThrows(RoleNotFoundException.class, () -> repository.applyRoleInUser(user, Security.SYSTEM_ADMIN));
+    }
+
+    @Test
+    void shouldChangePassword(){
+
+        val user = mock(User.class);
+        val keycloakUser = mock(UserRepresentation.class);
+
+        given(user.getExternalId()).willReturn(UUID.randomUUID());
+        given(user.getPassword()).willReturn(RandomStringUtils.random(10));
+        given(userClient.getById(any(UUID.class))).willReturn(ResponseEntity.of(Optional.of(keycloakUser)));
+
+        repository.changePassword(user);
+
+        verify(keycloakUser, times(1)).setCredentials(any(List.class));
+        verify(userClient, times(1)).update(any(UUID.class), any(UserRepresentation.class));
+
+    }
+
+    @Test
+    void doNotChangePassword() {
+        val user = mock(User.class);
+        val keycloakUser = mock(UserRepresentation.class);
+
+        given(user.getExternalId()).willReturn(UUID.randomUUID());
+        given(user.getPassword()).willReturn(RandomStringUtils.random(10));
+        given(userClient.getById(any(UUID.class))).willReturn(ResponseEntity.notFound().build());
+
+        assertThrows(UserNotFoundException.class, () -> repository.changePassword(user));
+
     }
 
 }

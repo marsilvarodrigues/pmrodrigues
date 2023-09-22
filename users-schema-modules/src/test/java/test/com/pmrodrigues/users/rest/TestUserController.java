@@ -6,6 +6,7 @@ import com.pmrodrigues.commons.controlleradvices.ValidationErrorControllerAdvice
 import com.pmrodrigues.commons.exceptions.KeycloakIntegrationFailed;
 import com.pmrodrigues.commons.exceptions.NotCreateException;
 import com.pmrodrigues.security.configurations.WebSecurityConfiguration;
+import com.pmrodrigues.security.exceptions.OperationNotAllowedException;
 import com.pmrodrigues.users.dtos.UserDTO;
 import com.pmrodrigues.users.exceptions.UserNotFoundException;
 import com.pmrodrigues.users.model.User;
@@ -13,6 +14,7 @@ import com.pmrodrigues.users.rest.UserController;
 import com.pmrodrigues.users.service.UserService;
 import lombok.SneakyThrows;
 import lombok.val;
+import org.apache.commons.codec.binary.Base64;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -35,8 +37,9 @@ import java.util.UUID;
 import static java.lang.String.format;
 import static org.mockito.BDDMockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 
 @ExtendWith(SpringExtension.class)
@@ -331,6 +334,48 @@ class TestUserController {
                         .content(json))
                 .andDo(print())
                 .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    @SneakyThrows
+    void shouldChangePassword() {
+        willDoNothing().given(userService).changePassword(any(UUID.class), any(String.class));
+
+        val password = Base64.encodeBase64("teste".getBytes());
+
+        mvc.perform(patch(String.format("/users/" + UUID.randomUUID().toString()))
+                .contentType(MediaType.TEXT_PLAIN)
+                .content(password))
+                .andDo(print())
+                .andExpect(status().isNoContent());
+    }
+
+    @Test
+    @SneakyThrows
+    void shouldNotChangePasswordUserNotFound() {
+        willThrow(UserNotFoundException.class).given(userService).changePassword(any(UUID.class), any(String.class));
+
+        val password = Base64.encodeBase64("teste".getBytes());
+
+        mvc.perform(patch(String.format("/users/" + UUID.randomUUID().toString()))
+                        .contentType(MediaType.TEXT_PLAIN)
+                        .content(password))
+                .andDo(print())
+                .andExpect(status().isNotFound());
+    }
+
+    @Test
+    @SneakyThrows
+    void shouldNotChangePasswordOperationNotAllowed() {
+        willThrow(OperationNotAllowedException.class).given(userService).changePassword(any(UUID.class), any(String.class));
+
+        val password = Base64.encodeBase64("teste".getBytes());
+
+        mvc.perform(patch(String.format("/users/" + UUID.randomUUID().toString()))
+                        .contentType(MediaType.TEXT_PLAIN)
+                        .content(password))
+                .andDo(print())
+                .andExpect(status().isForbidden());
     }
 
 }

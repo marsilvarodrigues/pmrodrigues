@@ -26,13 +26,18 @@ public final class UserFactory {
         }
 
         if( !isBlank(user.getPassword()) ) {
-            val credential = new CredentialRepresentation();
-            credential.setTemporary(false);
-            credential.setType(CredentialRepresentation.PASSWORD);
-            credential.setValue(user.getPassword());
-            userRepresentation.setCredentials(List.of(credential));
+            changePassword(user.getPassword(), userRepresentation);
         }
 
+        return userRepresentation;
+    }
+
+    public static UserRepresentation changePassword(final String password, final UserRepresentation userRepresentation) {
+        val credential = new CredentialRepresentation();
+        credential.setTemporary(false);
+        credential.setType(CredentialRepresentation.PASSWORD);
+        credential.setValue(password);
+        userRepresentation.setCredentials(List.of(credential));
         return userRepresentation;
     }
 }

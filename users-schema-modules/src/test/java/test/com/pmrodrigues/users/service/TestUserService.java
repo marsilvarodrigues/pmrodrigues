@@ -3,6 +3,9 @@ package test.com.pmrodrigues.users.service;
 
 import com.pmrodrigues.commons.dtos.Email;
 import com.pmrodrigues.commons.exceptions.KeycloakIntegrationFailed;
+import com.pmrodrigues.security.exceptions.OperationNotAllowedException;
+import com.pmrodrigues.security.roles.Security;
+import com.pmrodrigues.security.utils.SecurityUtils;
 import com.pmrodrigues.users.clients.EmailClient;
 import com.pmrodrigues.users.exceptions.UserNotFoundException;
 import com.pmrodrigues.users.model.User;
@@ -11,6 +14,7 @@ import com.pmrodrigues.users.repositories.UserRepository;
 import com.pmrodrigues.users.service.UserService;
 import lombok.SneakyThrows;
 import lombok.val;
+import org.apache.commons.lang.RandomStringUtils;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -213,6 +217,84 @@ class TestUserService {
 
         assertNotNull(userService.getAuthenticatedUser());
 
+    }
+    @Test
+    void shouldChangePassword() {
+
+        val mockStatic = mockStatic(SecurityUtils.class);
+        val id = UUID.randomUUID();
+        try {
+            mockStatic.when(() -> SecurityUtils.isUserInRole(Security.SYSTEM_ADMIN)).thenReturn(Boolean.FALSE);
+            mockStatic.when(() -> SecurityUtils.getUserLoggedId()).thenReturn(Optional.of(id));
+
+            val user = mock(User.class);
+
+            given(repository.findById(any(UUID.class))).willReturn(Optional.of(user));
+            given(user.getId()).willReturn(id);
+
+            userService.changePassword(id, RandomStringUtils.random(10));
+
+            verify(user, times(1)).setPassword(anyString());
+            verify(userClient, times(1)).changePassword(any(User.class));
+        }finally{
+            mockStatic.close();
+        }
+
+    }
+
+    @Test
+    void shouldChangePasswordUserIsSystemAdmin() {
+
+        val mockStatic = mockStatic(SecurityUtils.class);
+        val id = UUID.randomUUID();
+        try {
+            mockStatic.when(() -> SecurityUtils.isUserInRole(Security.SYSTEM_ADMIN)).thenReturn(Boolean.TRUE);
+            mockStatic.when(() -> SecurityUtils.getUserLoggedId()).thenReturn(Optional.of(UUID.randomUUID()));
+
+            val user = mock(User.class);
+
+            given(repository.findById(any(UUID.class))).willReturn(Optional.of(user));
+            given(user.getId()).willReturn(id);
+
+            userService.changePassword(id, RandomStringUtils.random(10));
+
+            verify(user, times(1)).setPassword(anyString());
+            verify(userClient, times(1)).changePassword(any(User.class));
+        }finally{
+            mockStatic.close();
+        }
+
+    }
+
+    @Test
+    void dontShouldChangePasswordUserNotFound() {
+
+        val id = UUID.randomUUID();
+        given(repository.findById(any(UUID.class))).willReturn(Optional.empty());
+
+        assertThrows(UserNotFoundException.class, () -> userService.changePassword(id, RandomStringUtils.random(10)));
+
+    }
+
+    @Test
+    void dontShouldChangePasswordUserIsDifferentThanUserConnected() {
+        val mockStatic = mockStatic(SecurityUtils.class);
+        val id = UUID.randomUUID();
+
+        try {
+            mockStatic.when(() -> SecurityUtils.isUserInRole(Security.SYSTEM_ADMIN)).thenReturn(Boolean.FALSE);
+            mockStatic.when(() -> SecurityUtils.getUserLoggedId()).thenReturn(Optional.of(UUID.randomUUID()));
+
+            val user = mock(User.class);
+
+            given(repository.findById(any(UUID.class))).willReturn(Optional.of(user));
+            given(user.getId()).willReturn(id);
+
+            assertThrows(OperationNotAllowedException.class, () -> userService.changePassword(id, RandomStringUtils.random(10)));
+
+        }finally{
+            mockStatic.close();
+        }
     }
 
 }

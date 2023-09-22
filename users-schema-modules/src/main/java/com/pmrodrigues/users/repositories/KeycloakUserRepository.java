@@ -127,7 +127,24 @@ public class KeycloakUserRepository {
 
         val keycloakUser = userResponse.getBody();
 
-        keycloakUser.getRealmRoles().add(roleName.toString());
+        keycloakUser.getRealmRoles().add(roleName);
         userClient.update(user.getExternalId(), keycloakUser);
+    }
+
+    @Timed(histogram = true, value = "KeycloakUserRepository.changePassword")
+    public void changePassword(@NonNull User user) {
+        log.info("change the password for user {}", user);
+        val userResponse = userClient.getById(user.getExternalId());
+
+        if(userResponse.getStatusCode() == HttpStatus.NOT_FOUND){
+            throw new UserNotFoundException();
+        }
+
+        var keycloakUser = userResponse.getBody();
+        keycloakUser = UserFactory.changePassword(user.getPassword(), keycloakUser);
+
+        userClient.update(user.getExternalId(), keycloakUser);
+
+
     }
 }

@@ -97,7 +97,13 @@ class TestAddressController {
                 new UserDTO(UUID.randomUUID(), "teste", "teste", "test@test.com"));
 
         val json = objectMapper.writeValueAsString(address);
-        val returned = Address.builder().id(UUID.randomUUID()).build();
+        val returned = Address.builder()
+                    .id(UUID.randomUUID())
+                    .state(State.builder()
+                                .code("RJ")
+                                .build())
+                    .owner(User.builder().id(address.owner().id()).build())
+                    .build();
 
         given(service.createNewAddress(any(AddressDTO.class))).willReturn(returned);
 
