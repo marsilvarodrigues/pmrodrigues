@@ -1,0 +1,52 @@
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+		http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.8.xsd">
+
+    <property name="now" value="now()" dbms="mysql,h2"/>
+    <property name="now" value="current_timestamp" dbms="postgresql"/>
+
+    <changeSet id="create_phone_table" author="marcelo">
+        <createTable tableName="phones" >
+            <column name="id" type="java.util.UUID">
+                <constraints nullable="false" primaryKey="true" unique="true" />
+            </column>
+
+            <column name="user_id" type="java.util.UUID">
+                <constraints nullable="false" foreignKeyName="fk_phone_user" referencedTableName="USERS" />
+            </column>
+
+            <column name="phone_number" type="varchar2(20)">
+                <constraints nullable="false" />
+            </column>
+
+            <column name="phone_type"  type="int">
+                <constraints nullable="false" />
+            </column>
+
+            <column name="created_at" type="datetime" defaultValueDate="${now}" >
+                <constraints nullable="false"  />
+            </column>
+
+            <column name="created_by" type="java.util.UUID" >
+                <constraints nullable="false" foreignKeyName="fk_phone_added_by_user" referencedTableName="USERS" />
+            </column>
+
+            <column name="updated_at" type="datetime" defaultValueDate="${now}" >
+                <constraints nullable="false" />
+            </column>
+
+            <column name="updated_by" type="java.util.UUID" >
+                <constraints nullable="false" foreignKeyName="fk_phone_changed_by_user" referencedTableName="USERS" />
+            </column>
+        </createTable>
+
+        <rollback>
+            <dropTable tableName="phones" />
+        </rollback>
+    </changeSet>
+
+
+
+</databaseChangeLog>

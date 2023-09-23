@@ -32,10 +32,10 @@ public class SpecificationAddress {
 
     }
 
-    public static Specification<Address> neightboor(String neightboor){
+    public static Specification<Address> neighbor(String neighbor){
         return (root, criteriaQuery, criteriaBuilder) -> {
-            if( !isBlank(neightboor) )
-                return criteriaBuilder.like(root.get("neightboor"), neightboor + "%");
+            if( !isBlank(neighbor) )
+                return criteriaBuilder.like(root.get("neighbor"), neighbor + "%");
             else return null;
         };
 

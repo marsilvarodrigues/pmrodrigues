@@ -37,6 +37,7 @@ import static org.springframework.data.jpa.domain.Specification.where;
 @Transactional(propagation = Propagation.SUPPORTS)
 @Component
 public class UserService {
+    public static final String NEW_USER_TEMPLATE = "newUser";
     private final UserRepository repository;
     private final EmailClient emailService;
     private final KeycloakUserRepository keycloakUserRepository;
@@ -72,7 +73,7 @@ public class UserService {
     }
 
     private boolean sendWelcomeEmail(User user) {
-        val email = emailService.getEmailByName("newUser")
+        val email = emailService.getEmailByName(NEW_USER_TEMPLATE)
                 .getBody()
                 .to(user.getEmail())
                 .subject(format("You are Welcome {0} ", user.getFullName()))

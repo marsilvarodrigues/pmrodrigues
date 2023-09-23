@@ -100,7 +100,7 @@ public class AddressService {
                             state(address.getState())
                             .and(zipcode(address.getZipcode()))
                             .and(city(address.getCity()))
-                            .and(neightboor(address.getNeighbor()))
+                            .and(neighbor(address.getNeighbor()))
                             .and(address(address.getAddress1())), pageRequest);
         } else {
             return repository.findAll(
@@ -108,7 +108,7 @@ public class AddressService {
                     .and(state(address.getState()))
                     .and(zipcode(address.getZipcode()))
                     .and(city(address.getCity()))
-                    .and(neightboor(address.getNeighbor()))
+                    .and(neighbor(address.getNeighbor()))
                     .and(address(address.getAddress1())), pageRequest);
         }
 

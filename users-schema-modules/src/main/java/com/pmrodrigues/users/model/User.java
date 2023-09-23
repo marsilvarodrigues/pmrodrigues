@@ -26,6 +26,7 @@ import static com.pmrodrigues.commons.stringutils.PasswordGenerator.generatePass
 @ToString(exclude = {"password"})
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
 @EntityListeners(AuditingEntityListener.class)
+@With
 public class User {
     @Id
     @Column(name = "id", nullable = false)
