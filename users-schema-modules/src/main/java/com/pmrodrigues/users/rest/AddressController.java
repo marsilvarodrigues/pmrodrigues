@@ -40,9 +40,9 @@ public class AddressController {
     private final AddressService addressService;
 
     @Timed(value = "AddressController.getAddressById", histogram = true)
-    @ApiOperation(value = "Get a address by a specific id", nickname = "getAddressById", notes = "Get a address by a specific id", response = Address.class, tags={ "address", })
+    @ApiOperation(value = "Get a address by a specific id", nickname = "getAddressById", notes = "Get a address by a specific id", response = AddressDTO.class, tags={ "address", })
     @ApiResponses(value = {
-            @ApiResponse(code = 200, message = "OK", response = Address.class),
+            @ApiResponse(code = 200, message = "OK", response = AddressDTO.class),
             @ApiResponse(code = 404, message = "Address not found") })
     @GetMapping(
             value = "/{id}",
@@ -57,9 +57,9 @@ public class AddressController {
     @Timed(value = "AddressController.listAll", histogram = true)
     @ApiOperation(value = "List all address by", nickname = "listAll",
             notes = "List all addresses by",
-            response = Address.class, tags={ "address", })
+            response = AddressDTO.class, tags={ "address", })
     @ApiResponses(value = {
-            @ApiResponse(code = 200, message = "OK", response = Address.class)})
+            @ApiResponse(code = 200, message = "OK", response = AddressDTO.class)})
     @GetMapping(
             produces = { MediaType.APPLICATION_JSON_VALUE }
     )
@@ -88,9 +88,9 @@ public class AddressController {
     }
 
     @Timed(value = "AddressController.add", histogram = true)
-    @ApiOperation(value = "Create a new address", nickname = "add", response = Address.class, tags={ "address"})
+    @ApiOperation(value = "Create a new address", nickname = "add", response = AddressDTO.class, tags={ "address"})
     @ApiResponses(value = {
-            @ApiResponse(code = 201, message = "Address successful created", response = Address.class),
+            @ApiResponse(code = 201, message = "Address successful created", response = AddressDTO.class),
             @ApiResponse(code = 403, message = "User not allowed to do this operation"),
             @ApiResponse(code = 400, message = "Failed to create a address")})
     @PostMapping(
@@ -124,7 +124,7 @@ public class AddressController {
     }
 
     @Timed(value = "AddressController.deleteById", histogram = true)
-    @ApiOperation(value = "Delete Address By Id", nickname = "deleteById", notes = "Delete a address by a specific id", response = Address.class, tags={ "address", })
+    @ApiOperation(value = "Delete Address By Id", nickname = "deleteById", notes = "Delete a address by a specific id",  tags={ "address", })
     @ApiResponses(value = {
             @ApiResponse(code = 204, message = "No Content"),
             @ApiResponse(code = 404, message = "Address not found") })
@@ -134,8 +134,7 @@ public class AddressController {
     )
     public ResponseEntity<String> deleteById(@ApiParam(required = true) @PathVariable("id") final UUID id) {
         log.info("deleting user with id {}", id);
-        val address = addressService.findById(id);
-        addressService.delete(address);
+        addressService.delete(id);
 
         return ResponseEntity.noContent()
                 .build();

@@ -95,7 +95,7 @@ class TestUserService {
     @Test
     @DisplayName("Should not save a new user with existed other with the same email")
     void shouldNotSaveExistedOnKeyCloak() {
-        val user = User.builder().email("").build();
+
         Optional<User> optional = Optional.empty();
 
         given(repository.findByEmail(any(String.class))).willReturn(optional);
@@ -107,9 +107,9 @@ class TestUserService {
     @Test
     @DisplayName("Should delete user")
     void shouldDeleteUser() {
-        val user = User.builder().id(UUID.randomUUID()).externalId(UUID.randomUUID()).build();
+        val user = User.builder().email("").externalId(UUID.randomUUID()).build();
         given(repository.findById(any(UUID.class))).willReturn(Optional.of(user));
-        userService.delete(user);
+        userService.delete(UUID.randomUUID());
 
         verify(repository).delete(any(User.class));
         verify(userClient).delete(any(UUID.class));
@@ -118,12 +118,12 @@ class TestUserService {
     @Test
     @DisplayName("Should not delete user because he doesn't exist")
     void shouldNotDeleteUserNotFound(){
-        val user = User.builder().id(UUID.randomUUID()).build();
+
         given(repository.findById(any(UUID.class))).willReturn(Optional.empty());
 
 
         assertThrows(UserNotFoundException.class, () ->{
-            userService.delete(user);
+            userService.delete(UUID.randomUUID());
         });
 
     }
@@ -136,7 +136,7 @@ class TestUserService {
         willThrow(new KeycloakIntegrationFailed()).given(userClient).delete(any(UUID.class));
 
         assertThrows(KeycloakIntegrationFailed.class, () ->{
-            userService.delete(user);
+            userService.delete(UUID.randomUUID());
         });
 
     }

@@ -39,7 +39,7 @@ import static org.junit.jupiter.api.Assertions.*;
 @EnableJpaAuditing
 @EntityScan("com.pmrodrigues.users.model")
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
-public class TestPhoneRepository {
+class TestPhoneRepository {
     @Autowired
     private UserRepository userRepository;
     @Autowired

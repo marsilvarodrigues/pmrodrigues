@@ -97,7 +97,8 @@ public class AddressService {
 
         if( SecurityUtils.isUserInRole(Security.SYSTEM_ADMIN) ){
             return repository.findAll(
-                            state(address.getState())
+                            owner(address.getOwner())
+                            .and(state(address.getState()))
                             .and(zipcode(address.getZipcode()))
                             .and(city(address.getCity()))
                             .and(neighbor(address.getNeighbor()))
@@ -120,13 +121,12 @@ public class AddressService {
         log.info("try to get address by id {}",id);
         var loggedUser = userService.getAuthenticatedUser()
                 .orElseThrow(UserNotFoundException::new);
-        if( SecurityUtils.isUserInRole(Security.SYSTEM_ADMIN) ) {
-            return repository.findById(id)
-                    .orElseThrow(AddressNotFoundException::new);
-        }else{
-            val address =  repository.findById(id)
-                    .orElseThrow(AddressNotFoundException::new);
+        val address =  repository.findById(id)
+                .orElseThrow(AddressNotFoundException::new);
 
+        if( SecurityUtils.isUserInRole(Security.SYSTEM_ADMIN) ) {
+            return address;
+        }else{
             if( address.getOwner().equals(loggedUser) ) {
                 return address;
             }else{
@@ -138,20 +138,20 @@ public class AddressService {
     @Transactional(propagation = Propagation.REQUIRED)
     @Timed(histogram = true, value = "AddressService.delete")
     @SneakyThrows
-    public void delete(Address address) {
-        log.info("try to delete address {}",address);
+    public void delete(@NonNull UUID id) {
+        log.info("try to delete address {}",id);
 
-        val toDelete = repository.findById(address.getId())
+        val address = repository.findById(id)
                 .orElseThrow(AddressNotFoundException::new);
 
         if( SecurityUtils.isUserInRole(Security.SYSTEM_ADMIN) ) {
-            repository.delete(toDelete);
+            repository.delete(address);
         }else{
             val loggedUser = userService.getAuthenticatedUser()
                     .orElseThrow(UserNotFoundException::new);
 
-            if( toDelete.getOwner().equals(loggedUser) ){
-                repository.delete(toDelete);
+            if( address.getOwner().equals(loggedUser) ){
+                repository.delete(address);
             }else{
                 throw new OperationNotAllowedException();
             }

@@ -22,6 +22,7 @@ public record AddressDTO(
         String state,
         UserDTO owner) {
 
+
     public static AddressDTO fromAddress(Address address) {
         return new AddressDTO(
                 address.getId(),

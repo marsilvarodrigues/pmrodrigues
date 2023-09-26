@@ -134,8 +134,7 @@ public class UserController{
     )
     public ResponseEntity<String> deleteById(@ApiParam(required = true) @PathVariable("id") final UUID id) {
         log.info("deleting user with id {}", id);
-        val user = userService.findById(id);
-        userService.delete(user);
+        userService.delete(id);
 
         return ResponseEntity.noContent()
                 .build();

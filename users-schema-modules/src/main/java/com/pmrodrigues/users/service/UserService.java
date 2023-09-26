@@ -100,14 +100,13 @@ public class UserService {
     @Timed(histogram = true, value = "UserService.delete")
     @Transactional(propagation = Propagation.REQUIRED)
     @SneakyThrows
-    public void delete(@NonNull final User user){
-        log.info("delete user {} from database", user);
-        val toDelete = repository.findById(user.getId())
+    public void delete(@NonNull final UUID id){
+        log.info("delete user {} from database", id);
+        val user = repository.findById(id)
                 .orElseThrow(UserNotFoundException::new);
 
-        keycloakUserRepository.delete(toDelete.getExternalId());
-        repository.delete(toDelete);
-        log.info("user {} deleted from database", user);
+        keycloakUserRepository.delete(user.getExternalId());
+        repository.delete(user);
 
     }
 

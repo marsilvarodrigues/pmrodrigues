@@ -24,6 +24,8 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.mockito.junit.jupiter.MockitoSettings;
 import org.mockito.quality.Strictness;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.jpa.domain.Specification;
 
 import java.util.Optional;
 import java.util.UUID;
@@ -74,6 +76,7 @@ class TestAddressService {
         given(address.withState(any(State.class))).willReturn(address);
 
         service.createNewAddress(toSave);
+
         verify(address, times(1)).setOwner(any(User.class));
         verify(addressRepository, times(1)).save(any(Address.class));
 
@@ -82,59 +85,59 @@ class TestAddressService {
     @Test
     void shouldAddANewAddressForOtherUser() {
 
-        val mockStatic = mockStatic(SecurityUtils.class);
-        mockStatic.when(() -> SecurityUtils.isUserInRole(Security.SYSTEM_ADMIN)).thenReturn(Boolean.FALSE);
+        try ( val mockStatic = mockStatic(SecurityUtils.class) ) {
+            mockStatic.when(() -> SecurityUtils.isUserInRole(Security.SYSTEM_ADMIN)).thenReturn(Boolean.FALSE);
 
-        val toSave = mock(AddressDTO.class);
-        val state = Optional.of(new State());
-        val address = mock(Address.class);
+            val toSave = mock(AddressDTO.class);
+            val state = Optional.of(new State());
+            val address = mock(Address.class);
 
-        given(toSave.state()).willReturn("RJ");
-        given(stateRepository.findByCode(anyString())).willReturn(state);
-        given(toSave.toAddress()).willReturn(address);
-        given(address.withState(any(State.class))).willReturn(address);
+            given(toSave.state()).willReturn("RJ");
+            given(stateRepository.findByCode(anyString())).willReturn(state);
+            given(toSave.toAddress()).willReturn(address);
+            given(address.withState(any(State.class))).willReturn(address);
 
-        given(address.getOwner()).willReturn(defaultOwner);
-        service.createNewAddress(toSave);
-        verify(address, never()).setOwner(any(User.class));
-        verify(addressRepository, times(1)).save(address);
+            given(address.getOwner()).willReturn(defaultOwner);
+            service.createNewAddress(toSave);
+            verify(address, never()).setOwner(any(User.class));
+            verify(addressRepository, times(1)).save(address);
+        }
 
-        mockStatic.close();
     }
 
     @Test
     void shouldOnlyAdministratorCouldCreateAddressForOwnerPreviouslySettingUp() {
 
-        val mockStatic = mockStatic(SecurityUtils.class);
-        mockStatic.when(() -> SecurityUtils.isUserInRole(Security.SYSTEM_ADMIN)).thenReturn(Boolean.TRUE);
+        try( val mockStatic = mockStatic(SecurityUtils.class) ) {
+            mockStatic.when(() -> SecurityUtils.isUserInRole(Security.SYSTEM_ADMIN)).thenReturn(Boolean.TRUE);
 
-        val other = User.builder().id(UUID.randomUUID())
-                .email("other@teste.com")
-                .build();
+            val other = User.builder().id(UUID.randomUUID())
+                    .email("other@teste.com")
+                    .build();
 
-        val toSave = mock(AddressDTO.class);
-        val state = Optional.of(new State());
-        val address = mock(Address.class);
+            val toSave = mock(AddressDTO.class);
+            val state = Optional.of(new State());
+            val address = mock(Address.class);
 
-        given(toSave.state()).willReturn("RJ");
-        given(stateRepository.findByCode(anyString())).willReturn(state);
-        given(toSave.toAddress()).willReturn(address);
-        given(address.withState(any(State.class))).willReturn(address);
+            given(toSave.state()).willReturn("RJ");
+            given(stateRepository.findByCode(anyString())).willReturn(state);
+            given(toSave.toAddress()).willReturn(address);
+            given(address.withState(any(State.class))).willReturn(address);
 
-        given(address.getOwner()).willReturn(other);
-        service.createNewAddress(toSave);
-        verify(address, never()).setOwner(any(User.class));
-        verify(addressRepository, times(1)).save(address);
+            given(address.getOwner()).willReturn(other);
+            service.createNewAddress(toSave);
+            verify(address, never()).setOwner(any(User.class));
+            verify(addressRepository, times(1)).save(address);
 
-        mockStatic.close();
+        }
 
     }
 
     @Test
     void shouldNotAdd() {
 
-        val mockStatic = mockStatic(SecurityUtils.class);
-        try {
+
+        try (val mockStatic = mockStatic(SecurityUtils.class)) {
             mockStatic.when(() -> SecurityUtils.isUserInRole(Security.SYSTEM_ADMIN)).thenReturn(Boolean.FALSE);
             val other = User.builder().id(UUID.randomUUID())
                     .email("other@teste.com")
@@ -156,8 +159,6 @@ class TestAddressService {
                 val saved = service.createNewAddress(toSave);
             });
 
-        }finally {
-            mockStatic.close();
         }
 
 
@@ -168,8 +169,7 @@ class TestAddressService {
     @SneakyThrows
     void shouldUpdateAddress() {
 
-        val mockStatic = mockStatic(SecurityUtils.class);
-        try{
+        try(val mockStatic = mockStatic(SecurityUtils.class);){
 
             mockStatic.when(() -> SecurityUtils.isUserInRole(Security.SYSTEM_ADMIN)).thenReturn(Boolean.TRUE);
 
@@ -185,8 +185,6 @@ class TestAddressService {
             service.updateAddress(UUID.randomUUID(), toUpdate);
 
             verify(addressRepository, times(1)).save(any(Address.class));
-        }finally {
-            mockStatic.close();
         }
 
     }
@@ -205,8 +203,8 @@ class TestAddressService {
     @SneakyThrows
     void shouldOnlyOwnerUpdateAddress() {
 
-        val mockStatic = mockStatic(SecurityUtils.class);
-        try {
+
+        try (val mockStatic = mockStatic(SecurityUtils.class)){
 
             mockStatic.when(() -> SecurityUtils.isUserInRole(Security.SYSTEM_ADMIN)).thenReturn(Boolean.FALSE);
 
@@ -222,8 +220,7 @@ class TestAddressService {
 
             service.updateAddress(UUID.randomUUID(), toUpdate);
             verify(addressRepository, times(1)).save(any(Address.class));
-        }finally {
-            mockStatic.close();
+
         }
 
     }
@@ -231,59 +228,58 @@ class TestAddressService {
     @Test
     void shouldNotSaveOwnerDifferent() {
 
-        val mockStatic = mockStatic(SecurityUtils.class);
-        mockStatic.when(() -> SecurityUtils.isUserInRole(Security.SYSTEM_ADMIN)).thenReturn(Boolean.FALSE);
+        try (val mockStatic = mockStatic(SecurityUtils.class)) {
+            mockStatic.when(() -> SecurityUtils.isUserInRole(Security.SYSTEM_ADMIN)).thenReturn(Boolean.FALSE);
 
-        val toUpdate = mock(AddressDTO.class);
-        val differentOwnser = User.builder().id(UUID.randomUUID()).build();
-        given(toUpdate.id()).willReturn(UUID.randomUUID());
-        given(toUpdate.owner()).willReturn(UserDTO.fromUser(differentOwnser));
-        given(toUpdate.state()).willReturn("RJ");
-        given(stateRepository.findByCode(anyString())).willReturn(Optional.of(new State()));
+            val toUpdate = mock(AddressDTO.class);
+            val differentOwnser = User.builder().id(UUID.randomUUID()).build();
+            given(toUpdate.id()).willReturn(UUID.randomUUID());
+            given(toUpdate.owner()).willReturn(UserDTO.fromUser(differentOwnser));
+            given(toUpdate.state()).willReturn("RJ");
+            given(stateRepository.findByCode(anyString())).willReturn(Optional.of(new State()));
 
-        given(addressRepository.findById(any(UUID.class)))
-                .willReturn(Optional.of(Address.builder().owner(defaultOwner).build()));
+            given(addressRepository.findById(any(UUID.class)))
+                    .willReturn(Optional.of(Address.builder().owner(defaultOwner).build()));
 
-        assertThrows(OperationNotAllowedException.class, () -> service.updateAddress(UUID.randomUUID(), toUpdate));
+            assertThrows(OperationNotAllowedException.class, () -> service.updateAddress(UUID.randomUUID(), toUpdate));
 
-        mockStatic.close();
+        }
 
     }
 
     @Test
     void shouldGetAddressById() {
 
-        val mockStatic = mockStatic(SecurityUtils.class);
-        mockStatic.when(() -> SecurityUtils.isUserInRole(Security.SYSTEM_ADMIN)).thenReturn(Boolean.TRUE);
+        try (val mockStatic = mockStatic(SecurityUtils.class)) {
+            mockStatic.when(() -> SecurityUtils.isUserInRole(Security.SYSTEM_ADMIN)).thenReturn(Boolean.TRUE);
 
-        given(addressRepository.findById(any(UUID.class))).willReturn(Optional.of(new Address()));
-        assertNotNull(service.findById(UUID.randomUUID()));
-
-        mockStatic.close();
+            given(addressRepository.findById(any(UUID.class))).willReturn(Optional.of(new Address()));
+            assertNotNull(service.findById(UUID.randomUUID()));
+        }
     }
 
     @Test
     void shouldGetAddressByIdOnlyMyAddress() {
 
-        val mockStatic = mockStatic(SecurityUtils.class);
-        mockStatic.when(() -> SecurityUtils.isUserInRole(Security.SYSTEM_ADMIN)).thenReturn(Boolean.FALSE);
-        val address = Address.builder().owner(defaultOwner).build();
-        given(addressRepository.findById(any(UUID.class))).willReturn(Optional.of(address));
-        assertNotNull(service.findById(UUID.randomUUID()));
+        try (val mockStatic = mockStatic(SecurityUtils.class)) {
+            mockStatic.when(() -> SecurityUtils.isUserInRole(Security.SYSTEM_ADMIN)).thenReturn(Boolean.FALSE);
+            val address = Address.builder().owner(defaultOwner).build();
+            given(addressRepository.findById(any(UUID.class))).willReturn(Optional.of(address));
+            assertNotNull(service.findById(UUID.randomUUID()));
+        }
 
-        mockStatic.close();
     }
 
     @Test
     void shouldntFindAddressById() {
-        val mockStatic = mockStatic(SecurityUtils.class);
-        mockStatic.when(() -> SecurityUtils.isUserInRole(Security.SYSTEM_ADMIN)).thenReturn(Boolean.TRUE);
+        try( val mockStatic = mockStatic(SecurityUtils.class) ) {
+            mockStatic.when(() -> SecurityUtils.isUserInRole(Security.SYSTEM_ADMIN)).thenReturn(Boolean.TRUE);
 
-        given(addressRepository.findById(any(UUID.class))).willReturn(Optional.empty());
+            given(addressRepository.findById(any(UUID.class))).willReturn(Optional.empty());
 
-        assertThrows(NotFoundException.class, () -> service.findById(UUID.randomUUID()));
+            assertThrows(NotFoundException.class, () -> service.findById(UUID.randomUUID()));
+        }
 
-        mockStatic.close();
     }
 
     @Test
@@ -303,18 +299,18 @@ class TestAddressService {
     @Test
     void shouldDeleteAddress() {
 
-        val mockStatic = mockStatic(SecurityUtils.class);
-        mockStatic.when(() -> SecurityUtils.isUserInRole(Security.SYSTEM_ADMIN)).thenReturn(Boolean.TRUE);
+        try( val mockStatic = mockStatic(SecurityUtils.class) ) {
+            mockStatic.when(() -> SecurityUtils.isUserInRole(Security.SYSTEM_ADMIN)).thenReturn(Boolean.TRUE);
 
-        val address = Address.builder().id(UUID.randomUUID()).owner(defaultOwner).build();
+            val address = Address.builder().id(UUID.randomUUID()).owner(defaultOwner).build();
 
-        given(addressRepository.findById(any(UUID.class))).willReturn(Optional.of(address));
+            given(addressRepository.findById(any(UUID.class))).willReturn(Optional.of(address));
 
-        service.delete(address);
+            service.delete(UUID.randomUUID());
 
-        verify(addressRepository).delete(address);
+            verify(addressRepository).delete(address);
+        }
 
-        mockStatic.close();
 
     }
 
@@ -327,8 +323,7 @@ class TestAddressService {
 
         given(addressRepository.findById(any(UUID.class))).willReturn(Optional.of(address));
 
-        service.delete(address);
-
+        service.delete(UUID.randomUUID());
         verify(addressRepository).delete(address);
 
         mockStatic.close();
@@ -344,11 +339,34 @@ class TestAddressService {
 
         given(addressRepository.findById(any(UUID.class))).willReturn(Optional.of(address));
 
-        assertThrows(OperationNotAllowedException.class, () -> service.delete(address));
-
+        assertThrows(OperationNotAllowedException.class, () -> service.delete(UUID.randomUUID()));
 
         mockStatic.close();
     }
 
- 
+    @Test
+    void shouldListAllAddressByLoggedUser() {
+        try( val mockStatic = mockStatic(SecurityUtils.class) ) {
+            mockStatic.when(() -> SecurityUtils.isUserInRole(Security.SYSTEM_ADMIN)).thenReturn(Boolean.FALSE);
+            val pageable = mock(PageRequest.class);
+            service.findAll(new Address(), pageable);
+
+            verify(addressRepository).findAll(
+                    any(Specification.class),any(PageRequest.class));
+
+        }
+    }
+
+    @Test
+    void shouldListAllAddress() {
+        try ( val mockStatic = mockStatic(SecurityUtils.class) ) {
+            mockStatic.when(() -> SecurityUtils.isUserInRole(Security.SYSTEM_ADMIN)).thenReturn(Boolean.TRUE);
+            service.findAll(new Address(), PageRequest.of(1,10));
+
+            verify(addressRepository).findAll(
+                    any(Specification.class),any(PageRequest.class));
+
+        }
+    }
+
 }
