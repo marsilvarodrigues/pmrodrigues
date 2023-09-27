@@ -4,7 +4,6 @@ import com.pmrodrigues.users.model.enums.AddressType;
 import lombok.*;
 import org.hibernate.annotations.Fetch;
 import org.hibernate.annotations.FetchMode;
-import org.hibernate.validator.constraints.Length;
 import org.springframework.data.annotation.CreatedBy;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedBy;
@@ -15,14 +14,16 @@ import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
+import javax.validation.constraints.Size;
 import java.time.Instant;
 import java.util.UUID;
 
 @Entity
 @Table(name = "address")
-@Data
 @AllArgsConstructor
 @NoArgsConstructor
+@Getter
+@Setter
 @Builder
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
 @EntityListeners(AuditingEntityListener.class)
@@ -32,21 +33,26 @@ public class Address {
     @Id
     @Column(name = "id", nullable = false)
     @EqualsAndHashCode.Exclude
+    @Setter(value = AccessLevel.PRIVATE)
     private UUID id;
 
     @JoinColumn(name = "user_id", referencedColumnName = "id")
     @ManyToOne(optional = false,targetEntity = User.class,fetch = FetchType.EAGER)
     @Fetch(FetchMode.JOIN)
+    @NotNull
+    @ToString.Exclude
     private User owner;
 
     @Enumerated(EnumType.ORDINAL)
     @Column(name = "address_type", nullable = false)
     @NotNull
+    @EqualsAndHashCode.Include
     private AddressType addressType;
 
     @Column(name = "address1", nullable = false)
     @NotNull
     @NotBlank
+    @EqualsAndHashCode.Include
     private String address1;
 
     @Column(name = "address2")
@@ -55,23 +61,27 @@ public class Address {
     @Column(name = "zipcode", nullable = false)
     @NotNull
     @NotBlank
-    @Length(min = 9, max = 9)
+    @Size(min = 9)
     @Pattern(regexp = "\\d{5}[-\\s]?\\d{3}")
+    @EqualsAndHashCode.Include
     private String zipcode;
 
     @Column(name = "neighbor", nullable = false)
     @NotNull
     @NotBlank
+    @EqualsAndHashCode.Include
     private String neighbor;
 
     @Column(name = "city", nullable = false)
     @NotNull
     @NotBlank
+    @EqualsAndHashCode.Include
     private String city;
 
     @ManyToOne(optional = false, targetEntity = State.class)
     @JoinColumn(name = "state_id", referencedColumnName = "id", nullable = false)
     @NotNull
+    @EqualsAndHashCode.Include
     private State state;
 
     @CreatedDate

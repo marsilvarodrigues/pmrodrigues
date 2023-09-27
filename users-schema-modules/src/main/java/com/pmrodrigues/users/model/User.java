@@ -3,6 +3,7 @@ package com.pmrodrigues.users.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.*;
+import lombok.experimental.SuperBuilder;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
@@ -18,11 +19,12 @@ import static com.pmrodrigues.commons.stringutils.PasswordGenerator.generatePass
 
 @Entity
 @Table(name = "users")
+@Inheritance(strategy = InheritanceType.JOINED)
 @Getter
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-@Builder
+@SuperBuilder()
 @ToString(exclude = {"password"})
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
 @EntityListeners(AuditingEntityListener.class)
@@ -30,6 +32,7 @@ import static com.pmrodrigues.commons.stringutils.PasswordGenerator.generatePass
 public class User {
     @Id
     @Column(name = "id", nullable = false)
+    @Setter(value = AccessLevel.PRIVATE)
     private UUID id;
 
     @Column(name = "firstName" , length = 200, nullable = false)
@@ -78,4 +81,5 @@ public class User {
     public boolean isNew() {
         return this.externalId == null;
     }
+
 }

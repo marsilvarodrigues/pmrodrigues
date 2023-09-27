@@ -12,7 +12,14 @@
     <include file="address/2_create_table_address.xml" relativeToChangelogFile="true"  />
     <include file="address/3_alter_table_state.xml" relativeToChangelogFile="true"  />
     <include file="address/4_alter_table_address.xml" relativeToChangelogFile="true"  />
+    <include file="address/5_add_foreign_key_address.xml" relativeToChangelogFile="true"  />
+    <include file="address/6_change_address_table_to_become_user_id_nullable.xml" relativeToChangelogFile="true"  />
 
     <include file="phone/1_create_table_phone.xml" relativeToChangelogFile="true" />
+    <include file="phone/2_add_foreign_key_phone.xml" relativeToChangelogFile="true" />
+    <include file="phone/3_change_phone_table_to_become_user_id_nullable.xml" relativeToChangelogFile="true" />
+
+    <include file="client/1_create_table_client.xml" relativeToChangelogFile="true" />
+    <include file="client/2_add_foreign_key_constraint.xml" relativeToChangelogFile="true" />
 
 </databaseChangeLog>

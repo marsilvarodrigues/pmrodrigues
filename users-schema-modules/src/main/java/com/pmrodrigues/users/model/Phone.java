@@ -13,6 +13,8 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Pattern;
+import javax.validation.constraints.Size;
 import java.time.Instant;
 import java.util.UUID;
 
@@ -29,22 +31,28 @@ import java.util.UUID;
 public class Phone {
     @Id
     @Column(name = "id", nullable = false)
-    @EqualsAndHashCode.Include
+    @Setter(value = AccessLevel.PRIVATE)
     private UUID id;
 
-    @JoinColumn(name = "user_id", referencedColumnName = "id")
+    @JoinColumn(name = "user_id", referencedColumnName = "id", nullable = false)
     @ManyToOne(optional = false,targetEntity = User.class,fetch = FetchType.EAGER)
     @Fetch(FetchMode.JOIN)
+    @NotNull
+    @ToString.Exclude
     private User owner;
 
     @NotBlank
     @NotNull
     @Column(name = "phone_number" , length = 20, nullable = false)
+    @EqualsAndHashCode.Include
+    @Size(min = 9)
+    @Pattern(regexp = "\\d{5}[-\\s]?\\d{4}")
     private String phoneNumber;
 
     @Enumerated(EnumType.ORDINAL)
     @Column(name = "phone_type")
     @NotNull
+    @EqualsAndHashCode.Include
     private PhoneType type;
 
 
