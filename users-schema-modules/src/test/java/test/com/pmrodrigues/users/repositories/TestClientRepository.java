@@ -23,8 +23,8 @@ import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.test.annotation.Rollback;
 import org.springframework.test.context.ContextConfiguration;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Instant;
 import java.time.LocalDate;
@@ -32,6 +32,7 @@ import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.UUID;
 
+import static com.pmrodrigues.users.specifications.SpecificationClient.*;
 import static org.junit.Assert.*;
 
 @DataJpaTest()
@@ -56,6 +57,59 @@ public class TestClientRepository {
 
     private User user;
 
+    private Client createClient() {
+        var client = Client.builder()
+                .birthday(LocalDate.now().minusYears(20))
+                .firstName("teste")
+                .lastName("teste")
+                .email("client@test.com")
+                .build();
+        client = client.add(
+                        Phone.builder()
+                                .phoneNumber("11234-1234")
+                                .type(PhoneType.CELLPHONE)
+                                .build())
+                .add(Address.builder()
+                        .addressType(AddressType.ROAD)
+                        .state(stateRepository.findByCode("RJ").get())
+                        .city("teste")
+                        .neighbor("teste")
+                        .address1("test")
+                        .zipcode("12345-123")
+                        .build());
+        return client;
+    }
+
+    @Test
+    @Transactional
+    void shouldSearchByAddress() {
+        val client = createClient();
+        val state = stateRepository.findByCode("RJ").get();
+        clientRepository.save(client);
+
+        var clients = clientRepository.findAll(state(state));
+        assertTrue(!clients.isEmpty());
+        assertTrue(clients.contains(client));
+
+        clients = clientRepository.findAll(city("teste"));
+        assertTrue(!clients.isEmpty());
+        assertTrue(clients.contains(client));
+
+    }
+
+    @Test
+    @Transactional
+    void shouldSearchByAge() {
+        val client = createClient();
+
+        clientRepository.save(client);
+
+        var clients = clientRepository.findAll(olderThan(20));
+        assertTrue(!clients.isEmpty());
+        assertTrue(clients.contains(client));
+    }
+
+
     @BeforeEach
     void beforeEach() {
         this.user = User.builder().firstName("teste")
@@ -78,28 +132,10 @@ public class TestClientRepository {
     }
 
     @Test
-    @Rollback
+    @Transactional
     void shouldCreateAClient() {
 
-        var client = Client.builder()
-                        .birthday(LocalDate.now())
-                        .firstName("teste")
-                        .lastName("teste")
-                        .email("client@test.com")
-                .build();
-        client = client.add(
-                Phone.builder()
-                     .phoneNumber("11234-1234")
-                     .type(PhoneType.CELLPHONE)
-                      .build())
-                .add(Address.builder()
-                        .addressType(AddressType.ROAD)
-                        .state(stateRepository.findByCode("RJ").get())
-                        .city("teste")
-                        .neighbor("teste")
-                        .address1("test")
-                        .zipcode("12345-123")
-                        .build());
+        var client = createClient();
 
         val saved = clientRepository.save(client);
 
@@ -119,27 +155,10 @@ public class TestClientRepository {
     }
 
     @Test
+    @Transactional
     void shouldUpdateAPhoneFromAClient() {
 
-        var client = Client.builder()
-                .birthday(LocalDate.now())
-                .firstName("teste")
-                .lastName("teste")
-                .email("client@test.com")
-                .build();
-        client = client.add(
-                        Phone.builder()
-                                .phoneNumber("11234-1234")
-                                .type(PhoneType.CELLPHONE)
-                                .build())
-                .add(Address.builder()
-                        .addressType(AddressType.ROAD)
-                        .state(stateRepository.findByCode("RJ").get())
-                        .city("teste")
-                        .neighbor("teste")
-                        .address1("test")
-                        .zipcode("12345-123")
-                        .build());
+        var client = createClient();
 
         val saved = clientRepository.save(client);
 
@@ -147,14 +166,53 @@ public class TestClientRepository {
         clientRepository.save(saved);
 
         assertEquals(2, saved.getPhones().size());
-        assertTrue( saved.getPhones().stream().filter(p -> p.getType() == PhoneType.HOME).allMatch( p-> p.getId() != null ));
 
+        assertTrue( saved.getPhones().stream().filter(p -> p.getType() == PhoneType.HOME).allMatch( p-> p.getId() != null ));
         saved.remove(Phone.builder().phoneNumber("321").type(PhoneType.HOME).build());
+
         clientRepository.save(saved);
 
         val other = clientRepository.findById(saved.getId()).get();
 
         assertEquals(1, other.getPhones().size());
+
+    }
+
+    @Test
+    @Transactional
+    void shouldUpdateAnAddressFromAClient() {
+
+        var client = createClient();
+
+        val saved = clientRepository.save(client);
+
+        saved.add(Address.builder()
+                .addressType(AddressType.STREET)
+                .state(stateRepository.findByCode("SP").get())
+                .city("teste")
+                .neighbor("teste")
+                .address1("test")
+                .zipcode("12345-123")
+                .build());
+        clientRepository.save(saved);
+
+        assertEquals(2, saved.getAddresses().size());
+
+        assertTrue( saved.getAddresses().stream().filter(p -> p.getAddressType() == AddressType.STREET).allMatch( p-> p.getId() != null ));
+        saved.remove(Address.builder()
+                .addressType(AddressType.STREET)
+                .state(stateRepository.findByCode("SP").get())
+                .city("teste")
+                .neighbor("teste")
+                .address1("test")
+                .zipcode("12345-123")
+                .build());
+
+        clientRepository.save(saved);
+
+        val other = clientRepository.findById(saved.getId()).get();
+
+        assertEquals(1, other.getAddresses().size());
 
     }
 }

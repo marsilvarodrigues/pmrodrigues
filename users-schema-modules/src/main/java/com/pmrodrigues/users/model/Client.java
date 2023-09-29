@@ -11,6 +11,7 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 import javax.persistence.*;
 import java.time.Instant;
 import java.time.LocalDate;
+import java.time.Period;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -83,5 +84,9 @@ public class Client extends User {
         if( phones != null && phones.contains(phone))
             this.phones.remove(phone);
         return this;
+    }
+
+    public Long getAge() {
+        return Long.valueOf(Period.between(birthday, LocalDate.now()).getYears());
     }
 }
