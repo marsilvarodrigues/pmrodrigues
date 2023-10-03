@@ -161,7 +161,7 @@ class TestUserController {
     @SneakyThrows
     @DisplayName("Should not delete user by Id - User Not Found")
     void shouldNotDeleteUserNotFound() {
-        given(userService.findById(any(UUID.class))).willThrow(UserNotFoundException.class);
+        willThrow(UserNotFoundException.class).given(userService).delete(any(UUID.class));
 
         mvc.perform(delete("/users/" + UUID.randomUUID())
                         .contentType(MediaType.APPLICATION_JSON))
@@ -173,7 +173,7 @@ class TestUserController {
     @SneakyThrows
     @DisplayName("Should List all Users")
     void shouldListAllUsers() {
-        given(userService.findAll(any(User.class), any(PageRequest.class))).willReturn(Page.empty());
+        given(userService.findAll(any(UserDTO.class), any(PageRequest.class))).willReturn(Page.empty());
 
         mvc.perform(get("/users")
                         .contentType(MediaType.APPLICATION_JSON))
@@ -186,7 +186,7 @@ class TestUserController {
     @DisplayName("Should List all Users")
     void shouldListAllUsersWithBody() {
 
-        given(userService.findAll(any(User.class), any(PageRequest.class))).willReturn(Page.empty());
+        given(userService.findAll(any(UserDTO.class), any(PageRequest.class))).willReturn(Page.empty());
 
         var user = UserDTO.builder().firstName("test").build();
         var body = new ObjectMapper().writeValueAsString(user);
@@ -203,7 +203,7 @@ class TestUserController {
     @DisplayName("Should List a page of all user")
     void shouldGetAPageOfAllUsers() {
 
-        given(userService.findAll(any(User.class),
+        given(userService.findAll(any(UserDTO.class),
                 any(PageRequest.class))).willReturn(Page.empty());
 
         mvc.perform(get("/users?page=1&size=10")
@@ -213,7 +213,7 @@ class TestUserController {
 
         Sort sort = Sort.by(Sort.Order.desc("id"));
 
-        verify(userService).findAll(new User(), PageRequest.of(1, 10, sort));
+        verify(userService).findAll(new UserDTO(null, null, null, null), PageRequest.of(1, 10, sort));
 
     }
 
@@ -222,7 +222,7 @@ class TestUserController {
     @DisplayName("Should List All user sorted")
     void shouldGetAllUsersSortedList() {
 
-        given(userService.findAll(any(User.class), any(PageRequest.class))).willReturn(Page.empty());
+        given(userService.findAll(any(UserDTO.class), any(PageRequest.class))).willReturn(Page.empty());
 
         mvc.perform(get("/users?sort=email|desc&sort=firstName|asc&sort=lastName|desc")
                         .contentType(MediaType.APPLICATION_JSON))
@@ -233,7 +233,7 @@ class TestUserController {
                 Sort.Order.asc("firstName"),
                 Sort.Order.desc("lastName"));
 
-        verify(userService).findAll(any(User.class), eq(PageRequest.of(0, 50, sort)));
+        verify(userService).findAll(any(UserDTO.class), eq(PageRequest.of(0, 50, sort)));
 
     }
 
@@ -242,7 +242,7 @@ class TestUserController {
     @DisplayName("Should List All user sorted")
     void shouldGetAllUsersSorted() {
 
-        given(userService.findAll(any(User.class), any(PageRequest.class))).willReturn(Page.empty());
+        given(userService.findAll(any(UserDTO.class), any(PageRequest.class))).willReturn(Page.empty());
 
         mvc.perform(get("/users?sort=email|desc")
                         .contentType(MediaType.APPLICATION_JSON))
@@ -256,7 +256,7 @@ class TestUserController {
     @DisplayName("Should not sort")
     void shouldNotSort() {
 
-        given(userService.findAll(any(User.class), any(PageRequest.class))).willReturn(Page.empty());
+        given(userService.findAll(any(UserDTO.class), any(PageRequest.class))).willReturn(Page.empty());
 
         mvc.perform(get("/users?sort=desc")
                         .contentType(MediaType.APPLICATION_JSON))

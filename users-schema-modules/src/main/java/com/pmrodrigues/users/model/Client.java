@@ -54,13 +54,6 @@ public class Client extends User {
     @Column(name = "updated_by")
     private UUID updatedBy;
 
-    @Override
-    @PrePersist
-    public void preInsert() {
-        super.preInsert();
-
-    }
-
     public Client add(@NonNull Phone phone) {
         if( phones == null ) phones = new ArrayList<>();
 

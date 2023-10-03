@@ -26,6 +26,7 @@ public record UserDTO(
 
     public User toUser(){
         return User.builder()
+                .id(id)
                 .firstName(firstName)
                 .lastName(lastName)
                 .email(email)

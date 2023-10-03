@@ -87,11 +87,6 @@ class TestUserRepository {
 
         assertEquals(1L, found.getTotalElements());
 
-        found = userRepository.findAll(where(expiredDate(LocalDateTime.now().minus(2, ChronoUnit.MONTHS))),
-                PageRequest.of(0, 10));
-
-        assertEquals(100L, found.getTotalElements());
-
     }
 
     @Test

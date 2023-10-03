@@ -1,5 +1,6 @@
 package com.pmrodrigues.users.service;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.pmrodrigues.commons.exceptions.NotCreateException;
 import com.pmrodrigues.commons.exceptions.NotFoundException;
 import com.pmrodrigues.security.exceptions.OperationNotAllowedException;
@@ -42,6 +43,8 @@ public class UserService {
     private final EmailClient emailService;
     private final KeycloakUserRepository keycloakUserRepository;
 
+    private final ObjectMapper objectMapper = new ObjectMapper();
+
     @Timed(histogram = true, value = "UserService.findById")
     public User findById(@NonNull final UUID userId) {
         log.info("get user by id {}", userId);
@@ -71,6 +74,7 @@ public class UserService {
         return user;
 
     }
+
 
     private boolean sendWelcomeEmail(User user) {
         val email = emailService.getEmailByName(NEW_USER_TEMPLATE)
@@ -112,13 +116,12 @@ public class UserService {
 
     @Timed(histogram = true, value = "UserService.findAll")
     @SneakyThrows
-    public Page<User> findAll(@NonNull User user, @NonNull PageRequest pageRequest){
+    public Page<User> findAll(@NonNull UserDTO user, @NonNull PageRequest pageRequest){
         log.info("list all users by sample {}", user);
         return repository.findAll(
-                    where(firstName(user.getFirstName())).
-                    and(lastName(user.getLastName())).
-                    and(email(user.getEmail())).
-                    and(expiredDate(user.getExpiredDate())),
+                    where(firstName(user.firstName())).
+                    and(lastName(user.lastName())).
+                    and(email(user.email())),
                 pageRequest);
     }
 

@@ -186,7 +186,7 @@ class TestPhoneService {
             mockStatic.when(() -> SecurityUtils.isUserInRole(Security.SYSTEM_ADMIN)).thenReturn(Boolean.FALSE);
 
             val pageable = mock(PageRequest.class);
-            phoneService.findAll(new Phone(), pageable);
+            phoneService.findAll(new PhoneDTO(null, new UserDTO(null, null, null, null), null, null), pageable);
 
             verify(phoneRepository).findAll(
                     any(Specification.class),any(PageRequest.class));
@@ -199,7 +199,7 @@ class TestPhoneService {
             mockStatic.when(() -> SecurityUtils.isUserInRole(Security.SYSTEM_ADMIN)).thenReturn(Boolean.TRUE);
 
             val pageable = mock(PageRequest.class);
-            phoneService.findAll(new Phone(), pageable);
+            phoneService.findAll(new PhoneDTO(null, new UserDTO(null, null, null, null), null, null), pageable);
 
             verify(phoneRepository).findAll(
                     any(Specification.class),any(PageRequest.class));

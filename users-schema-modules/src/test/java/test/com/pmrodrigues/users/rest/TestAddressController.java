@@ -213,7 +213,7 @@ class TestAddressController {
 
         val message = objectMapper.writeValueAsString(address);
 
-        when(service.findAll(any(Address.class), any(PageRequest.class))).thenReturn(Page.empty());
+        when(service.findAll(any(AddressDTO.class), any(PageRequest.class))).thenReturn(Page.empty());
 
         mvc.perform(get("/addresses?page=1&size=10")
                         .content(message)
@@ -227,7 +227,7 @@ class TestAddressController {
     @SneakyThrows
     void shouldSearchAddressBodyEmpty() {
 
-        when(service.findAll(any(Address.class), any(PageRequest.class))).thenReturn(Page.empty());
+        when(service.findAll(any(AddressDTO.class), any(PageRequest.class))).thenReturn(Page.empty());
 
         mvc.perform(get("/addresses?page=1&size=10")
                         .contentType(MediaType.APPLICATION_JSON))
@@ -240,7 +240,7 @@ class TestAddressController {
     @DisplayName("Should List All Addresses sorted")
     void shouldGetAllUsersSortedList() {
 
-        given(service.findAll(any(Address.class), any(PageRequest.class))).willReturn(Page.empty());
+        given(service.findAll(any(AddressDTO.class), any(PageRequest.class))).willReturn(Page.empty());
 
         mvc.perform(get("/addresses?sort=city|desc&sort=state.name|asc&sort=zipcode|desc")
                         .contentType(MediaType.APPLICATION_JSON))
@@ -251,7 +251,7 @@ class TestAddressController {
                 Sort.Order.asc("state.name"),
                 Sort.Order.desc("zipcode"));
 
-        verify(service).findAll(any(Address.class), eq(PageRequest.of(0, 50, sort)));
+        verify(service).findAll(any(AddressDTO.class), eq(PageRequest.of(0, 50, sort)));
 
     }
 

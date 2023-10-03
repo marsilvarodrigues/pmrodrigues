@@ -5,7 +5,6 @@ import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import org.springframework.data.jpa.domain.Specification;
 
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 
@@ -42,15 +41,6 @@ public class SpecificationUser {
                 return null;
         };
 
-    }
-
-    public static Specification<User> expiredDate(LocalDateTime expiredDate){
-        return (root, criteriaQuery, criteriaBuilder) -> {
-            if( expiredDate != null )
-                return criteriaBuilder.greaterThanOrEqualTo(root.get("expiredDate"), expiredDate);
-            else
-                return null;
-        };
     }
 
     public static Specification<User> externalId(List<UUID> externalIds) {

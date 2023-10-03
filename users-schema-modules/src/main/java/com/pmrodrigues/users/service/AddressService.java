@@ -90,27 +90,27 @@ public class AddressService {
 
     @Timed(histogram = true, value = "AddressService.findAll")
     @SneakyThrows
-    public Page<Address> findAll(@NonNull Address address, @NonNull PageRequest pageRequest){
+    public Page<Address> findAll(@NonNull AddressDTO address, @NonNull PageRequest pageRequest){
         log.info("list all addresses by sample {}", address);
         var loggedUser = userService.getAuthenticatedUser()
                 .orElseThrow(UserNotFoundException::new);
 
         if( SecurityUtils.isUserInRole(Security.SYSTEM_ADMIN) ){
             return repository.findAll(
-                            owner(address.getOwner())
-                            .and(state(address.getState()))
-                            .and(zipcode(address.getZipcode()))
-                            .and(city(address.getCity()))
-                            .and(neighbor(address.getNeighbor()))
-                            .and(address(address.getAddress1())), pageRequest);
+                            owner(address.owner().toUser())
+                            .and(state(address.toAddress().getState()))
+                            .and(zipcode(address.zipcode()))
+                            .and(city(address.city()))
+                            .and(neighbor(address.neighbor()))
+                            .and(address(address.address1())), pageRequest);
         } else {
             return repository.findAll(
                     owner(loggedUser)
-                    .and(state(address.getState()))
-                    .and(zipcode(address.getZipcode()))
-                    .and(city(address.getCity()))
-                    .and(neighbor(address.getNeighbor()))
-                    .and(address(address.getAddress1())), pageRequest);
+                    .and(state(address.toAddress().getState()))
+                    .and(zipcode(address.zipcode()))
+                    .and(city(address.city()))
+                    .and(neighbor(address.neighbor()))
+                    .and(address(address.address1())), pageRequest);
         }
 
     }

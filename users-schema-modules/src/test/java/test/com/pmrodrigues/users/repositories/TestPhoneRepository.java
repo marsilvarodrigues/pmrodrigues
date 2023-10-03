@@ -101,7 +101,7 @@ class TestPhoneRepository {
             PhoneType randomPhoneType = phoneTypes[randomIndex];
             counts.put(randomPhoneType, counts.get(randomPhoneType) + 1);
 
-            val phone = Phone.builder().phoneNumber(RandomStringUtils.randomNumeric(10))
+            val phone = Phone.builder().phoneNumber(RandomStringUtils.randomNumeric(9))
                     .type(randomPhoneType)
                     .owner(user).build();
             phoneRepository.save(phone);

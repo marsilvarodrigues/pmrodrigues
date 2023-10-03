@@ -2,7 +2,6 @@ package com.pmrodrigues.users.rest;
 
 import com.pmrodrigues.commons.request.validates.ValuesAllowed;
 import com.pmrodrigues.users.dtos.UserDTO;
-import com.pmrodrigues.users.model.User;
 import com.pmrodrigues.users.service.UserService;
 import io.micrometer.core.annotation.Timed;
 import io.swagger.annotations.ApiOperation;
@@ -51,6 +50,7 @@ public class UserController{
             produces = { MediaType.APPLICATION_JSON_VALUE },
             consumes = { MediaType.APPLICATION_JSON_VALUE }
     )
+
     public ResponseEntity<UserDTO> add(@ApiParam(required = true) @Valid @RequestBody final UserDTO user) {
         log.info("try to save a new user as {}",user);
         val saved = userService.createNewUser(user);
@@ -115,8 +115,7 @@ public class UserController{
         var sortBy = createSortForString(sort);
 
         var sample = Optional.ofNullable(user)
-                             .map(UserDTO::toUser)
-                              .orElse(new User());
+                              .orElse(new UserDTO(null, null, null, null));
 
         val response = userService.findAll(sample, PageRequest.of(page, size, Sort.by(sortBy))).map(UserDTO::fromUser);
         return ResponseEntity.ok(response);

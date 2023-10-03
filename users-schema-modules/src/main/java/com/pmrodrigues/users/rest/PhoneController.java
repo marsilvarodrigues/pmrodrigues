@@ -3,7 +3,6 @@ package com.pmrodrigues.users.rest;
 import com.pmrodrigues.commons.request.validates.ValuesAllowed;
 import com.pmrodrigues.users.dtos.PhoneDTO;
 import com.pmrodrigues.users.model.Address;
-import com.pmrodrigues.users.model.Phone;
 import com.pmrodrigues.users.service.PhoneService;
 import io.micrometer.core.annotation.Timed;
 import io.swagger.annotations.ApiOperation;
@@ -133,8 +132,7 @@ public class PhoneController {
         var sortBy = createSortForString(sort);
 
         var sample = Optional.ofNullable(phone)
-                .map(PhoneDTO::toPhone)
-                .orElse(new Phone());
+                .orElse(new PhoneDTO(null, null, null, null));
 
         val response = phoneService.findAll(sample , PageRequest.of(page, size, Sort.by(sortBy))).map(PhoneDTO::fromPhone);
         return ResponseEntity.ok(response);

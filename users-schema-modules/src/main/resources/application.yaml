@@ -32,7 +32,6 @@ spring:
         use_jdbc_metadata_defaults: false
     database-platform: org.hibernate.dialect.PostgreSQLDialect
   datasource:
-    platform: postgresql
     driver-class-name: org.postgresql.Driver
     url: jdbc:postgresql://${POSTGRES_URL:localhost}:${POSTGRES_PORT:5432}/${POSTGRES_DB:pmrodrigues}
     username: ${POSTGRES_USER:postgres}
@@ -56,6 +55,9 @@ spring:
         provider:
           keycloak:
             issuerUri: http://${KEYCLOAK_LOCATION:localhost:8080}/auth/realms/master
+  sql:
+    init:
+      platform: postgresql
 feign:
   encoder:
     charset-from-content-type: true

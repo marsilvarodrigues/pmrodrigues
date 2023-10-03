@@ -2,7 +2,6 @@ package com.pmrodrigues.users.rest;
 
 import com.pmrodrigues.commons.request.validates.ValuesAllowed;
 import com.pmrodrigues.users.dtos.AddressDTO;
-import com.pmrodrigues.users.model.Address;
 import com.pmrodrigues.users.service.AddressService;
 import io.micrometer.core.annotation.Timed;
 import io.swagger.annotations.ApiOperation;
@@ -79,8 +78,7 @@ public class AddressController {
         var sortBy = createSortForString(sort);
 
         var sample = Optional.ofNullable(address)
-                .map(AddressDTO::toAddress)
-                .orElse(new Address());
+                .orElse(new AddressDTO(null, null, null, null, null, null, null, null, null));
 
         val response = addressService.findAll(sample , PageRequest.of(page, size, Sort.by(sortBy))).map(AddressDTO::fromAddress);
         return ResponseEntity.ok(response);

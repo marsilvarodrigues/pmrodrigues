@@ -205,7 +205,7 @@ class TestPhoneController {
 
         val message = objectMapper.writeValueAsString(phone);
 
-        given(service.findAll(any(Phone.class), any(PageRequest.class))).willReturn(Page.empty());
+        given(service.findAll(any(PhoneDTO.class), any(PageRequest.class))).willReturn(Page.empty());
 
         mvc.perform(get("/phones?page=1&size=10")
                         .content(message)
@@ -219,7 +219,7 @@ class TestPhoneController {
     @SneakyThrows
     void shouldSearchPhonesBodyEmpty() {
 
-        given(service.findAll(any(Phone.class), any(PageRequest.class))).willReturn(Page.empty());
+        given(service.findAll(any(PhoneDTO.class), any(PageRequest.class))).willReturn(Page.empty());
 
         mvc.perform(get("/phones?page=1&size=10")
                         .contentType(MediaType.APPLICATION_JSON))
@@ -232,7 +232,7 @@ class TestPhoneController {
     @DisplayName("Should List All Phones sorted")
     void shouldGetAllPhonesSortedList() {
 
-        given(service.findAll(any(Phone.class), any(PageRequest.class))).willReturn(Page.empty());
+        given(service.findAll(any(PhoneDTO.class), any(PageRequest.class))).willReturn(Page.empty());
 
         mvc.perform(get("/phones?sort=type|desc")
                         .contentType(MediaType.APPLICATION_JSON))
@@ -241,7 +241,7 @@ class TestPhoneController {
 
         Sort sort = Sort.by(Sort.Order.desc("type"));
 
-        verify(service).findAll(any(Phone.class), eq(PageRequest.of(0, 50, sort)));
+        verify(service).findAll(any(PhoneDTO.class), eq(PageRequest.of(0, 50, sort)));
 
     }
 

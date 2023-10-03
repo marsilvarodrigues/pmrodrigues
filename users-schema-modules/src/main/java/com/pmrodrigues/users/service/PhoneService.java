@@ -82,17 +82,17 @@ public class PhoneService {
     }
 
     @Timed(histogram = true, value = "PhoneService.findAll")
-    public Page<Phone> findAll(@NonNull Phone phone, @NonNull PageRequest pageRequest) {
+    public Page<Phone> findAll(@NonNull PhoneDTO phone, @NonNull PageRequest pageRequest) {
         log.info("list all phones by sample {}", phone);
         var loggedUser = userService.getAuthenticatedUser()
                 .orElseThrow(UserNotFoundException::new);
 
         if( SecurityUtils.isUserInRole(Security.SYSTEM_ADMIN) ) {
-            return phoneRepository.findAll(owner(phone.getOwner())
-                    .and(type(phone.getType())), pageRequest);
+            return phoneRepository.findAll(owner(phone.owner().toUser())
+                    .and(type(phone.type())), pageRequest);
         } else {
             return phoneRepository.findAll(owner(loggedUser)
-                    .and(type(phone.getType())), pageRequest);
+                    .and(type(phone.type())), pageRequest);
         }
     }
 

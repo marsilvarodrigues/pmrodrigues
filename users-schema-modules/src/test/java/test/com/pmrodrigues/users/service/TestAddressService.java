@@ -349,7 +349,7 @@ class TestAddressService {
         try( val mockStatic = mockStatic(SecurityUtils.class) ) {
             mockStatic.when(() -> SecurityUtils.isUserInRole(Security.SYSTEM_ADMIN)).thenReturn(Boolean.FALSE);
             val pageable = mock(PageRequest.class);
-            service.findAll(new Address(), pageable);
+            service.findAll(new AddressDTO(null, null, null, null, null, null, null, null, new UserDTO(null, null, null, null)), pageable);
 
             verify(addressRepository).findAll(
                     any(Specification.class),any(PageRequest.class));
@@ -361,7 +361,7 @@ class TestAddressService {
     void shouldListAllAddress() {
         try ( val mockStatic = mockStatic(SecurityUtils.class) ) {
             mockStatic.when(() -> SecurityUtils.isUserInRole(Security.SYSTEM_ADMIN)).thenReturn(Boolean.TRUE);
-            service.findAll(new Address(), PageRequest.of(1,10));
+            service.findAll(new AddressDTO(null, null, null, null, null, null, null, null, new UserDTO(null, null, null, null)), PageRequest.of(1,10));
 
             verify(addressRepository).findAll(
                     any(Specification.class),any(PageRequest.class));

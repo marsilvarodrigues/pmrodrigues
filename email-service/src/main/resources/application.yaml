@@ -12,6 +12,8 @@ logging:
       - com.pmrodrigues
 
 spring:
+  application:
+    name: email-service
   output:
     ansi:
       enabled: DETECT
@@ -45,6 +47,11 @@ keycloak:
   principal-attribute: preferred_username
   public-client: true
   confidential-port: 0
+
+eureka:
+  client:
+    serviceUrl:
+      defaultZone=http://localhost:8081/eureka:
 
 emails:
   templates:
