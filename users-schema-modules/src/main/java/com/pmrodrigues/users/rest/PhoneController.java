@@ -66,7 +66,7 @@ public class PhoneController {
     )
     public ResponseEntity<PhoneDTO> add(@ApiParam(required = true) @Valid @RequestBody final PhoneDTO phone) {
         log.info("try to save a new phone as {}",phone);
-        val saved = phoneService.createNewPhone(phone);
+        val saved = phoneService.create(phone);
         log.info("phone {} saved into database",saved);
 
         return ResponseEntity.created(URI.create("/phones/" + saved.getId()))
@@ -85,7 +85,7 @@ public class PhoneController {
     )
     public ResponseEntity<String> update(@ApiParam(required = true) @PathVariable("id") final UUID id,@ApiParam(required = true) @Valid @RequestBody final PhoneDTO phone){
         log.info("try to update a phone {}", phone);
-        phoneService.updatePhone(id, phone);
+        phoneService.update(id, phone);
         log.info("phone {} saved", phone);
         return ResponseEntity.ok().build();
     }

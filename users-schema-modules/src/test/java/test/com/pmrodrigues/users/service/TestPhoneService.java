@@ -65,7 +65,7 @@ class TestPhoneService {
             mockStatic.when(() -> SecurityUtils.isUserInRole(Security.SYSTEM_ADMIN)).thenReturn(Boolean.FALSE);
             given(userService.findById(any(UUID.class))).willReturn(defaultOwner);
 
-            phoneService.createNewPhone(new PhoneDTO(null,
+            phoneService.create(new PhoneDTO(null,
                     new UserDTO(defaultOwner.getId(),null,null,null),
                     "teste", PhoneType.CELLPHONE));
 
@@ -80,7 +80,7 @@ class TestPhoneService {
 
             mockStatic.when(() -> SecurityUtils.isUserInRole(Security.SYSTEM_ADMIN)).thenReturn(Boolean.FALSE);
 
-            phoneService.createNewPhone(new PhoneDTO(null,
+            phoneService.create(new PhoneDTO(null,
                     null,
                     "teste", PhoneType.CELLPHONE));
 
@@ -95,7 +95,7 @@ class TestPhoneService {
             mockStatic.when(() -> SecurityUtils.isUserInRole(Security.SYSTEM_ADMIN)).thenReturn(Boolean.FALSE);
             given(userService.findById(any(UUID.class))).willReturn(User.builder().id(UUID.randomUUID()).build());
 
-            assertThrows(OperationNotAllowedException.class, (() -> phoneService.createNewPhone(new PhoneDTO(null,
+            assertThrows(OperationNotAllowedException.class, (() -> phoneService.create(new PhoneDTO(null,
                     new UserDTO(UUID.randomUUID(),null,null,null),
                     "teste", PhoneType.CELLPHONE))));
         }
@@ -108,7 +108,7 @@ class TestPhoneService {
             mockStatic.when(() -> SecurityUtils.isUserInRole(Security.SYSTEM_ADMIN)).thenReturn(Boolean.TRUE);
             given(userService.findById(any(UUID.class))).willReturn(User.builder().id(UUID.randomUUID()).build());
 
-            phoneService.createNewPhone(new PhoneDTO(null,
+            phoneService.create(new PhoneDTO(null,
                     new UserDTO(UUID.randomUUID(),null,null,null),
                     "teste", PhoneType.CELLPHONE));
 
@@ -126,7 +126,7 @@ class TestPhoneService {
 
             val id = UUID.randomUUID();
 
-            phoneService.updatePhone(id, new PhoneDTO(id,
+            phoneService.update(id, new PhoneDTO(id,
                     new UserDTO(defaultOwner.getId(),null,null,null),
                     "teste", PhoneType.CELLPHONE));
 
@@ -144,7 +144,7 @@ class TestPhoneService {
 
             val id = UUID.randomUUID();
 
-            phoneService.updatePhone(id, new PhoneDTO(id,
+            phoneService.update(id, new PhoneDTO(id,
                     new UserDTO(defaultOwner.getId(),null,null,null),
                     "teste", PhoneType.CELLPHONE));
 
@@ -161,7 +161,7 @@ class TestPhoneService {
 
             val id = UUID.randomUUID();
 
-            assertThrows(OperationNotAllowedException.class, () -> phoneService.updatePhone(id, new PhoneDTO(id,
+            assertThrows(OperationNotAllowedException.class, () -> phoneService.update(id, new PhoneDTO(id,
                     new UserDTO(defaultOwner.getId(),null,null,null),
                     "teste", PhoneType.CELLPHONE)));
 
@@ -175,7 +175,7 @@ class TestPhoneService {
 
         val id = UUID.randomUUID();
 
-        assertThrows(PhoneNotFoundException.class, () -> phoneService.updatePhone(id, new PhoneDTO(id,
+        assertThrows(PhoneNotFoundException.class, () -> phoneService.update(id, new PhoneDTO(id,
                 new UserDTO(defaultOwner.getId(),null,null,null),
                 "teste", PhoneType.CELLPHONE)));
     }

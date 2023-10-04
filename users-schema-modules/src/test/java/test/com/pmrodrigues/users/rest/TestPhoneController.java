@@ -103,7 +103,7 @@ class TestPhoneController {
                     .owner(User.builder().id(phone.owner().id()).build())
                     .build();
 
-        given(service.createNewPhone(any(PhoneDTO.class))).willReturn(returned);
+        given(service.create(any(PhoneDTO.class))).willReturn(returned);
 
 
 
@@ -125,7 +125,7 @@ class TestPhoneController {
 
         val json = objectMapper.writeValueAsString(phone);
 
-        given(service.createNewPhone(any(PhoneDTO.class))).willThrow(new OperationNotAllowedException("User not allowed for this operation"));
+        given(service.create(any(PhoneDTO.class))).willThrow(new OperationNotAllowedException("User not allowed for this operation"));
 
         mvc.perform(post("/phones")
                         .content(json)
@@ -142,7 +142,7 @@ class TestPhoneController {
 
         val phone = new PhoneDTO(UUID.randomUUID(), new UserDTO(UUID.randomUUID(),null, null, null),null,PhoneType.CELLPHONE);
 
-        willDoNothing().given(service).updatePhone(any(UUID.class), any(PhoneDTO.class));
+        willDoNothing().given(service).update(any(UUID.class), any(PhoneDTO.class));
 
         val json = objectMapper.writeValueAsString(phone);
 
@@ -162,7 +162,7 @@ class TestPhoneController {
 
         val phone = new PhoneDTO(UUID.randomUUID(), new UserDTO(UUID.randomUUID(),null, null, null),null,PhoneType.CELLPHONE);
 
-        willThrow(new PhoneNotFoundException()).given(service).updatePhone(any(UUID.class), any(PhoneDTO.class));
+        willThrow(new PhoneNotFoundException()).given(service).update(any(UUID.class), any(PhoneDTO.class));
 
         val json = objectMapper.writeValueAsString(phone);
 
@@ -182,7 +182,7 @@ class TestPhoneController {
 
         val phone = new PhoneDTO(UUID.randomUUID(), new UserDTO(UUID.randomUUID(),null, null, null),null,PhoneType.CELLPHONE);
 
-        willThrow(new OperationNotAllowedException("")).given(service).updatePhone(any(UUID.class), any(PhoneDTO.class));
+        willThrow(new OperationNotAllowedException("")).given(service).update(any(UUID.class), any(PhoneDTO.class));
 
         val json = objectMapper.writeValueAsString(phone);
 

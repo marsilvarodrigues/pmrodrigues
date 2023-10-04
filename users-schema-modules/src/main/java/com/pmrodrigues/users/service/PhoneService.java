@@ -36,7 +36,7 @@ public class PhoneService {
 
     @Transactional(propagation = Propagation.REQUIRED)
     @Timed(histogram = true, value = "PhoneService.createNewPhone")
-    public Phone createNewPhone(@NonNull PhoneDTO phoneDTO) {
+    public Phone create(@NonNull PhoneDTO phoneDTO) {
         log.info("adding a new phone {}", phoneDTO);
 
         var phone = phoneDTO.toPhone();
@@ -60,7 +60,7 @@ public class PhoneService {
 
     @Transactional(propagation = Propagation.REQUIRED)
     @Timed(histogram = true, value = "PhoneService.updatePhone")
-    public void updatePhone(@NonNull UUID id, @NonNull PhoneDTO phoneDTO) {
+    public void update(@NonNull UUID id, @NonNull PhoneDTO phoneDTO) {
         log.info("updating phone {} by id {}", phoneDTO, id);
 
         var phone = phoneRepository.findById(id).orElseThrow(PhoneNotFoundException::new);
