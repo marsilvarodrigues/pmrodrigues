@@ -97,11 +97,11 @@ public class AddressController {
     )
     public ResponseEntity<AddressDTO> add(@ApiParam(required = true) @Valid @RequestBody final AddressDTO address) {
         log.info("try to save a new address as {}",address);
-        val saved = addressService.createNewAddress(address);
+        val saved = addressService.create(address);
         log.info("address {} saved into database",saved);
 
-        return ResponseEntity.created(URI.create("/addresses/" + saved.getId()))
-                .body(AddressDTO.fromAddress(saved));
+        return ResponseEntity.created(URI.create("/addresses/" + saved.id()))
+                .body(saved);
     }
 
     @Timed(value = "AddressController.update", histogram = true)
@@ -116,7 +116,7 @@ public class AddressController {
     )
     public ResponseEntity<String> update(@ApiParam(required = true) @PathVariable("id") final UUID id,@ApiParam(required = true) @Valid @RequestBody final AddressDTO address){
         log.info("try to update a address {}", address);
-        addressService.updateAddress(id, address);
+        addressService.update(id, address);
         log.info("address {} saved", address);
         return ResponseEntity.ok().build();
     }

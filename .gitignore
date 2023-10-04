@@ -6,3 +6,8 @@
 /.idea/
 /.jpb/
 pmrodrigues-project.iml
+/common/common.iml
+/email-service/email-service.iml
+/security/security.iml
+/.run/TestAddressService.run.xml
+/users-schema-modules/users-schema-modules.iml

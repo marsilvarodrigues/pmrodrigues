@@ -22,6 +22,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Optional;
 import java.util.UUID;
 
 import static com.pmrodrigues.users.specifications.SpecificationAddress.*;
@@ -36,10 +37,10 @@ public class AddressService {
 
     private final UserService userService;
 
-    @Timed(histogram = true, value = "AddressService.createNewAddress")
+    @Timed(histogram = true, value = "AddressService.create")
     @Transactional(propagation = Propagation.REQUIRED)
     @SneakyThrows
-    public Address createNewAddress(@NonNull AddressDTO address){
+    public AddressDTO create(@NonNull AddressDTO address){
         val connectedUser = userService.getAuthenticatedUser()
                 .orElseThrow(UserNotFoundException::new);
 
@@ -55,13 +56,15 @@ public class AddressService {
         } else if(!toSave.getOwner().equals(connectedUser) && !SecurityUtils.isUserInRole(Security.SYSTEM_ADMIN)) {
             throw new OperationNotAllowedException();
         }
-        return repository.save(toSave);
+        return Optional.of(repository.save(toSave))
+                    .map(AddressDTO::fromAddress)
+                    .get();
     }
 
     @Timed(histogram = true, value= "AddressService.updateAddress")
     @Transactional(propagation = Propagation.REQUIRED)
     @SneakyThrows
-    public void updateAddress(@NonNull UUID id, @NonNull AddressDTO address) throws OperationNotAllowedException {
+    public void update(@NonNull UUID id, @NonNull AddressDTO address) throws OperationNotAllowedException {
         log.info("update the address {}", address);
 
         var existed = repository.findById(id)

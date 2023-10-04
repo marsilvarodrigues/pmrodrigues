@@ -98,15 +98,17 @@ class TestAddressController {
                 new UserDTO(UUID.randomUUID(), "teste", "teste", "test@test.com"));
 
         val json = objectMapper.writeValueAsString(address);
-        val returned = Address.builder()
-                    .id(UUID.randomUUID())
-                    .state(State.builder()
-                                .code("RJ")
-                                .build())
-                    .owner(User.builder().id(address.owner().id()).build())
-                    .build();
+        val returned = new AddressDTO(UUID.randomUUID(),
+                address.addressType(),
+                address.address1(),
+                address.address2(),
+                address.zipcode(),
+                address.neighbor(),
+                address.city(),
+                address.state(),
+                address.owner());
 
-        given(service.createNewAddress(any(AddressDTO.class))).willReturn(returned);
+        given(service.create(any(AddressDTO.class))).willReturn(returned);
 
 
 
@@ -117,7 +119,7 @@ class TestAddressController {
                 )
                 .andDo(print())
                 .andExpect(status().isCreated())
-                .andExpect(redirectedUrl("/addresses/" + returned.getId().toString()));
+                .andExpect(redirectedUrl("/addresses/" + returned.id().toString()));
     }
 
     @Test
@@ -129,7 +131,7 @@ class TestAddressController {
 
         val json = objectMapper.writeValueAsString(address);
 
-        given(service.createNewAddress(any(AddressDTO.class))).willThrow(new OperationNotAllowedException("User not allowed for this operation"));
+        given(service.create(any(AddressDTO.class))).willThrow(new OperationNotAllowedException("User not allowed for this operation"));
 
         mvc.perform(post("/addresses")
                         .content(json)
@@ -147,7 +149,7 @@ class TestAddressController {
         val address = new AddressDTO(UUID.randomUUID(), AddressType.STREET, "teste",null, "12345-123", "TESTE", "TESTE", "RJ",
                 new UserDTO(UUID.randomUUID(), "teste", "teste", "test@test.com"));
 
-        willDoNothing().given(service).updateAddress(any(UUID.class), any(AddressDTO.class));
+        willDoNothing().given(service).update(any(UUID.class), any(AddressDTO.class));
 
         val json = objectMapper.writeValueAsString(address);
 
@@ -168,7 +170,7 @@ class TestAddressController {
         val address = new AddressDTO(UUID.randomUUID(), AddressType.STREET, "teste",null, "12345-123", "TESTE", "TESTE", "RJ",
                 new UserDTO(UUID.randomUUID(), "teste", "teste", "test@test.com"));
 
-        willThrow(new NotFoundException()).given(service).updateAddress(any(UUID.class), any(AddressDTO.class));
+        willThrow(new NotFoundException()).given(service).update(any(UUID.class), any(AddressDTO.class));
 
         val json = objectMapper.writeValueAsString(address);
 
@@ -189,7 +191,7 @@ class TestAddressController {
         val address = new AddressDTO(UUID.randomUUID(), AddressType.STREET, "teste",null, "12345-123", "TESTE", "TESTE", "RJ",
                 new UserDTO(UUID.randomUUID(), "teste", "teste", "test@test.com"));
 
-        willThrow(new OperationNotAllowedException("")).given(service).updateAddress(any(UUID.class), any(AddressDTO.class));
+        willThrow(new OperationNotAllowedException("")).given(service).update(any(UUID.class), any(AddressDTO.class));
 
         val json = objectMapper.writeValueAsString(address);
 

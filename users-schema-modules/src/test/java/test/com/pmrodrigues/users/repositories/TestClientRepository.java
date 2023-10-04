@@ -64,6 +64,7 @@ public class TestClientRepository {
                 .lastName("teste")
                 .email("client@test.com")
                 .build();
+
         client = client.add(
                         Phone.builder()
                                 .phoneNumber("11234-1234")

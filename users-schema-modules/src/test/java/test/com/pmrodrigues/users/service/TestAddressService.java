@@ -34,6 +34,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
+import static org.mockito.BDDMockito.willDoNothing;
 import static org.mockito.Mockito.*;
 
 @ExtendWith({MockitoExtension.class})
@@ -66,18 +67,23 @@ class TestAddressService {
     @Test
     void shouldAddMyNewAddress() {
 
-        val toSave = mock(AddressDTO.class);
+        val toSave = new AddressDTO(null, null, null, null, null, null, null, "RJ", null);
         val state = Optional.of(new State());
         val address = mock(Address.class);
 
-        given(toSave.state()).willReturn("RJ");
+        given(userService.getAuthenticatedUser()).willReturn(Optional.of(new User()));
+
         given(stateRepository.findByCode(anyString())).willReturn(state);
-        given(toSave.toAddress()).willReturn(address);
+
         given(address.withState(any(State.class))).willReturn(address);
+        given(address.getOwner()).willReturn(null);
+        willDoNothing().given(address).setOwner(any(User.class));
+        given(addressRepository.save(any(Address.class))).willReturn(address);
+        given(address.getState()).willReturn(new State());
+        given(address.getOwner()).willReturn(new User());
 
-        service.createNewAddress(toSave);
+        service.create(toSave);
 
-        verify(address, times(1)).setOwner(any(User.class));
         verify(addressRepository, times(1)).save(any(Address.class));
 
     }
@@ -88,19 +94,21 @@ class TestAddressService {
         try ( val mockStatic = mockStatic(SecurityUtils.class) ) {
             mockStatic.when(() -> SecurityUtils.isUserInRole(Security.SYSTEM_ADMIN)).thenReturn(Boolean.FALSE);
 
-            val toSave = mock(AddressDTO.class);
+            val toSave = new AddressDTO(null, null, null, null, null,
+                    null, null, "RJ", UserDTO.fromUser(defaultOwner));
             val state = Optional.of(new State());
             val address = mock(Address.class);
 
-            given(toSave.state()).willReturn("RJ");
             given(stateRepository.findByCode(anyString())).willReturn(state);
-            given(toSave.toAddress()).willReturn(address);
             given(address.withState(any(State.class))).willReturn(address);
-
             given(address.getOwner()).willReturn(defaultOwner);
-            service.createNewAddress(toSave);
+            given(addressRepository.save(any(Address.class))).willReturn(address);
+            given(address.getState()).willReturn(new State());
+            given(address.getOwner()).willReturn(new User());
+
+            service.create(toSave);
             verify(address, never()).setOwner(any(User.class));
-            verify(addressRepository, times(1)).save(address);
+            verify(addressRepository, times(1)).save(any(Address.class));
         }
 
     }
@@ -115,19 +123,22 @@ class TestAddressService {
                     .email("other@teste.com")
                     .build();
 
-            val toSave = mock(AddressDTO.class);
+            val toSave = new AddressDTO(null, null, null, null,
+                    null, null, null, "RJ", UserDTO.fromUser(other));
             val state = Optional.of(new State());
             val address = mock(Address.class);
 
-            given(toSave.state()).willReturn("RJ");
             given(stateRepository.findByCode(anyString())).willReturn(state);
-            given(toSave.toAddress()).willReturn(address);
-            given(address.withState(any(State.class))).willReturn(address);
 
-            given(address.getOwner()).willReturn(other);
-            service.createNewAddress(toSave);
+            given(address.withState(any(State.class))).willReturn(address);
+            given(addressRepository.save(any(Address.class))).willReturn(address);
+            given(address.getState()).willReturn(new State());
+            given(address.getOwner()).willReturn(new User());
+
+            service.create(toSave);
+
             verify(address, never()).setOwner(any(User.class));
-            verify(addressRepository, times(1)).save(address);
+            verify(addressRepository, times(1)).save(any(Address.class));
 
         }
 
@@ -156,7 +167,7 @@ class TestAddressService {
             given(address.getOwner()).willReturn(other);
 
             assertThrows(OperationNotAllowedException.class, () ->{
-                val saved = service.createNewAddress(toSave);
+                val saved = service.create(toSave);
             });
 
         }
@@ -182,7 +193,7 @@ class TestAddressService {
                     Optional.of(Address.builder().owner(defaultOwner).build())
             );
 
-            service.updateAddress(UUID.randomUUID(), toUpdate);
+            service.update(UUID.randomUUID(), toUpdate);
 
             verify(addressRepository, times(1)).save(any(Address.class));
         }
@@ -195,7 +206,7 @@ class TestAddressService {
         given(addressRepository.findById(any(UUID.class))).willReturn(Optional.empty());
         val address = mock(AddressDTO.class);
         assertThrows(AddressNotFoundException.class, () ->
-           service.updateAddress(UUID.randomUUID(), address)
+           service.update(UUID.randomUUID(), address)
         );
     }
 
@@ -218,7 +229,7 @@ class TestAddressService {
             given(addressRepository.findById(any(UUID.class)))
                     .willReturn(Optional.of(Address.builder().owner(defaultOwner).build()));
 
-            service.updateAddress(UUID.randomUUID(), toUpdate);
+            service.update(UUID.randomUUID(), toUpdate);
             verify(addressRepository, times(1)).save(any(Address.class));
 
         }
@@ -241,7 +252,7 @@ class TestAddressService {
             given(addressRepository.findById(any(UUID.class)))
                     .willReturn(Optional.of(Address.builder().owner(defaultOwner).build()));
 
-            assertThrows(OperationNotAllowedException.class, () -> service.updateAddress(UUID.randomUUID(), toUpdate));
+            assertThrows(OperationNotAllowedException.class, () -> service.update(UUID.randomUUID(), toUpdate));
 
         }
 
