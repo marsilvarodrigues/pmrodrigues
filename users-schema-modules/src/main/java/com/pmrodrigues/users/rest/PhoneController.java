@@ -1,6 +1,7 @@
 package com.pmrodrigues.users.rest;
 
 import com.pmrodrigues.commons.request.validates.ValuesAllowed;
+import com.pmrodrigues.commons.rest.DataController;
 import com.pmrodrigues.users.dtos.PhoneDTO;
 import com.pmrodrigues.users.model.Address;
 import com.pmrodrigues.users.service.PhoneService;
@@ -34,7 +35,7 @@ import static com.pmrodrigues.commons.data.utils.SortUtils.createSortForString;
 @RequiredArgsConstructor
 @RequestMapping(value = "/phones")
 @Validated
-public class PhoneController {
+public class PhoneController implements DataController<UUID, PhoneDTO> {
 
     private final PhoneService phoneService;
 

@@ -5,7 +5,7 @@ import com.pmrodrigues.commons.controlleradvices.DuplicatedKeyControllerAdvice;
 import com.pmrodrigues.commons.controlleradvices.ValidationErrorControllerAdvice;
 import com.pmrodrigues.commons.exceptions.NotFoundException;
 import com.pmrodrigues.security.configurations.WebSecurityConfiguration;
-import com.pmrodrigues.security.exceptions.OperationNotAllowedException;
+import com.pmrodrigues.commons.exceptions.OperationNotAllowedException;
 import com.pmrodrigues.users.dtos.PhoneDTO;
 import com.pmrodrigues.users.dtos.UserDTO;
 import com.pmrodrigues.users.exceptions.PhoneNotFoundException;

@@ -1,7 +1,8 @@
 package com.pmrodrigues.users.service;
 
 
-import com.pmrodrigues.security.exceptions.OperationNotAllowedException;
+import com.pmrodrigues.commons.services.DataService;
+import com.pmrodrigues.commons.exceptions.OperationNotAllowedException;
 import com.pmrodrigues.security.roles.Security;
 import com.pmrodrigues.security.utils.SecurityUtils;
 import com.pmrodrigues.users.dtos.PhoneDTO;
@@ -29,7 +30,7 @@ import static com.pmrodrigues.users.specifications.SpecificationPhone.type;
 @Slf4j
 @Transactional(propagation = Propagation.SUPPORTS)
 @Component
-public class PhoneService implements DataService<UUID, PhoneDTO>{
+public class PhoneService implements DataService<UUID, PhoneDTO> {
 
     private final UserService userService;
     private final PhoneRepository phoneRepository;
@@ -47,7 +48,7 @@ public class PhoneService implements DataService<UUID, PhoneDTO>{
         var user = loggedUser;
 
         if( phoneDTO.owner() != null )
-            user = userService.findById(phoneDTO.owner().id());
+            user = userService.getById(phoneDTO.owner().id());
 
         if( user.equals(loggedUser) || SecurityUtils.isUserInRole(Security.SYSTEM_ADMIN) ){
             phone = phone.withOwner(user);
@@ -69,7 +70,7 @@ public class PhoneService implements DataService<UUID, PhoneDTO>{
         val loggedUser = userService.getAuthenticatedUser()
                 .orElseThrow(UserNotFoundException::new);
 
-        val owner = userService.findById(phoneDTO.owner().id());
+        val owner = userService.getById(phoneDTO.owner().id());
         if( loggedUser.equals(owner) || SecurityUtils.isUserInRole(Security.SYSTEM_ADMIN) ){
             phone.withPhoneNumber(phoneDTO.phoneNumber())
                     .withOwner(owner)

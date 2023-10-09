@@ -1,6 +1,7 @@
 package com.pmrodrigues.users.rest;
 
 import com.pmrodrigues.commons.request.validates.ValuesAllowed;
+import com.pmrodrigues.commons.rest.DataController;
 import com.pmrodrigues.users.dtos.UserDTO;
 import com.pmrodrigues.users.service.UserService;
 import io.micrometer.core.annotation.Timed;
@@ -36,7 +37,7 @@ import static com.pmrodrigues.commons.data.utils.SortUtils.createSortForString;
 @RequiredArgsConstructor
 @RequestMapping(value = "/users")
 @Validated
-public class UserController{
+public class UserController implements DataController<UUID, UserDTO> {
 
     private final UserService userService;
 
@@ -56,8 +57,8 @@ public class UserController{
         val saved = userService.create(user);
         log.info("user {} saved into database",saved);
 
-        return ResponseEntity.created(URI.create("/users/" + saved.getId()))
-                .body(UserDTO.fromUser(saved));
+        return ResponseEntity.created(URI.create("/users/" + saved.id()))
+                .body(saved);
     }
 
     @Timed(value = "UserController.update", histogram = true)
@@ -86,10 +87,10 @@ public class UserController{
             value = "/{id}",
             produces = { MediaType.APPLICATION_JSON_VALUE }
     )
-    public ResponseEntity<UserDTO> getUserById(@ApiParam(required = true) @PathVariable("id") final UUID id) {
+    public ResponseEntity<UserDTO> getById(@ApiParam(required = true) @PathVariable("id") final UUID id) {
         log.info("finding user with id {}", id);
         val user = userService.findById(id);
-        return ResponseEntity.ok(UserDTO.fromUser(user));
+        return ResponseEntity.ok(user);
 
     }
 
@@ -117,7 +118,7 @@ public class UserController{
         var sample = Optional.ofNullable(user)
                               .orElse(new UserDTO(null, null, null, null));
 
-        val response = userService.findAll(sample, PageRequest.of(page, size, Sort.by(sortBy))).map(UserDTO::fromUser);
+        val response = userService.findAll(sample, PageRequest.of(page, size, Sort.by(sortBy)));
         return ResponseEntity.ok(response);
 
     }

@@ -3,7 +3,7 @@ package test.com.pmrodrigues.users.service;
 
 import com.pmrodrigues.commons.dtos.Email;
 import com.pmrodrigues.commons.exceptions.KeycloakIntegrationFailed;
-import com.pmrodrigues.security.exceptions.OperationNotAllowedException;
+import com.pmrodrigues.commons.exceptions.OperationNotAllowedException;
 import com.pmrodrigues.security.roles.Security;
 import com.pmrodrigues.security.utils.SecurityUtils;
 import com.pmrodrigues.users.clients.EmailClient;

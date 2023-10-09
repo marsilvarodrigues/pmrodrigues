@@ -1,7 +1,7 @@
 package test.com.pmrodrigues.users.service;
 
 import com.pmrodrigues.commons.exceptions.NotFoundException;
-import com.pmrodrigues.security.exceptions.OperationNotAllowedException;
+import com.pmrodrigues.commons.exceptions.OperationNotAllowedException;
 import com.pmrodrigues.security.roles.Security;
 import com.pmrodrigues.security.utils.SecurityUtils;
 import com.pmrodrigues.users.dtos.AddressDTO;

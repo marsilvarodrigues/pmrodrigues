@@ -1,6 +1,7 @@
 package com.pmrodrigues.users.rest;
 
 import com.pmrodrigues.commons.request.validates.ValuesAllowed;
+import com.pmrodrigues.commons.rest.DataController;
 import com.pmrodrigues.users.dtos.AddressDTO;
 import com.pmrodrigues.users.service.AddressService;
 import io.micrometer.core.annotation.Timed;
@@ -34,7 +35,7 @@ import static com.pmrodrigues.commons.data.utils.SortUtils.createSortForString;
 @RequiredArgsConstructor
 @RequestMapping(value = "/addresses")
 @Validated
-public class AddressController {
+public class AddressController implements DataController<UUID, AddressDTO> {
 
     private final AddressService addressService;
 
@@ -47,7 +48,7 @@ public class AddressController {
             value = "/{id}",
             produces = { MediaType.APPLICATION_JSON_VALUE }
     )
-    public ResponseEntity<AddressDTO> getAddressById(@NonNull @ApiParam(required = true) @PathVariable(name = "id") UUID id) {
+    public ResponseEntity<AddressDTO> getById(@NonNull @ApiParam(required = true) @PathVariable(name = "id") UUID id) {
         log.info("try to read address by id {}", id);
         val address = addressService.findById(id);
         return ResponseEntity.ok(address);

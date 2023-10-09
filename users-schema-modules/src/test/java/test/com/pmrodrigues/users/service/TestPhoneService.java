@@ -1,6 +1,6 @@
 package test.com.pmrodrigues.users.service;
 
-import com.pmrodrigues.security.exceptions.OperationNotAllowedException;
+import com.pmrodrigues.commons.exceptions.OperationNotAllowedException;
 import com.pmrodrigues.security.roles.Security;
 import com.pmrodrigues.security.utils.SecurityUtils;
 import com.pmrodrigues.users.dtos.PhoneDTO;
@@ -63,7 +63,7 @@ class TestPhoneService {
         try(val mockStatic = mockStatic(SecurityUtils.class) ){
 
             mockStatic.when(() -> SecurityUtils.isUserInRole(Security.SYSTEM_ADMIN)).thenReturn(Boolean.FALSE);
-            given(userService.findById(any(UUID.class))).willReturn(defaultOwner);
+            given(userService.getById(any(UUID.class))).willReturn(defaultOwner);
 
             phoneService.create(new PhoneDTO(null,
                     new UserDTO(defaultOwner.getId(),null,null,null),
@@ -93,7 +93,7 @@ class TestPhoneService {
         try(val mockStatic = mockStatic(SecurityUtils.class) ){
 
             mockStatic.when(() -> SecurityUtils.isUserInRole(Security.SYSTEM_ADMIN)).thenReturn(Boolean.FALSE);
-            given(userService.findById(any(UUID.class))).willReturn(User.builder().id(UUID.randomUUID()).build());
+            given(userService.getById(any(UUID.class))).willReturn(User.builder().id(UUID.randomUUID()).build());
 
             assertThrows(OperationNotAllowedException.class, (() -> phoneService.create(new PhoneDTO(null,
                     new UserDTO(UUID.randomUUID(),null,null,null),
@@ -106,7 +106,7 @@ class TestPhoneService {
         try(val mockStatic = mockStatic(SecurityUtils.class) ){
 
             mockStatic.when(() -> SecurityUtils.isUserInRole(Security.SYSTEM_ADMIN)).thenReturn(Boolean.TRUE);
-            given(userService.findById(any(UUID.class))).willReturn(User.builder().id(UUID.randomUUID()).build());
+            given(userService.getById(any(UUID.class))).willReturn(User.builder().id(UUID.randomUUID()).build());
 
             phoneService.create(new PhoneDTO(null,
                     new UserDTO(UUID.randomUUID(),null,null,null),
@@ -121,7 +121,7 @@ class TestPhoneService {
 
         try(val mockStatic = mockStatic(SecurityUtils.class) ){
             mockStatic.when(() -> SecurityUtils.isUserInRole(Security.SYSTEM_ADMIN)).thenReturn(Boolean.FALSE);
-            given(userService.findById(any(UUID.class))).willReturn(defaultOwner);
+            given(userService.getById(any(UUID.class))).willReturn(defaultOwner);
             given(phoneRepository.findById(any(UUID.class))).willReturn(Optional.of(new Phone()));
 
             val id = UUID.randomUUID();
@@ -139,7 +139,7 @@ class TestPhoneService {
     void shouldSaveForOtherUserLoggedUserIsSystemAdmin(){
         try(val mockStatic = mockStatic(SecurityUtils.class) ){
             mockStatic.when(() -> SecurityUtils.isUserInRole(Security.SYSTEM_ADMIN)).thenReturn(Boolean.TRUE);
-            given(userService.findById(any(UUID.class))).willReturn(new User().withId(UUID.randomUUID()));
+            given(userService.getById(any(UUID.class))).willReturn(new User().withId(UUID.randomUUID()));
             given(phoneRepository.findById(any(UUID.class))).willReturn(Optional.of(new Phone()));
 
             val id = UUID.randomUUID();
@@ -156,7 +156,7 @@ class TestPhoneService {
     void shouldNotSaveUserIsNotSystemAdmin() {
         try(val mockStatic = mockStatic(SecurityUtils.class) ){
             mockStatic.when(() -> SecurityUtils.isUserInRole(Security.SYSTEM_ADMIN)).thenReturn(Boolean.FALSE);
-            given(userService.findById(any(UUID.class))).willReturn(new User().withId(UUID.randomUUID()));
+            given(userService.getById(any(UUID.class))).willReturn(new User().withId(UUID.randomUUID()));
             given(phoneRepository.findById(any(UUID.class))).willReturn(Optional.of(new Phone()));
 
             val id = UUID.randomUUID();
@@ -170,7 +170,7 @@ class TestPhoneService {
     }
     @Test
     void phoneNotFound() {
-        given(userService.findById(any(UUID.class))).willReturn(new User().withId(UUID.randomUUID()));
+        given(userService.getById(any(UUID.class))).willReturn(new User().withId(UUID.randomUUID()));
         given(phoneRepository.findById(any(UUID.class))).willReturn(Optional.empty());
 
         val id = UUID.randomUUID();

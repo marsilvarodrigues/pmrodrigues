@@ -2,7 +2,8 @@ package com.pmrodrigues.users.service;
 
 import com.pmrodrigues.commons.exceptions.NotCreateException;
 import com.pmrodrigues.commons.exceptions.NotFoundException;
-import com.pmrodrigues.security.exceptions.OperationNotAllowedException;
+import com.pmrodrigues.commons.exceptions.OperationNotAllowedException;
+import com.pmrodrigues.commons.services.DataService;
 import com.pmrodrigues.security.roles.Security;
 import com.pmrodrigues.security.utils.SecurityUtils;
 import com.pmrodrigues.users.clients.EmailClient;
@@ -36,23 +37,31 @@ import static org.springframework.data.jpa.domain.Specification.where;
 @Slf4j
 @Transactional(propagation = Propagation.SUPPORTS)
 @Component
-public class UserService {
+public class UserService implements DataService<UUID, UserDTO> {
     public static final String NEW_USER_TEMPLATE = "newUser";
     private final UserRepository repository;
     private final EmailClient emailService;
     private final KeycloakUserRepository keycloakUserRepository;
 
-    @Timed(histogram = true, value = "UserService.findById")
-    public User findById(@NonNull final UUID userId) {
+    @Timed(histogram = true, value = "UserService.getById")
+    public User getById(@NonNull final UUID userId) {
         log.info("get user by id {}", userId);
         return repository.findById(userId)
+                .orElseThrow(UserNotFoundException::new);
+    }
+
+    @Timed(histogram = true, value = "UserService.findById")
+    public UserDTO findById(@NonNull final UUID userId) {
+        log.info("get user by id {}", userId);
+        return Optional.of(getById(userId))
+                .map(UserDTO::fromUser)
                 .orElseThrow(UserNotFoundException::new);
     }
 
     @Timed(histogram = true, value = "UserService.createNewUser")
     @Transactional(propagation = Propagation.REQUIRED)
     @SneakyThrows
-    public User create(@NonNull UserDTO toSave) {
+    public UserDTO create(@NonNull UserDTO toSave) {
 
         log.info("creating a new user {}", toSave);
 
@@ -68,7 +77,7 @@ public class UserService {
             throw new NotCreateException();
         }
         user.setExternalId(keycloakId);
-        return user;
+        return UserDTO.fromUser(user);
 
     }
 
@@ -113,13 +122,14 @@ public class UserService {
 
     @Timed(histogram = true, value = "UserService.findAll")
     @SneakyThrows
-    public Page<User> findAll(@NonNull UserDTO user, @NonNull PageRequest pageRequest){
+    public Page<UserDTO> findAll(@NonNull UserDTO user, @NonNull PageRequest pageRequest){
         log.info("list all users by sample {}", user);
         return repository.findAll(
                     where(firstName(user.firstName())).
                     and(lastName(user.lastName())).
                     and(email(user.email())),
-                pageRequest);
+                pageRequest)
+                .map(UserDTO::fromUser);
     }
 
     @Timed(histogram = true, value = "UserService.updateUser")

@@ -6,7 +6,7 @@ import com.pmrodrigues.commons.controlleradvices.ValidationErrorControllerAdvice
 import com.pmrodrigues.commons.exceptions.KeycloakIntegrationFailed;
 import com.pmrodrigues.commons.exceptions.NotCreateException;
 import com.pmrodrigues.security.configurations.WebSecurityConfiguration;
-import com.pmrodrigues.security.exceptions.OperationNotAllowedException;
+import com.pmrodrigues.commons.exceptions.OperationNotAllowedException;
 import com.pmrodrigues.users.dtos.UserDTO;
 import com.pmrodrigues.users.exceptions.UserNotFoundException;
 import com.pmrodrigues.users.model.User;
@@ -63,7 +63,7 @@ class TestUserController {
     @DisplayName("Should get a user by id")
     void shouldGet() {
 
-        given(userService.findById(any(UUID.class))).willReturn(new User());
+        given(userService.findById(any(UUID.class))).willReturn(new UserDTO(null, null, null, null));
 
         mvc.perform(get(format("/users/%s", UUID.randomUUID()))
                 )
@@ -87,8 +87,7 @@ class TestUserController {
     @SneakyThrows
     @DisplayName("Should save a new user")
     void shouldSaveUser() {
-        val user = User.builder().email("test@test.com").firstName("teste")
-                .lastName("teste").build();
+        val user = new UserDTO(null, "teste", "teste", "test@test.com");
         given(userService.create(any(UserDTO.class))).willReturn(user);
 
         val json = objectMapper.writeValueAsString(user);
@@ -149,7 +148,7 @@ class TestUserController {
     @SneakyThrows
     @DisplayName("Should delete user by Id")
     void shouldDeleteUser() {
-        given(userService.findById(any(UUID.class))).willReturn(new User());
+        given(userService.findById(any(UUID.class))).willReturn(new UserDTO(null, "teste", "teste", "test@test.com"));
 
         mvc.perform(delete("/users/" + UUID.randomUUID())
                         .contentType(MediaType.APPLICATION_JSON))

@@ -1,6 +1,5 @@
-package com.pmrodrigues.users.service;
+package com.pmrodrigues.commons.services;
 
-import com.pmrodrigues.security.exceptions.OperationNotAllowedException;
 import lombok.NonNull;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -8,7 +7,7 @@ import org.springframework.data.domain.PageRequest;
 public interface DataService<I, E> {
     E create(@NonNull E entity);
 
-    void update(@NonNull I id, @NonNull E entity) throws OperationNotAllowedException;
+    void update(@NonNull I id, @NonNull E entity);
 
     Page<E> findAll(@NonNull E entity, @NonNull PageRequest pageRequest);
 
