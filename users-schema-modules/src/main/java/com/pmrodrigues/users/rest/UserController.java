@@ -53,7 +53,7 @@ public class UserController{
 
     public ResponseEntity<UserDTO> add(@ApiParam(required = true) @Valid @RequestBody final UserDTO user) {
         log.info("try to save a new user as {}",user);
-        val saved = userService.createNewUser(user);
+        val saved = userService.create(user);
         log.info("user {} saved into database",saved);
 
         return ResponseEntity.created(URI.create("/users/" + saved.getId()))
@@ -71,7 +71,7 @@ public class UserController{
     )
     public ResponseEntity<String> update(@ApiParam(required = true) @PathVariable("id") final UUID id,@ApiParam(required = true) @Valid @RequestBody final UserDTO user){
         log.info("try to update a user {}", user);
-        userService.updateUser(id, user);
+        userService.update(id, user);
         log.info("user {} saved", user);
         return ResponseEntity.ok().build();
     }

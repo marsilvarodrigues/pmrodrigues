@@ -24,6 +24,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.mockito.junit.jupiter.MockitoSettings;
 import org.mockito.quality.Strictness;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.jpa.domain.Specification;
 
@@ -264,7 +265,7 @@ class TestAddressService {
         try (val mockStatic = mockStatic(SecurityUtils.class)) {
             mockStatic.when(() -> SecurityUtils.isUserInRole(Security.SYSTEM_ADMIN)).thenReturn(Boolean.TRUE);
 
-            given(addressRepository.findById(any(UUID.class))).willReturn(Optional.of(new Address()));
+            given(addressRepository.findById(any(UUID.class))).willReturn(Optional.of(Address.builder().state(new State()).owner(new User()).build()));
             assertNotNull(service.findById(UUID.randomUUID()));
         }
     }
@@ -274,7 +275,7 @@ class TestAddressService {
 
         try (val mockStatic = mockStatic(SecurityUtils.class)) {
             mockStatic.when(() -> SecurityUtils.isUserInRole(Security.SYSTEM_ADMIN)).thenReturn(Boolean.FALSE);
-            val address = Address.builder().owner(defaultOwner).build();
+            val address = Address.builder().owner(defaultOwner).state(State.builder().build()).build();
             given(addressRepository.findById(any(UUID.class))).willReturn(Optional.of(address));
             assertNotNull(service.findById(UUID.randomUUID()));
         }
@@ -360,6 +361,12 @@ class TestAddressService {
         try( val mockStatic = mockStatic(SecurityUtils.class) ) {
             mockStatic.when(() -> SecurityUtils.isUserInRole(Security.SYSTEM_ADMIN)).thenReturn(Boolean.FALSE);
             val pageable = mock(PageRequest.class);
+            val page = Page.empty();
+
+            given(addressRepository.findAll(
+                    any(Specification.class),any(PageRequest.class)))
+                    .willReturn(page);
+
             service.findAll(new AddressDTO(null, null, null, null, null, null, null, null, new UserDTO(null, null, null, null)), pageable);
 
             verify(addressRepository).findAll(
@@ -372,6 +379,13 @@ class TestAddressService {
     void shouldListAllAddress() {
         try ( val mockStatic = mockStatic(SecurityUtils.class) ) {
             mockStatic.when(() -> SecurityUtils.isUserInRole(Security.SYSTEM_ADMIN)).thenReturn(Boolean.TRUE);
+
+            val page = Page.empty();
+
+            given(addressRepository.findAll(
+                    any(Specification.class),any(PageRequest.class)))
+                    .willReturn(page);
+
             service.findAll(new AddressDTO(null, null, null, null, null, null, null, null, new UserDTO(null, null, null, null)), PageRequest.of(1,10));
 
             verify(addressRepository).findAll(

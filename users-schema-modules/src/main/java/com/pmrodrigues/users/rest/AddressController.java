@@ -50,7 +50,7 @@ public class AddressController {
     public ResponseEntity<AddressDTO> getAddressById(@NonNull @ApiParam(required = true) @PathVariable(name = "id") UUID id) {
         log.info("try to read address by id {}", id);
         val address = addressService.findById(id);
-        return ResponseEntity.ok(AddressDTO.fromAddress(address));
+        return ResponseEntity.ok(address);
     }
 
     @Timed(value = "AddressController.listAll", histogram = true)
@@ -80,7 +80,7 @@ public class AddressController {
         var sample = Optional.ofNullable(address)
                 .orElse(new AddressDTO(null, null, null, null, null, null, null, null, null));
 
-        val response = addressService.findAll(sample , PageRequest.of(page, size, Sort.by(sortBy))).map(AddressDTO::fromAddress);
+        val response = addressService.findAll(sample , PageRequest.of(page, size, Sort.by(sortBy)));
         return ResponseEntity.ok(response);
 
     }

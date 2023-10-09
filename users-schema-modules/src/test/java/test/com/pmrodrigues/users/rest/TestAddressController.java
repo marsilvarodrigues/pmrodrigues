@@ -9,9 +9,6 @@ import com.pmrodrigues.security.exceptions.OperationNotAllowedException;
 import com.pmrodrigues.users.dtos.AddressDTO;
 import com.pmrodrigues.users.dtos.UserDTO;
 import com.pmrodrigues.users.exceptions.PhoneNotFoundException;
-import com.pmrodrigues.users.model.Address;
-import com.pmrodrigues.users.model.State;
-import com.pmrodrigues.users.model.User;
 import com.pmrodrigues.users.model.enums.AddressType;
 import com.pmrodrigues.users.rest.AddressController;
 import com.pmrodrigues.users.service.AddressService;
@@ -65,11 +62,7 @@ class TestAddressController {
     @SneakyThrows
     void shouldGetAddressById(){
 
-        given(service.findById(any(UUID.class))).willReturn(Address.builder()
-                .state(State.builder()
-                        .build())
-                .owner(User.builder().build())
-                .build());
+        given(service.findById(any(UUID.class))).willReturn(new AddressDTO(null, null, null ,null, null, null, null, null, null));
 
         mvc.perform(get(format("/addresses/%s",UUID.randomUUID()))
                 )

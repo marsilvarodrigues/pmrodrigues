@@ -51,7 +51,7 @@ public class PhoneController {
         log.info("get phone by id {}", id);
         val phone = phoneService.findById(id);
 
-        return ResponseEntity.ok(PhoneDTO.fromPhone(phone));
+        return ResponseEntity.ok(phone);
     }
 
     @Timed(value = "PhoneController.add", histogram = true)
@@ -69,8 +69,8 @@ public class PhoneController {
         val saved = phoneService.create(phone);
         log.info("phone {} saved into database",saved);
 
-        return ResponseEntity.created(URI.create("/phones/" + saved.getId()))
-                .body(PhoneDTO.fromPhone(saved));
+        return ResponseEntity.created(URI.create("/phones/" + saved.id()))
+                .body(saved);
     }
 
     @Timed(value = "PhoneController.update", histogram = true)
@@ -134,7 +134,7 @@ public class PhoneController {
         var sample = Optional.ofNullable(phone)
                 .orElse(new PhoneDTO(null, null, null, null));
 
-        val response = phoneService.findAll(sample , PageRequest.of(page, size, Sort.by(sortBy))).map(PhoneDTO::fromPhone);
+        val response = phoneService.findAll(sample , PageRequest.of(page, size, Sort.by(sortBy)));
         return ResponseEntity.ok(response);
 
     }

@@ -9,8 +9,6 @@ import com.pmrodrigues.security.exceptions.OperationNotAllowedException;
 import com.pmrodrigues.users.dtos.PhoneDTO;
 import com.pmrodrigues.users.dtos.UserDTO;
 import com.pmrodrigues.users.exceptions.PhoneNotFoundException;
-import com.pmrodrigues.users.model.Phone;
-import com.pmrodrigues.users.model.User;
 import com.pmrodrigues.users.model.enums.PhoneType;
 import com.pmrodrigues.users.rest.PhoneController;
 import com.pmrodrigues.users.service.PhoneService;
@@ -64,11 +62,7 @@ class TestPhoneController {
     @SneakyThrows
     void shouldGetPhoneById(){
 
-        given(service.findById(any(UUID.class))).willReturn(Phone.builder()
-                .owner(User.builder().build())
-                .type(PhoneType.CELLPHONE)
-                .phoneNumber("")
-                .build());
+        given(service.findById(any(UUID.class))).willReturn(new PhoneDTO(null, null, null, null));
 
         mvc.perform(get(format("/phones/%s",UUID.randomUUID()))
                 )
@@ -96,12 +90,7 @@ class TestPhoneController {
         val phone = new PhoneDTO(UUID.randomUUID(), new UserDTO(UUID.randomUUID(),null, null, null),null,PhoneType.CELLPHONE);
 
         val json = objectMapper.writeValueAsString(phone);
-        val returned = Phone.builder()
-                    .id(UUID.randomUUID())
-                    .type(PhoneType.CELLPHONE)
-                    .phoneNumber("")
-                    .owner(User.builder().id(phone.owner().id()).build())
-                    .build();
+        val returned = new PhoneDTO(phone.id(), null, null, null);
 
         given(service.create(any(PhoneDTO.class))).willReturn(returned);
 
@@ -114,7 +103,7 @@ class TestPhoneController {
                 )
                 .andDo(print())
                 .andExpect(status().isCreated())
-                .andExpect(redirectedUrl("/phones/" + returned.getId().toString()));
+                .andExpect(redirectedUrl("/phones/" + returned.id().toString()));
     }
 
     @Test

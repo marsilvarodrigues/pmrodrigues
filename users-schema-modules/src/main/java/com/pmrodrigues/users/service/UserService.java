@@ -1,6 +1,5 @@
 package com.pmrodrigues.users.service;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.pmrodrigues.commons.exceptions.NotCreateException;
 import com.pmrodrigues.commons.exceptions.NotFoundException;
 import com.pmrodrigues.security.exceptions.OperationNotAllowedException;
@@ -43,8 +42,6 @@ public class UserService {
     private final EmailClient emailService;
     private final KeycloakUserRepository keycloakUserRepository;
 
-    private final ObjectMapper objectMapper = new ObjectMapper();
-
     @Timed(histogram = true, value = "UserService.findById")
     public User findById(@NonNull final UUID userId) {
         log.info("get user by id {}", userId);
@@ -55,7 +52,7 @@ public class UserService {
     @Timed(histogram = true, value = "UserService.createNewUser")
     @Transactional(propagation = Propagation.REQUIRED)
     @SneakyThrows
-    public User createNewUser(@NonNull UserDTO toSave) {
+    public User create(@NonNull UserDTO toSave) {
 
         log.info("creating a new user {}", toSave);
 
@@ -127,7 +124,7 @@ public class UserService {
 
     @Timed(histogram = true, value = "UserService.updateUser")
     @Transactional(propagation = Propagation.REQUIRED)
-    public void updateUser(@NonNull final UUID id, @NonNull final UserDTO user) {
+    public void update(@NonNull final UUID id, @NonNull final UserDTO user) {
         log.info("trying to update user {}",user);
         val existed = repository.findById(id)
                 .orElseThrow(UserNotFoundException::new);

@@ -7,7 +7,6 @@ import com.pmrodrigues.users.dtos.AddressDTO;
 import com.pmrodrigues.users.exceptions.AddressNotFoundException;
 import com.pmrodrigues.users.exceptions.StateNotFoundException;
 import com.pmrodrigues.users.exceptions.UserNotFoundException;
-import com.pmrodrigues.users.model.Address;
 import com.pmrodrigues.users.repositories.AddressRepository;
 import com.pmrodrigues.users.repositories.StateRepository;
 import io.micrometer.core.annotation.Timed;
@@ -31,12 +30,14 @@ import static com.pmrodrigues.users.specifications.SpecificationAddress.*;
 @Slf4j
 @Transactional(propagation = Propagation.SUPPORTS)
 @Component
-public class AddressService {
+public class AddressService implements DataService<UUID, AddressDTO> {
     private final StateRepository stateRepository;
     private final AddressRepository repository;
 
     private final UserService userService;
 
+
+    @Override
     @Timed(histogram = true, value = "AddressService.create")
     @Transactional(propagation = Propagation.REQUIRED)
     @SneakyThrows
@@ -61,6 +62,7 @@ public class AddressService {
                     .get();
     }
 
+    @Override
     @Timed(histogram = true, value= "AddressService.updateAddress")
     @Transactional(propagation = Propagation.REQUIRED)
     @SneakyThrows
@@ -91,9 +93,10 @@ public class AddressService {
 
     }
 
+    @Override
     @Timed(histogram = true, value = "AddressService.findAll")
     @SneakyThrows
-    public Page<Address> findAll(@NonNull AddressDTO address, @NonNull PageRequest pageRequest){
+    public Page<AddressDTO> findAll(@NonNull AddressDTO address, @NonNull PageRequest pageRequest){
         log.info("list all addresses by sample {}", address);
         var loggedUser = userService.getAuthenticatedUser()
                 .orElseThrow(UserNotFoundException::new);
@@ -105,7 +108,8 @@ public class AddressService {
                             .and(zipcode(address.zipcode()))
                             .and(city(address.city()))
                             .and(neighbor(address.neighbor()))
-                            .and(address(address.address1())), pageRequest);
+                            .and(address(address.address1())), pageRequest)
+                            .map(AddressDTO::fromAddress);
         } else {
             return repository.findAll(
                     owner(loggedUser)
@@ -113,14 +117,16 @@ public class AddressService {
                     .and(zipcode(address.zipcode()))
                     .and(city(address.city()))
                     .and(neighbor(address.neighbor()))
-                    .and(address(address.address1())), pageRequest);
+                    .and(address(address.address1())), pageRequest)
+                    .map(AddressDTO::fromAddress);
         }
 
     }
 
+    @Override
     @Timed(histogram = true, value = "AddressService.findById")
     @SneakyThrows
-    public Address findById(UUID id) {
+    public AddressDTO findById(UUID id) {
         log.info("try to get address by id {}",id);
         var loggedUser = userService.getAuthenticatedUser()
                 .orElseThrow(UserNotFoundException::new);
@@ -128,16 +134,21 @@ public class AddressService {
                 .orElseThrow(AddressNotFoundException::new);
 
         if( SecurityUtils.isUserInRole(Security.SYSTEM_ADMIN) ) {
-            return address;
+            return Optional.of(address)
+                    .map(AddressDTO::fromAddress)
+                    .get();
         }else{
             if( address.getOwner().equals(loggedUser) ) {
-                return address;
+                return Optional.of(address)
+                        .map(AddressDTO::fromAddress)
+                        .get();
             }else{
                 throw new AddressNotFoundException();
             }
         }
     }
 
+    @Override
     @Transactional(propagation = Propagation.REQUIRED)
     @Timed(histogram = true, value = "AddressService.delete")
     @SneakyThrows

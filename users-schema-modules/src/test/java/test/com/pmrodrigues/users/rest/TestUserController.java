@@ -89,7 +89,7 @@ class TestUserController {
     void shouldSaveUser() {
         val user = User.builder().email("test@test.com").firstName("teste")
                 .lastName("teste").build();
-        given(userService.createNewUser(any(UserDTO.class))).willReturn(user);
+        given(userService.create(any(UserDTO.class))).willReturn(user);
 
         val json = objectMapper.writeValueAsString(user);
 
@@ -108,7 +108,7 @@ class TestUserController {
     @DisplayName("Should not save a new user. There is other saved with the same email")
     void shouldNotSaveUserExistOtherSaved() {
 
-        willThrow(DuplicateKeyException.class).given(userService).createNewUser(any(UserDTO.class));
+        willThrow(DuplicateKeyException.class).given(userService).create(any(UserDTO.class));
 
         val user = User.builder().email("test@test.com").firstName("teste")
                 .lastName("teste").build();
@@ -133,7 +133,7 @@ class TestUserController {
         val user = User.builder().id(UUID.randomUUID()).build();
         val json = objectMapper.writeValueAsString(user);
 
-        given(userService.createNewUser(any(UserDTO.class))).willThrow(new NotCreateException());
+        given(userService.create(any(UserDTO.class))).willThrow(new NotCreateException());
 
         mvc.perform(post("/users")
                         .content(json)
@@ -271,7 +271,7 @@ class TestUserController {
     @Test
     @SneakyThrows
     void shouldUpdateUser() {
-        willDoNothing().given(userService).updateUser(any(UUID.class), any(UserDTO.class));
+        willDoNothing().given(userService).update(any(UUID.class), any(UserDTO.class));
 
         val user = User.builder()
                 .email("test@test.com")
@@ -294,7 +294,7 @@ class TestUserController {
     @SneakyThrows
     void shouldNotUpdateUserUserNotFound() {
 
-        willThrow(UserNotFoundException.class).given(userService).updateUser(any(UUID.class), any(UserDTO.class));
+        willThrow(UserNotFoundException.class).given(userService).update(any(UUID.class), any(UserDTO.class));
 
         val user = User.builder()
                 .email("test@test.com")
@@ -317,7 +317,7 @@ class TestUserController {
     @SneakyThrows
     void shouldNotUpdateKeycloackIntegrationFailed() {
 
-        willThrow(KeycloakIntegrationFailed.class).given(userService).updateUser(any(UUID.class), any(UserDTO.class));
+        willThrow(KeycloakIntegrationFailed.class).given(userService).update(any(UUID.class), any(UserDTO.class));
 
         val user = User.builder()
                 .email("test@test.com")

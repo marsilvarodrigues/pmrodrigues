@@ -7,7 +7,6 @@ import com.pmrodrigues.security.utils.SecurityUtils;
 import com.pmrodrigues.users.dtos.PhoneDTO;
 import com.pmrodrigues.users.exceptions.PhoneNotFoundException;
 import com.pmrodrigues.users.exceptions.UserNotFoundException;
-import com.pmrodrigues.users.model.Phone;
 import com.pmrodrigues.users.repositories.PhoneRepository;
 import io.micrometer.core.annotation.Timed;
 import lombok.NonNull;
@@ -20,6 +19,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Optional;
 import java.util.UUID;
 
 import static com.pmrodrigues.users.specifications.SpecificationPhone.owner;
@@ -29,14 +29,14 @@ import static com.pmrodrigues.users.specifications.SpecificationPhone.type;
 @Slf4j
 @Transactional(propagation = Propagation.SUPPORTS)
 @Component
-public class PhoneService {
+public class PhoneService implements DataService<UUID, PhoneDTO>{
 
     private final UserService userService;
     private final PhoneRepository phoneRepository;
 
     @Transactional(propagation = Propagation.REQUIRED)
     @Timed(histogram = true, value = "PhoneService.createNewPhone")
-    public Phone create(@NonNull PhoneDTO phoneDTO) {
+    public PhoneDTO create(@NonNull PhoneDTO phoneDTO) {
         log.info("adding a new phone {}", phoneDTO);
 
         var phone = phoneDTO.toPhone();
@@ -51,7 +51,9 @@ public class PhoneService {
 
         if( user.equals(loggedUser) || SecurityUtils.isUserInRole(Security.SYSTEM_ADMIN) ){
             phone = phone.withOwner(user);
-            return phoneRepository.save(phone);
+            return Optional.of(phoneRepository.save(phone))
+                    .map(PhoneDTO::fromPhone)
+                    .get();
         } else {
             throw new OperationNotAllowedException();
         }
@@ -82,42 +84,50 @@ public class PhoneService {
     }
 
     @Timed(histogram = true, value = "PhoneService.findAll")
-    public Page<Phone> findAll(@NonNull PhoneDTO phone, @NonNull PageRequest pageRequest) {
+    public Page<PhoneDTO> findAll(@NonNull PhoneDTO phone, @NonNull PageRequest pageRequest) {
         log.info("list all phones by sample {}", phone);
         var loggedUser = userService.getAuthenticatedUser()
                 .orElseThrow(UserNotFoundException::new);
 
         if( SecurityUtils.isUserInRole(Security.SYSTEM_ADMIN) ) {
             return phoneRepository.findAll(owner(phone.owner().toUser())
-                    .and(type(phone.type())), pageRequest);
+                    .and(type(phone.type())), pageRequest)
+                    .map(PhoneDTO::fromPhone);
         } else {
             return phoneRepository.findAll(owner(loggedUser)
-                    .and(type(phone.type())), pageRequest);
+                    .and(type(phone.type())), pageRequest)
+                    .map(PhoneDTO::fromPhone);
         }
     }
 
     @Timed(histogram = true, value = "PhoneService.findById")
-    public Phone findById(@NonNull UUID id) {
+    public PhoneDTO findById(@NonNull UUID id) {
         log.info("searching phone by id {}", id);
         var loggedUser = userService.getAuthenticatedUser()
                 .orElseThrow(UserNotFoundException::new);
         val phone =  phoneRepository.findById(id)
                 .orElseThrow(PhoneNotFoundException::new);
         if(SecurityUtils.isUserInRole(Security.SYSTEM_ADMIN)) {
-            return phone;
+            return Optional.of(phone)
+                    .map(PhoneDTO::fromPhone)
+                    .get();
         }else{
             if( !phone.getOwner().equals(loggedUser) ) {
                 throw new PhoneNotFoundException();
             }
         }
-        return phone;
+        return Optional.of(phone)
+                .map(PhoneDTO::fromPhone)
+                .get();
     }
     @Timed(histogram = true, value = "PhoneService.findById")
     public void delete(@NonNull UUID id) {
         log.info("deleting phone {}", id);
         var loggedUser = userService.getAuthenticatedUser()
                 .orElseThrow(UserNotFoundException::new);
-        val phone = this.findById(id);
+
+        val phone = phoneRepository.findById(id)
+                .orElseThrow(PhoneNotFoundException::new);
 
         if( SecurityUtils.isUserInRole(Security.SYSTEM_ADMIN) ){
             phoneRepository.delete(phone);

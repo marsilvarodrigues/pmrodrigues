@@ -73,7 +73,7 @@ class TestUserService {
         given(emailService.getEmailByName(any(String.class))).willReturn(ResponseEntity.ok(new Email()));
         given(emailService.send(any(Email.class))).willReturn(ResponseEntity.ok().build());
 
-        userService.createNewUser(new UserDTO(null, "test", "test", "test@test.com"));
+        userService.create(new UserDTO(null, "test", "test", "test@test.com"));
 
         verify(emailService).send(any(Email.class));
 
@@ -88,7 +88,7 @@ class TestUserService {
         given(repository.findByEmail(any(String.class))).willReturn(optional);
 
         assertThrows(DuplicateKeyException.class, () ->
-                userService.createNewUser(new UserDTO(null, "test", "test", "test@test.com"))
+                userService.create(new UserDTO(null, "test", "test", "test@test.com"))
         );
     }
 
@@ -101,7 +101,7 @@ class TestUserService {
         given(repository.findByEmail(any(String.class))).willReturn(optional);
         given(userClient.getUserIdByEmail(any(String.class))).willReturn(Map.of("",""));
 
-        assertThrows(DuplicateKeyException.class, () -> userService.createNewUser(new UserDTO(null, "test", "test", "test@test.com")));
+        assertThrows(DuplicateKeyException.class, () -> userService.create(new UserDTO(null, "test", "test", "test@test.com")));
     }
 
     @Test
@@ -155,7 +155,7 @@ class TestUserService {
 
         given(repository.findById(any(UUID.class))).willReturn(Optional.of(user));
 
-        userService.updateUser(id, new UserDTO(null, "test", "test", "test@test.com"));
+        userService.update(id, new UserDTO(null, "test", "test", "test@test.com"));
 
         verify(repository).save(any(User.class));
         verify(userClient).update(any(User.class));
@@ -177,7 +177,7 @@ class TestUserService {
         given(repository.findById(any(UUID.class))).willReturn(Optional.empty());
 
 
-        assertThrows(UserNotFoundException.class, () -> userService.updateUser(id, new UserDTO(null, "test", "test", "test@test.com")));
+        assertThrows(UserNotFoundException.class, () -> userService.update(id, new UserDTO(null, "test", "test", "test@test.com")));
     }
 
     @Test
@@ -197,7 +197,7 @@ class TestUserService {
         given(repository.save(any(User.class))).willReturn(user);
         willThrow(new KeycloakIntegrationFailed()).given(userClient).update(any(User.class));
 
-        assertThrows(KeycloakIntegrationFailed.class, () -> userService.updateUser(id, new UserDTO(null, "test", "test", "test@test.com")));
+        assertThrows(KeycloakIntegrationFailed.class, () -> userService.update(id, new UserDTO(null, "test", "test", "test@test.com")));
     }
 
 
