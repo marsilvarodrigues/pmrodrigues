@@ -58,7 +58,7 @@ public class UserService implements DataService<UUID, UserDTO> {
                 .orElseThrow(UserNotFoundException::new);
     }
 
-    @Timed(histogram = true, value = "UserService.createNewUser")
+    @Timed(histogram = true, value = "UserService.create")
     @Transactional(propagation = Propagation.REQUIRED)
     @SneakyThrows
     public UserDTO create(@NonNull UserDTO toSave) {
@@ -132,7 +132,7 @@ public class UserService implements DataService<UUID, UserDTO> {
                 .map(UserDTO::fromUser);
     }
 
-    @Timed(histogram = true, value = "UserService.updateUser")
+    @Timed(histogram = true, value = "UserService.update")
     @Transactional(propagation = Propagation.REQUIRED)
     public void update(@NonNull final UUID id, @NonNull final UserDTO user) {
         log.info("trying to update user {}",user);

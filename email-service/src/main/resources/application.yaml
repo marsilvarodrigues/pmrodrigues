@@ -48,10 +48,7 @@ keycloak:
   public-client: true
   confidential-port: 0
 
-eureka:
-  client:
-    serviceUrl:
-      defaultZone=http://localhost:8081/eureka:
+
 
 emails:
   templates:

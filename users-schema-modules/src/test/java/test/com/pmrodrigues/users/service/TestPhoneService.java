@@ -21,6 +21,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.mockito.junit.jupiter.MockitoSettings;
 import org.mockito.quality.Strictness;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.jpa.domain.Specification;
 
@@ -64,6 +65,10 @@ class TestPhoneService {
 
             mockStatic.when(() -> SecurityUtils.isUserInRole(Security.SYSTEM_ADMIN)).thenReturn(Boolean.FALSE);
             given(userService.getById(any(UUID.class))).willReturn(defaultOwner);
+            given(phoneRepository.save(any(Phone.class))).willReturn(Phone.builder()
+                    .owner(User.builder().build())
+                    .build());
+
 
             phoneService.create(new PhoneDTO(null,
                     new UserDTO(defaultOwner.getId(),null,null,null),
@@ -79,7 +84,9 @@ class TestPhoneService {
         try(val mockStatic = mockStatic(SecurityUtils.class) ){
 
             mockStatic.when(() -> SecurityUtils.isUserInRole(Security.SYSTEM_ADMIN)).thenReturn(Boolean.FALSE);
-
+            given(phoneRepository.save(any(Phone.class))).willReturn(Phone.builder()
+                    .owner(User.builder().build())
+                    .build());
             phoneService.create(new PhoneDTO(null,
                     null,
                     "teste", PhoneType.CELLPHONE));
@@ -107,7 +114,9 @@ class TestPhoneService {
 
             mockStatic.when(() -> SecurityUtils.isUserInRole(Security.SYSTEM_ADMIN)).thenReturn(Boolean.TRUE);
             given(userService.getById(any(UUID.class))).willReturn(User.builder().id(UUID.randomUUID()).build());
-
+            given(phoneRepository.save(any(Phone.class))).willReturn(Phone.builder()
+                    .owner(User.builder().build())
+                    .build());
             phoneService.create(new PhoneDTO(null,
                     new UserDTO(UUID.randomUUID(),null,null,null),
                     "teste", PhoneType.CELLPHONE));
@@ -184,7 +193,7 @@ class TestPhoneService {
     void shouldListOnlyMyPhone() {
         try(val mockStatic = mockStatic(SecurityUtils.class) ) {
             mockStatic.when(() -> SecurityUtils.isUserInRole(Security.SYSTEM_ADMIN)).thenReturn(Boolean.FALSE);
-
+            given(phoneRepository.findAll(any(Specification.class),any(PageRequest.class))).willReturn(Page.empty());
             val pageable = mock(PageRequest.class);
             phoneService.findAll(new PhoneDTO(null, new UserDTO(null, null, null, null), null, null), pageable);
 
@@ -197,7 +206,7 @@ class TestPhoneService {
     void shouldListAllMyPhone() {
         try(val mockStatic = mockStatic(SecurityUtils.class) ) {
             mockStatic.when(() -> SecurityUtils.isUserInRole(Security.SYSTEM_ADMIN)).thenReturn(Boolean.TRUE);
-
+            given(phoneRepository.findAll(any(Specification.class),any(PageRequest.class))).willReturn(Page.empty());
             val pageable = mock(PageRequest.class);
             phoneService.findAll(new PhoneDTO(null, new UserDTO(null, null, null, null), null, null), pageable);
 
@@ -211,7 +220,7 @@ class TestPhoneService {
         try(val mockStatic = mockStatic(SecurityUtils.class) ) {
             mockStatic.when(() -> SecurityUtils.isUserInRole(Security.SYSTEM_ADMIN)).thenReturn(Boolean.TRUE);
 
-            given(phoneRepository.findById(any(UUID.class))).willReturn(Optional.of(new Phone()));
+            given(phoneRepository.findById(any(UUID.class))).willReturn(Optional.of(new Phone().withOwner(new User())));
 
             assertNotNull(phoneService.findById(UUID.randomUUID()));
 
