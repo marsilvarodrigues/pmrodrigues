@@ -25,6 +25,7 @@ import java.util.UUID;
 @SuperBuilder
 @EqualsAndHashCode(onlyExplicitlyIncluded = true, callSuper = true)
 @EntityListeners(AuditingEntityListener.class)
+@With
 public class Client extends User {
 
     @Column(name = "birthday", nullable = false)
@@ -82,4 +83,26 @@ public class Client extends User {
     public Long getAge() {
         return Long.valueOf(Period.between(birthday, LocalDate.now()).getYears());
     }
+
+    @Override
+    public Client withExternalId(final UUID uuid){
+        super.withExternalId(uuid);
+        return this;
+    }
+
+    public Client withFirstName(@NonNull String firstName){
+        super.withFirstName(firstName);
+        return this;
+    }
+
+    public Client withLastName(@NonNull String lastName) {
+        super.withLastName(lastName);
+        return this;
+    }
+
+    public Client withId(@NonNull UUID id) {
+        super.withId(id);
+        return this;
+    }
+
 }

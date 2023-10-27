@@ -65,10 +65,20 @@ public class UserService implements DataService<UUID, UserDTO> {
 
         log.info("creating a new user {}", toSave);
 
-        validateUserDoesNotExist(toSave.email());
+        if(exist(toSave.email())){
+            throw new DuplicateKeyException("I´m sorry but this was used before");
+        }
 
         val user = repository.save(toSave.toUser());
 
+        return UserDTO.fromUser(generateUser(user));
+
+    }
+
+    @Timed(histogram = true, value = "UserService.generateUser")
+    @Transactional(propagation = Propagation.REQUIRED)
+    @SneakyThrows
+    public User generateUser(@NonNull User user) {
         val keycloakId = keycloakUserRepository.insert(user);
 
         if(!sendWelcomeEmail(user) ){
@@ -77,12 +87,10 @@ public class UserService implements DataService<UUID, UserDTO> {
             throw new NotCreateException();
         }
         user.setExternalId(keycloakId);
-        return UserDTO.fromUser(user);
-
+        return user;
     }
 
-
-    private boolean sendWelcomeEmail(User user) {
+    public boolean sendWelcomeEmail(User user) {
         val email = emailService.getEmailByName(NEW_USER_TEMPLATE)
                 .getBody()
                 .to(user.getEmail())
@@ -98,13 +106,11 @@ public class UserService implements DataService<UUID, UserDTO> {
         }
     }
 
-    private void validateUserDoesNotExist(String email) {
+    public boolean exist(@NonNull String email) {
         val existed = repository.findByEmail(email);
         val existedInKeyCloak = keycloakUserRepository.getUserIdByEmail(email);
 
-        if( existed.isPresent() || !existedInKeyCloak.isEmpty() ) {
-            throw new DuplicateKeyException("I´m sorry but this was used before");
-        }
+        return existed.isPresent() || !existedInKeyCloak.isEmpty();
     }
 
     @Timed(histogram = true, value = "UserService.delete")
