@@ -1,0 +1,13 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: infra-configmap
+data:
+  PUSH_GATEWAY: "pushgateway:9091"
+  KEYCLOAK_LOCATION: "keycloak:8144"
+  KEYCLOAK_REALM: "master"
+  USER_SCHEMA_KEYCLOAK_CLIENT_ID: "94cf4fee-1b57-4e3c-8d97-195e7f7f1173"
+  USER_SCHEMA_KEYCLOAK_CLIENT_SECRET: "3FrxqjAubBRrKhn27cemzho7B4x3MIrN"
+  CLIENT_EMAIL_LOCATION: "localhost:8144"
+
+  

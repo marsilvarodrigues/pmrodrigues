@@ -26,6 +26,7 @@ import java.util.UUID;
 @NoArgsConstructor
 @Builder
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
+@ToString
 @EntityListeners(AuditingEntityListener.class)
 @With
 public class Phone {

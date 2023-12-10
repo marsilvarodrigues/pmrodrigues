@@ -28,6 +28,7 @@ import java.util.UUID;
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
 @EntityListeners(AuditingEntityListener.class)
 @With
+@ToString
 public class Address {
 
     @Id

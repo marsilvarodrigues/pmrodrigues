@@ -1,0 +1,20 @@
+FROM eclipse-temurin:18-jdk-alpine
+
+WORKDIR app
+EXPOSE 8143
+
+ENV POSTGRES_URL=localhost
+ENV POSTGRES_PORT=5432
+ENV POSTGRES_DB=pmrodrigues
+ENV POSTGRES_USER=postgres
+ENV POSTGRES_PASSWORD=postgres
+ENV CLIENT_EMAIL_LOCATION=localhost:8144
+ENV KEYCLOAK_LOCATION=localhost:8080
+ENV KEYCLOAK_REALM=master
+ENV KEYCLOAK_CLIENT_ID=94cf4fee-1b57-4e3c-8d97-195e7f7f1173
+ENV KEYCLOAK_CLIENT_SECRET=3FrxqjAubBRrKhn27cemzho7B4x3MIrN
+ENV PUSH_GATEWAY=localhost:9091
+
+COPY target/users-schema-modules-1.0-SNAPSHOT.jar ./app.jar
+
+ENTRYPOINT ["java","-jar","app.jar"]

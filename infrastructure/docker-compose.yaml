@@ -2,6 +2,7 @@ version: '3.9'
 services:
   zookeeper:
     image: confluentinc/cp-zookeeper:latest
+    container_name: zookeeper
     environment:
       ZOOKEEPER_CLIENT_PORT: 2181
       ZOOKEEPER_TICK_TIME: 2000
@@ -18,7 +19,7 @@ services:
     environment:
       KAFKA_BROKER_ID: 1
       KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
-      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092,PLAINTEXT_HOST://localhost:29092
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092,PLAINTEXT_HOST://kafka:29092
       KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
       KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
@@ -43,6 +44,7 @@ services:
 
   keycloak:
     image: quay.io/keycloak/keycloak:legacy
+    container_name: keycloak
     environment:
       DB_VENDOR: POSTGRES
       DB_ADDR: postgres
@@ -73,6 +75,7 @@ services:
       - '--web.enable-lifecycle'
 
   pushgateway:
+    container_name: pushgateway
     image: prom/pushgateway:v1.0.1
     volumes:
       - ./pushgateway:/etc/pushgateway
@@ -85,6 +88,25 @@ services:
     ports:
       - "9091:9091"
 
+  email-service:
+    container_name: email-service
+    image: pmrodrigues/email-service:1.0
+    ports:
+      - "8144:8144"
+      - "1492:1492"
+    environment:
+      - PUSH_GATEWAY=pushgateway:9091
+      - CLIENT_EMAIL_LOCATION=localhost:8144
+      - KEYCLOAK_LOCATION=keycloak:8080
+      - KEYCLOAK_REALM=master
+      - KEYCLOAK_CLIENT_ID=4c815705-49c8-43cc-88e7-eb1e9b8fe253
+      - KEYCLOAK_CLIENT_SECRET=N1v6yxmH05767mtUmx8o3fXpF6v7tBb3
+      - KAFKA_BOOTSTRAP_URL=kafka:29092
+    depends_on:
+      - kafka
+      - pushgateway
+      - prometheus
+      - keycloak
 volumes:
   db:
     driver: local

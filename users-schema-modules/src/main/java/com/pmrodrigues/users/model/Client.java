@@ -25,6 +25,7 @@ import java.util.UUID;
 @SuperBuilder
 @EqualsAndHashCode(onlyExplicitlyIncluded = true, callSuper = true)
 @EntityListeners(AuditingEntityListener.class)
+@ToString(callSuper = true)
 @With
 public class Client extends User {
 

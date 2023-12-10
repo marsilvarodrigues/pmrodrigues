@@ -1,0 +1,72 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: user-schema
+  labels:
+    app: user-schema
+spec:
+  containers:
+    - name: user-schema
+      image: pmrodrigues/user-schema:1.0
+      ports:
+        - containerPort: 8143
+        - containerPort: 1491
+      env:
+        - name: DB_VENDOR
+          value: POSTGRES
+        - name: DB_ADDR
+          valueFrom:
+            configMapKeyRef:
+              name: postgres-configmap
+              key: POSTGRES_URL
+        - name: DB_DATABASE
+          valueFrom:
+            configMapKeyRef:
+              name: postgres-configmap
+              key: POSTGRES_DB
+        - name: DB_USER
+          valueFrom:
+            configMapKeyRef:
+              name: postgres-configmap
+              key: POSTGRES_USER
+        - name: DB_PASSWORD
+          valueFrom:
+            configMapKeyRef:
+              name: postgres-configmap
+              key: POSTGRES_PASSWORD
+        - name: PUSH_GATEWAY
+          valueFrom:
+            configMapKeyRef:
+              name: infra-configmap
+              key: PUSH_GATEWAY
+        - name: CLIENT_EMAIL_LOCATION
+          valueFrom:
+            configMapKeyRef:
+              name: service-configmap
+              key: CLIENT_EMAIL_LOCATION
+        - name: KEYCLOAK_LOCATION
+          valueFrom:
+            configMapKeyRef:
+              name: infra-configmap
+              key: KEYCLOAK_LOCATION
+        - name: KEYCLOAK_REALM
+          valueFrom:
+            configMapKeyRef:
+              name: infra-configmap
+              key: KEYCLOAK_REALM
+        - name: KEYCLOAK_CLIENT_ID
+          valueFrom:
+            configMapKeyRef:
+              name: infra-configmap
+              key: USER_SCHEMA_KEYCLOAK_CLIENT_ID
+
+        - name: KEYCLOAK_CLIENT_SECRET
+          valueFrom:
+            configMapKeyRef:
+              name: infra-configmap
+              key: USER_SCHEMA_KEYCLOAK_CLIENT_SECRET
+
+      resources:
+        limits:
+          memory: 256Mi
+          cpu: "1"

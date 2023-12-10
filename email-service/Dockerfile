@@ -1,0 +1,15 @@
+FROM eclipse-temurin:18-jdk-alpine
+
+WORKDIR app
+EXPOSE 8144
+
+ENV KEYCLOAK_LOCATION=localhost:8080
+ENV KEYCLOAK_REALM=master
+ENV KEYCLOAK_CLIENT_ID=4c815705-49c8-43cc-88e7-eb1e9b8fe253
+ENV KEYCLOAK_CLIENT_SECRET=N1v6yxmH05767mtUmx8o3fXpF6v7tBb3
+ENV PUSH_GATEWAY=localhost:9091
+ENV KAFKA_BOOTSTRAP_URL=localhost:29092
+
+COPY target/email-service-1.0-SNAPSHOT.jar ./app.jar
+
+ENTRYPOINT ["java","-jar","app.jar"]

@@ -1,9 +1,13 @@
 package com.pmrodrigues.users.service;
 
 import com.pmrodrigues.commons.services.DataService;
+import com.pmrodrigues.users.dtos.AddressDTO;
 import com.pmrodrigues.users.dtos.ClientDTO;
+import com.pmrodrigues.users.dtos.PhoneDTO;
+import com.pmrodrigues.users.exceptions.UserNotFoundException;
 import com.pmrodrigues.users.model.Client;
 import com.pmrodrigues.users.repositories.ClientRepository;
+import com.pmrodrigues.users.repositories.KeycloakUserRepository;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -27,6 +31,8 @@ public class ClientService implements DataService<UUID, ClientDTO> {
 
     private final UserService userService;
 
+    private final KeycloakUserRepository keycloakUserRepository;
+
     @Override
     @Transactional(propagation = Propagation.REQUIRED)
     public ClientDTO create(@NonNull ClientDTO entity) {
@@ -43,7 +49,20 @@ public class ClientService implements DataService<UUID, ClientDTO> {
 
     @Override
     @Transactional(propagation = Propagation.REQUIRED)
-    public void update(@NonNull UUID id, @NonNull ClientDTO entity) {
+    public void update(@NonNull UUID id, @NonNull ClientDTO clientDTO) {
+        log.info("trying to update client {}",clientDTO);
+        val existed = repository.findById(id)
+                .orElseThrow(UserNotFoundException::new);
+
+        existed.setEmail(clientDTO.email());
+        existed.setFirstName(clientDTO.firstName());
+        existed.setLastName(clientDTO.lastName());
+        existed.setBirthday(clientDTO.birthDate());
+        existed.setAddresses(clientDTO.addresses().stream().map(AddressDTO::toAddress).toList());
+        existed.setPhones(clientDTO.phones().stream().map(PhoneDTO::toPhone).toList());
+
+        keycloakUserRepository.update(existed);
+        repository.save(existed);
 
     }
 

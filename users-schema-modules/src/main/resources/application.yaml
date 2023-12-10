@@ -70,9 +70,9 @@ feign:
 keycloak:
   auth-server-url: http://${KEYCLOAK_LOCATION:localhost:8080}/auth/
   realm: ${KEYCLOAK_REALM:master}
-  resource: 94cf4fee-1b57-4e3c-8d97-195e7f7f1173
+  resource: ${KEYCLOAK_CLIENT_ID:94cf4fee-1b57-4e3c-8d97-195e7f7f1173}
   credentials:
-    secret: 3FrxqjAubBRrKhn27cemzho7B4x3MIrN
+    secret: ${KEYCLOAK_CLIENT_SECRET:3FrxqjAubBRrKhn27cemzho7B4x3MIrN}
   ssl-required: none
   bearer-only: true
   principal-attribute: id
@@ -101,7 +101,7 @@ management:
       prometheus:
         pushgateway:
           enabled: true
-          base-url: http://localhost:9091
+          base-url: http://${PUSH_GATEWAY:localhost:9091}
           shutdown-operation: push
         step: 10s
   endpoints:

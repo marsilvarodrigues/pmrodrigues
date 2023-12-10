@@ -9,6 +9,7 @@ import com.pmrodrigues.users.model.User;
 import com.pmrodrigues.users.model.enums.AddressType;
 import com.pmrodrigues.users.model.enums.PhoneType;
 import com.pmrodrigues.users.repositories.ClientRepository;
+import com.pmrodrigues.users.repositories.KeycloakUserRepository;
 import com.pmrodrigues.users.service.ClientService;
 import com.pmrodrigues.users.service.UserService;
 import lombok.val;
@@ -19,7 +20,6 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.mockito.junit.jupiter.MockitoSettings;
 import org.mockito.quality.Strictness;
-import org.mockito.verification.VerificationMode;
 import org.springframework.dao.DuplicateKeyException;
 
 import java.time.LocalDate;
@@ -45,6 +45,9 @@ class TestClientService {
 
     @Mock
     private UserService userService;
+
+    @Mock
+    private KeycloakUserRepository keycloakUserRepository;
 
     @InjectMocks
     private ClientService service;
@@ -91,10 +94,12 @@ class TestClientService {
         val client = dto.toClient();
 
         given(clientRepository.findById(any(UUID.class))).willReturn(Optional.of(client));
-        willDoNothing().given(userService).update(client);
+        willDoNothing().given(keycloakUserRepository).update(any(User.class));
         given(clientRepository.save(any(Client.class))).willReturn(client);
 
-        verify(clientRepository.save(any(Client.class)), times(1));
+        service.update(id, dto);
+
+        verify(clientRepository, times(1)).save(any(Client.class));
     }
 
 }
