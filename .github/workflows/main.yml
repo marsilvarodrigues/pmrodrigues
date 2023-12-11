@@ -30,7 +30,8 @@ jobs:
 
     - name: Collect Junit Report
       run: |
-        for module in $(find . -maxdepth 1 -mindepth 1 -type d); do
+        modules=( "common" "email-service" "security" "users-schema-modules" )
+        for module in "${!fruits[@]}"; do
           echo "Processing module: $module"
           cd "$module"          
           cp -r target/surefire-reports/ $GITHUB_WORKSPACE/surefire-reports/$module
@@ -41,7 +42,8 @@ jobs:
     - name: Analyze JUnit Results
       id: test-results
       run: |
-        for module in $(find . -maxdepth 1 -mindepth 1 -type d); do
+        modules=( "common" "email-service" "security" "users-schema-modules" )
+        for module in "${!fruits[@]}"; do
           echo "Processing module: $module"
           cd "$module"
           total_tests=$(grep -oP 'tests="(\d+)"' $GITHUB_WORKSPACE/$module/surefire-reports/*.xml | grep -oP '\d+' | paste -sd+ - | bc)
