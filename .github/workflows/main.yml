@@ -1,4 +1,4 @@
-name: Docker Compose and Maven
+name: PMRodrigues Project Setup
 
 on:
   push:
