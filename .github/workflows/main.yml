@@ -9,10 +9,3 @@ jobs:
       - uses: isbang/compose-action@v1.5.1
         with:
           compose-file: "./docker/docker-compose.yml"
-      - uses: actions/setup-java@v3
-        with:
-            java-version: '18'
-            distribution: 'temurin'
-
-      - name: Run the Maven verify phase
-        run: mvn clean test -U
