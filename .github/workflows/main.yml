@@ -10,29 +10,29 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v2
+    - name: Checkout repository
+      uses: actions/checkout@v2
 
-      - name: Set up Docker Compose
-        run: |
-          sudo docker-compose -f infrastructure/docker-compose.yaml up -d
-        working-directory: .
+    - name: Set up Docker Compose
+      run: |
+        sudo docker-compose -f infrastructure/docker-compose.yaml up -d
+      working-directory: .
 
-      - name: Set up Java
-        uses: actions/setup-java
-        with:
-          distribution: 'temurin'
-          java-version: '18'
+    - name: Set up Java
+      uses: actions/setup-java@v2
+      with:
+        distribution: 'adopt'
+        java-version: '18'
 
-      - name: Build with Maven
-        run: mvn clean package
-        working-directory: path/to/your/maven/project
+    - name: Build with Maven
+      run: mvn clean package
+      working-directory: path/to/your/maven/project
 
-      - name: Stop Docker Compose
-        run: |
-          sudo docker-compose -f infrastructure/docker-compose.yaml down
-        working-directory: .
+    - name: Stop Docker Compose
+      run: |
+        sudo docker-compose -f infrastructure/docker-compose.yaml down
+      working-directory: .
 
-      - name: Clean up Docker
-        run: |
-          docker system prune -af
+    - name: Clean up Docker
+      run: |
+        docker system prune -af
