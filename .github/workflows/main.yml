@@ -59,7 +59,7 @@ jobs:
         done
 
         echo "${results[@]}" > $GITHUB_WORKSPACE/test-results.json
-        ls -R $GITHUB_WORKSPACE
+
       working-directory: ${{ github.workspace }}
 
     - name: Create Test Results Chart
@@ -69,7 +69,7 @@ jobs:
           const fs = require('fs');
           
           // Lê o conteúdo do arquivo JSON
-          const jsonContent = fs.readFileSync('$GITHUB_WORKSPACE/test-results.json', 'utf8');
+          const jsonContent = fs.readFileSync(process.env.GITHUB_WORKSPACE + '/test-results.json', 'utf8');
           const results = JSON.parse(jsonContent);
           
           // Loop através de cada módulo e cria um gráfico para cada um
