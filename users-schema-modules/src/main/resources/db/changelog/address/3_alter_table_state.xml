@@ -4,7 +4,9 @@
         xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
 		http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.8.xsd">
 
-    <property name="uuid"  value="gen_random_uuid()"/>
+    <property name="uuid"  value="gen_random_uuid()" dbms="postgresql"/>
+    <property name="uuid" value="random_uuid()" dbms="h2" />
+
     <changeSet id="alter_table_state" author="marcelo">
         <addColumn tableName="states">
             <column name="code" type="char(2)"/>

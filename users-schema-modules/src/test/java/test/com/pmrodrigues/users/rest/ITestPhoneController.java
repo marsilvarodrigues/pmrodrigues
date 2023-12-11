@@ -6,12 +6,12 @@ import com.pmrodrigues.commons.controlleradvices.ValidationErrorControllerAdvice
 import com.pmrodrigues.commons.exceptions.NotFoundException;
 import com.pmrodrigues.security.configurations.WebSecurityConfiguration;
 import com.pmrodrigues.commons.exceptions.OperationNotAllowedException;
-import com.pmrodrigues.users.dtos.AddressDTO;
+import com.pmrodrigues.users.dtos.PhoneDTO;
 import com.pmrodrigues.users.dtos.UserDTO;
 import com.pmrodrigues.users.exceptions.PhoneNotFoundException;
-import com.pmrodrigues.users.model.enums.AddressType;
-import com.pmrodrigues.users.rest.AddressController;
-import com.pmrodrigues.users.service.AddressService;
+import com.pmrodrigues.users.model.enums.PhoneType;
+import com.pmrodrigues.users.rest.PhoneController;
+import com.pmrodrigues.users.service.PhoneService;
 import lombok.SneakyThrows;
 import lombok.val;
 import org.junit.jupiter.api.DisplayName;
@@ -43,28 +43,28 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @ExtendWith(SpringExtension.class)
 @WebMvcTest(excludeAutoConfiguration = { WebSecurityConfiguration.class })
 @ContextConfiguration(classes = {
-        AddressController.class,
+        PhoneController.class,
         ValidationErrorControllerAdvice.class,
         DuplicatedKeyControllerAdvice.class} )
 @AutoConfigureMockMvc(addFilters = false)
 @ActiveProfiles("dev")
-class TestAddressController {
+class ITestPhoneController {
 
     private final ObjectMapper objectMapper = new ObjectMapper();
     @Autowired
     private MockMvc mvc;
 
     @MockBean
-    private AddressService service;
+    private PhoneService service;
 
 
     @Test
     @SneakyThrows
-    void shouldGetAddressById(){
+    void shouldGetPhoneById(){
 
-        given(service.findById(any(UUID.class))).willReturn(new AddressDTO(null, null, null ,null, null, null, null, null, null));
+        given(service.findById(any(UUID.class))).willReturn(new PhoneDTO(null, null, null, null));
 
-        mvc.perform(get(format("/addresses/%s",UUID.randomUUID()))
+        mvc.perform(get(format("/phones/%s",UUID.randomUUID()))
                 )
                 .andDo(print())
                 .andExpect(status().isOk());
@@ -73,10 +73,10 @@ class TestAddressController {
 
     @Test
     @SneakyThrows
-    void shouldntGetAddressById() {
+    void shouldntGetPhoneById() {
         given(service.findById(any(UUID.class))).willThrow(new NotFoundException());
 
-        mvc.perform(get(format("/addresses/%s",UUID.randomUUID()))
+        mvc.perform(get(format("/phones/%s",UUID.randomUUID()))
                 )
                 .andDo(print())
                 .andExpect(status().isNotFound());
@@ -84,49 +84,39 @@ class TestAddressController {
 
     @Test
     @SneakyThrows
-    void shouldAddANewAddress() {
+    void shouldAddANewPhone() {
 
 
-        val address = new AddressDTO(null, AddressType.STREET, "teste",null, "12345-123", "TESTE", "TESTE", "RJ",
-                new UserDTO(UUID.randomUUID(), "teste", "teste", "test@test.com"));
+        val phone = new PhoneDTO(UUID.randomUUID(), new UserDTO(UUID.randomUUID(),null, null, null),null,PhoneType.CELLPHONE);
 
-        val json = objectMapper.writeValueAsString(address);
-        val returned = new AddressDTO(UUID.randomUUID(),
-                address.addressType(),
-                address.address1(),
-                address.address2(),
-                address.zipcode(),
-                address.neighbor(),
-                address.city(),
-                address.state(),
-                address.owner());
+        val json = objectMapper.writeValueAsString(phone);
+        val returned = new PhoneDTO(phone.id(), null, null, null);
 
-        given(service.create(any(AddressDTO.class))).willReturn(returned);
+        given(service.create(any(PhoneDTO.class))).willReturn(returned);
 
 
 
-        mvc.perform(post("/addresses")
+        mvc.perform(post("/phones")
                         .content(json)
                         .contentType(MediaType.APPLICATION_JSON)
 
                 )
                 .andDo(print())
                 .andExpect(status().isCreated())
-                .andExpect(redirectedUrl("/addresses/" + returned.id().toString()));
+                .andExpect(redirectedUrl("/phones/" + returned.id().toString()));
     }
 
     @Test
     @SneakyThrows
-    void shouldntAddAddressUserNotAllowed() {
+    void shouldntAddPhoneUserNotAllowed() {
 
-        val address = new AddressDTO(null, AddressType.STREET, "teste",null, "12345-123", "TESTE", "TESTE", "RJ",
-                new UserDTO(UUID.randomUUID(), "teste", "teste", "test@test.com"));
+        val phone = new PhoneDTO(UUID.randomUUID(), new UserDTO(UUID.randomUUID(),null, null, null),null,PhoneType.CELLPHONE);
 
-        val json = objectMapper.writeValueAsString(address);
+        val json = objectMapper.writeValueAsString(phone);
 
-        given(service.create(any(AddressDTO.class))).willThrow(new OperationNotAllowedException("User not allowed for this operation"));
+        given(service.create(any(PhoneDTO.class))).willThrow(new OperationNotAllowedException("User not allowed for this operation"));
 
-        mvc.perform(post("/addresses")
+        mvc.perform(post("/phones")
                         .content(json)
                         .contentType(MediaType.APPLICATION_JSON)
 
@@ -137,16 +127,15 @@ class TestAddressController {
 
     @Test
     @SneakyThrows
-    void shouldUpdateAddress(){
+    void shouldUpdatePhone(){
 
-        val address = new AddressDTO(UUID.randomUUID(), AddressType.STREET, "teste",null, "12345-123", "TESTE", "TESTE", "RJ",
-                new UserDTO(UUID.randomUUID(), "teste", "teste", "test@test.com"));
+        val phone = new PhoneDTO(UUID.randomUUID(), new UserDTO(UUID.randomUUID(),null, null, null),null,PhoneType.CELLPHONE);
 
-        willDoNothing().given(service).update(any(UUID.class), any(AddressDTO.class));
+        willDoNothing().given(service).update(any(UUID.class), any(PhoneDTO.class));
 
-        val json = objectMapper.writeValueAsString(address);
+        val json = objectMapper.writeValueAsString(phone);
 
-        mvc.perform(put("/addresses/" + address.id())
+        mvc.perform(put("/phones/" + phone.id())
                         .content(json)
                         .contentType(MediaType.APPLICATION_JSON)
 
@@ -158,16 +147,15 @@ class TestAddressController {
 
     @Test
     @SneakyThrows
-    void shouldntUpdatAddressNotFound(){
+    void shouldntUpdatePhoneNotFound(){
 
-        val address = new AddressDTO(UUID.randomUUID(), AddressType.STREET, "teste",null, "12345-123", "TESTE", "TESTE", "RJ",
-                new UserDTO(UUID.randomUUID(), "teste", "teste", "test@test.com"));
+        val phone = new PhoneDTO(UUID.randomUUID(), new UserDTO(UUID.randomUUID(),null, null, null),null,PhoneType.CELLPHONE);
 
-        willThrow(new NotFoundException()).given(service).update(any(UUID.class), any(AddressDTO.class));
+        willThrow(new PhoneNotFoundException()).given(service).update(any(UUID.class), any(PhoneDTO.class));
 
-        val json = objectMapper.writeValueAsString(address);
+        val json = objectMapper.writeValueAsString(phone);
 
-        mvc.perform(put("/addresses/" + address.id().toString())
+        mvc.perform(put("/phones/" + phone.id().toString())
                         .content(json)
                         .contentType(MediaType.APPLICATION_JSON)
 
@@ -179,16 +167,15 @@ class TestAddressController {
 
     @Test
     @SneakyThrows
-    void shouldntUpdatAddressOperationNotAllowed(){
+    void shouldntUpdatPhoneOperationNotAllowed(){
 
-        val address = new AddressDTO(UUID.randomUUID(), AddressType.STREET, "teste",null, "12345-123", "TESTE", "TESTE", "RJ",
-                new UserDTO(UUID.randomUUID(), "teste", "teste", "test@test.com"));
+        val phone = new PhoneDTO(UUID.randomUUID(), new UserDTO(UUID.randomUUID(),null, null, null),null,PhoneType.CELLPHONE);
 
-        willThrow(new OperationNotAllowedException("")).given(service).update(any(UUID.class), any(AddressDTO.class));
+        willThrow(new OperationNotAllowedException("")).given(service).update(any(UUID.class), any(PhoneDTO.class));
 
-        val json = objectMapper.writeValueAsString(address);
+        val json = objectMapper.writeValueAsString(phone);
 
-        mvc.perform(put("/addresses/" + address.id().toString())
+        mvc.perform(put("/phones/" + phone.id().toString())
                         .content(json)
                         .contentType(MediaType.APPLICATION_JSON)
 
@@ -201,16 +188,15 @@ class TestAddressController {
 
     @Test
     @SneakyThrows
-    void shouldSearchAddress() {
+    void shouldSearchPhones() {
 
-        val address = new AddressDTO(UUID.randomUUID(), AddressType.STREET, "teste",null, "12345-123", "TESTE", "TESTE", "RJ",
-                new UserDTO(UUID.randomUUID(), "teste", "teste", "test@test.com"));
+        val phone = new PhoneDTO(UUID.randomUUID(), new UserDTO(UUID.randomUUID(),null, null, null),null,PhoneType.CELLPHONE);
 
-        val message = objectMapper.writeValueAsString(address);
+        val message = objectMapper.writeValueAsString(phone);
 
-        when(service.findAll(any(AddressDTO.class), any(PageRequest.class))).thenReturn(Page.empty());
+        given(service.findAll(any(PhoneDTO.class), any(PageRequest.class))).willReturn(Page.empty());
 
-        mvc.perform(get("/addresses?page=1&size=10")
+        mvc.perform(get("/phones?page=1&size=10")
                         .content(message)
                         .contentType(MediaType.APPLICATION_JSON))
                 .andDo(print())
@@ -220,11 +206,11 @@ class TestAddressController {
 
     @Test
     @SneakyThrows
-    void shouldSearchAddressBodyEmpty() {
+    void shouldSearchPhonesBodyEmpty() {
 
-        when(service.findAll(any(AddressDTO.class), any(PageRequest.class))).thenReturn(Page.empty());
+        given(service.findAll(any(PhoneDTO.class), any(PageRequest.class))).willReturn(Page.empty());
 
-        mvc.perform(get("/addresses?page=1&size=10")
+        mvc.perform(get("/phones?page=1&size=10")
                         .contentType(MediaType.APPLICATION_JSON))
                 .andDo(print())
                 .andExpect(status().isOk());
@@ -232,31 +218,28 @@ class TestAddressController {
 
     @Test
     @SneakyThrows
-    @DisplayName("Should List All Addresses sorted")
-    void shouldGetAllUsersSortedList() {
+    @DisplayName("Should List All Phones sorted")
+    void shouldGetAllPhonesSortedList() {
 
-        given(service.findAll(any(AddressDTO.class), any(PageRequest.class))).willReturn(Page.empty());
+        given(service.findAll(any(PhoneDTO.class), any(PageRequest.class))).willReturn(Page.empty());
 
-        mvc.perform(get("/addresses?sort=city|desc&sort=state.name|asc&sort=zipcode|desc")
+        mvc.perform(get("/phones?sort=type|desc")
                         .contentType(MediaType.APPLICATION_JSON))
                 .andDo(print())
                 .andExpect(status().isOk());
 
-        Sort sort = Sort.by(Sort.Order.desc("city"),
-                Sort.Order.asc("state.name"),
-                Sort.Order.desc("zipcode"));
+        Sort sort = Sort.by(Sort.Order.desc("type"));
 
-        verify(service).findAll(any(AddressDTO.class), eq(PageRequest.of(0, 50, sort)));
+        verify(service).findAll(any(PhoneDTO.class), eq(PageRequest.of(0, 50, sort)));
 
     }
 
     @Test
     @SneakyThrows
-    @DisplayName("Should delete address by Id")
-    void shouldDeleteUser() {
+    @DisplayName("Should delete phone by Id")
+    void shouldDeletePhone() {
 
-
-        mvc.perform(delete("/addresses/" + UUID.randomUUID())
+        mvc.perform(delete("/phones/" + UUID.randomUUID())
                         .contentType(MediaType.APPLICATION_JSON))
                 .andDo(print())
                 .andExpect(status().isNoContent());
@@ -266,12 +249,12 @@ class TestAddressController {
 
     @Test
     @SneakyThrows
-    @DisplayName("Should not delete user by Id - Address Not Found")
+    @DisplayName("Should not delete phone by Id - Phone Not Found")
     void shouldNotDeleteUserNotFound() {
 
         willThrow(PhoneNotFoundException.class).given(service).delete(any(UUID.class));
 
-        mvc.perform(delete("/addresses/" + UUID.randomUUID())
+        mvc.perform(delete("/phones/" + UUID.randomUUID())
                         .contentType(MediaType.APPLICATION_JSON))
                 .andDo(print())
                 .andExpect(status().isNotFound());

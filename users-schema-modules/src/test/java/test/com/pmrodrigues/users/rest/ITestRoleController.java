@@ -50,7 +50,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
         DuplicatedKeyControllerAdvice.class})
 @AutoConfigureMockMvc(addFilters = false)
 @ActiveProfiles("dev")
-class TestRoleController {
+class ITestRoleController {
 
     private final ObjectMapper objectMapper = new ObjectMapper();
     @Autowired

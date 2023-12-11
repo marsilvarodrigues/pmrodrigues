@@ -88,25 +88,6 @@ services:
     ports:
       - "9091:9091"
 
-  email-service:
-    container_name: email-service
-    image: pmrodrigues/email-service:1.0
-    ports:
-      - "8144:8144"
-      - "1492:1492"
-    environment:
-      - PUSH_GATEWAY=pushgateway:9091
-      - CLIENT_EMAIL_LOCATION=localhost:8144
-      - KEYCLOAK_LOCATION=keycloak:8080
-      - KEYCLOAK_REALM=master
-      - KEYCLOAK_CLIENT_ID=4c815705-49c8-43cc-88e7-eb1e9b8fe253
-      - KEYCLOAK_CLIENT_SECRET=N1v6yxmH05767mtUmx8o3fXpF6v7tBb3
-      - KAFKA_BOOTSTRAP_URL=kafka:29092
-    depends_on:
-      - kafka
-      - pushgateway
-      - prometheus
-      - keycloak
 volumes:
   db:
     driver: local

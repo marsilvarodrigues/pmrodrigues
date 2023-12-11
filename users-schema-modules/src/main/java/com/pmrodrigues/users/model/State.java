@@ -15,11 +15,13 @@ import java.util.UUID;
 public class State {
     @Id
     @Column(name = "id", nullable = false)
+    @EqualsAndHashCode.Include
     private UUID id;
 
     @Column(name = "name", nullable = false)
     private String name;
 
-    @Column(name = "code", nullable = false)
+    @Column(name = "code", nullable = false, unique = true)
+    @EqualsAndHashCode.Include
     private String code;
 }
