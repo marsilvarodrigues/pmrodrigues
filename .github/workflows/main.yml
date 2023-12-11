@@ -29,18 +29,30 @@ jobs:
       working-directory: .
 
     - name: Collect Junit Report
-      run: cp -r **/target/surefire-reports/ $GITHUB_WORKSPACE/surefire-reports/
+      run: |
+        for module in $(find . -maxdepth 1 -mindepth 1 -type d); do
+          echo "Processing module: $module"
+          cd "$module"          
+          cp -r target/surefire-reports/ $GITHUB_WORKSPACE/surefire-reports/$module
+          cd ..
+        done
       working-directory: .
 
     - name: Analyze JUnit Results
       id: test-results
       run: |
-          total_tests=$(grep -oP 'tests="(\d+)"' $GITHUB_WORKSPACE/surefire-reports/*.xml | grep -oP '\d+' | paste -sd+ - | bc)
-          successful_tests=$(grep -oP 'tests="(\d+)"\s+failures="0"\s+errors="0"' $GITHUB_WORKSPACE/surefire-reports/*.xml | wc -l)
-          echo "Total Tests: $total_tests"
-          echo "Successful Tests: $successful_tests"
-          echo "::set-output name=total_tests::$total_tests"
-          echo "::set-output name=successful_tests::$successful_tests"
+        for module in $(find . -maxdepth 1 -mindepth 1 -type d); do
+          echo "Processing module: $module"
+          cd "$module"
+          total_tests=$(grep -oP 'tests="(\d+)"' $GITHUB_WORKSPACE/$module/surefire-reports/*.xml | grep -oP '\d+' | paste -sd+ - | bc)
+          successful_tests=$(grep -oP 'tests="(\d+)"\s+failures="0"\s+errors="0"' $GITHUB_WORKSPACE/$module/surefire-reports/*.xml | wc -l)
+          cd ..
+        
+          echo "::set-output name=$module_total_tests::$total_tests"
+          echo "::set-output name=$module_successful_tests::$successful_tests"
+        
+        done
+
       working-directory: $GITHUB_WORKSPACE
 
     - name: Create Test Results Chart
