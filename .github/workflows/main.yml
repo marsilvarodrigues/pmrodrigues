@@ -21,12 +21,12 @@ jobs:
     - name: Set up Java
       uses: actions/setup-java@v2
       with:
-        distribution: 'adopt'
+        distribution: 'temurin'
         java-version: '18'
 
     - name: Build with Maven
       run: mvn clean package
-      working-directory: path/to/your/maven/project
+      working-directory: .
 
     - name: Stop Docker Compose
       run: |
