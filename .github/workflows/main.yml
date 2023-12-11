@@ -38,6 +38,7 @@ jobs:
             mkdir -p $GITHUB_WORKSPACE/surefire-reports/$module
             cp -r ./target/surefire-reports/* $GITHUB_WORKSPACE/surefire-reports/$module
           fi
+          cd ..
         done
       working-directory: ${{ github.workspace }}
 
@@ -45,16 +46,15 @@ jobs:
     - name: Analyze JUnit Results
       run: |
         modules=( "common" "email-service" "security" "users-schema-modules" )
-        for module in "${modules[@]}"; do
-          cd "$module" || exit 1
-          if [ -d "target/surefire-reports" ]; then
+        for module in "${modules[@]}"; do          
+          if [ -d "$module/surefire-reports" ]; then
             echo "Processing module: $GITHUB_WORKSPACE/$module/surefire-reports"
             total_tests=$(grep -oP 'tests="(\d+)"' $GITHUB_WORKSPACE/$module/surefire-reports/*.xml | grep -oP '\d+' | paste -sd+ - | bc)
             successful_tests=$(grep -oP 'tests="(\d+)"\s+failures="0"\s+errors="0"' $GITHUB_WORKSPACE/$module/surefire-reports/*.xml | wc -l)
             
             echo "::set-output name=$module_total_tests::$total_tests"
             echo "::set-output name=$module_successful_tests::$successful_tests"
-          fi
+          fi        
         done
       working-directory: ${{ github.workspace }}
 
