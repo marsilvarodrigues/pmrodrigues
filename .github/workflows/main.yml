@@ -37,6 +37,7 @@ jobs:
         done
       working-directory: ${{ github.workspace }}
 
+
     - name: Analyze JUnit Results
       run: |
         modules=( "common" "email-service" "security" "users-schema-modules" )
