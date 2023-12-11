@@ -31,7 +31,7 @@ jobs:
     - name: Collect Junit Report
       run: |
         modules=( "common" "email-service" "security" "users-schema-modules" )
-        for module in "${!modules[@]}"; do
+        for module in "${modules[@]}"; do
           echo "Processing module: $module"                  
           cp -r $module/target/surefire-reports/ $GITHUB_WORKSPACE/surefire-reports/$module          
         done
