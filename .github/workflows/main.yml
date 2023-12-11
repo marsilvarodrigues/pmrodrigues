@@ -1,11 +1,18 @@
-name: Preparing PMRodrigues Projects
+name: PMRodrigues Project Pipeline
 on: push
 jobs:
   test:
     runs-on: ubuntu-latest    
     steps:
+      - name: Preparing the environment
       - uses: actions/checkout@v2
+      - uses: isbang/compose-action@v1.5.1
         with:
-          compose-file: "./infrastructure/docker-compose.yaml"
-      - name: Build the stack      
-        run: docker-compose up -d
+          compose-file: "./docker/docker-compose.yml"
+      - uses: actions/setup-java@v3
+        with:
+            java-version: '18'
+            distribution: 'temurin'
+
+      - name: Run the Maven verify phase
+        run: mvn clean test -U
