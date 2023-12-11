@@ -32,8 +32,8 @@ jobs:
       run: |
         modules=( "common" "email-service" "security" "users-schema-modules" )
         for module in "${modules[@]}"; do
-          echo "Processing module: $module"                  
-          cp -r $module/target/surefire-reports/ $GITHUB_WORKSPACE/surefire-reports/$module          
+          echo "Processing module: ./$module/target/surefire-reports"                  
+          cp -r ./$module/target/surefire-reports $GITHUB_WORKSPACE/surefire-reports/$module          
         done
       working-directory: ${{ github.workspace }}
 
@@ -41,7 +41,7 @@ jobs:
       run: |
         modules=( "common" "email-service" "security" "users-schema-modules" )
         for module in "${modules[@]}"; do
-          echo "Processing module: $module"
+          echo "Processing module: $GITHUB_WORKSPACE/$module/surefire-reports"
           total_tests=$(grep -oP 'tests="(\d+)"' $GITHUB_WORKSPACE/$module/surefire-reports/*.xml | grep -oP '\d+' | paste -sd+ - | bc)
           successful_tests=$(grep -oP 'tests="(\d+)"\s+failures="0"\s+errors="0"' $GITHUB_WORKSPACE/$module/surefire-reports/*.xml | wc -l)
           
