@@ -37,7 +37,7 @@ jobs:
           cp -r target/surefire-reports/ $GITHUB_WORKSPACE/surefire-reports/$module
           cd ..
         done
-      working-directory: $GITHUB_WORKSPACE
+      working-directory: ${{ github.workspace }}
 
     - name: Analyze JUnit Results
       id: test-results
@@ -55,7 +55,7 @@ jobs:
         
         done
 
-      working-directory: $GITHUB_WORKSPACE
+      working-directory: ${{ github.workspace }}
 
     - name: Create Test Results Chart
       uses: actions/github-script@v5
