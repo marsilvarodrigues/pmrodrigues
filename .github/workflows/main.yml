@@ -1,19 +1,38 @@
-name: PMRodrigues Project Pipeline
-on: push
-jobs:
-  test:
-    runs-on: ubuntu-latest    
-    steps:
-      - name: Preparing the environment
-      - uses: actions/checkout@v2
-      - uses: isbang/compose-action@v1.5.1
-        with:
-          compose-file: "./infrastructure/docker-compose.yaml"
-        run: docker-compose up -d
+name: Docker Compose and Maven
 
-      - name: Run the Maven verify phase
-      - uses: actions/setup-java@v3
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      - name: Set up Docker Compose
+        run: |
+          sudo docker-compose -f infrastructure/docker-compose.yaml up -d
+        working-directory: .
+
+      - name: Set up Java
+        uses: actions/setup-java
         with:
-            java-version: '18'
-            distribution: 'temurin'
-        run: mvn clean test -U
+          distribution: 'temurin'
+          java-version: '18'
+
+      - name: Build with Maven
+        run: mvn clean package
+        working-directory: path/to/your/maven/project
+
+      - name: Stop Docker Compose
+        run: |
+          sudo docker-compose -f infrastructure/docker-compose.yaml down
+        working-directory: .
+
+      - name: Clean up Docker
+        run: |
+          docker system prune -af
