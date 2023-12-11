@@ -30,25 +30,31 @@ jobs:
 
     - name: Collect Junit Report
       run: |
-        modules=( "common" "email-service" "users-schema-modules" )
+        modules=( "common" "email-service" "security" "users-schema-modules" )
         for module in "${modules[@]}"; do
-          echo "Processing module: ./$module/target/surefire-reports"     
-          mkdir -p $GITHUB_WORKSPACE/surefire-reports/$module
-          cp -r ./$module/target/surefire-reports/* $GITHUB_WORKSPACE/surefire-reports/$module          
+          cd "$module" || exit 1
+          if [ -d "target/surefire-reports" ]; then
+            echo "Processing module: ./$module/target/surefire-reports"     
+            mkdir -p $GITHUB_WORKSPACE/surefire-reports/$module
+            cp -r ./$module/target/surefire-reports/* $GITHUB_WORKSPACE/surefire-reports/$module
+          fi
         done
       working-directory: ${{ github.workspace }}
 
 
     - name: Analyze JUnit Results
       run: |
-        modules=( "common" "email-service" "users-schema-modules" )
+        modules=( "common" "email-service" "security" "users-schema-modules" )
         for module in "${modules[@]}"; do
-          echo "Processing module: $GITHUB_WORKSPACE/$module/surefire-reports"
-          total_tests=$(grep -oP 'tests="(\d+)"' $GITHUB_WORKSPACE/$module/surefire-reports/*.xml | grep -oP '\d+' | paste -sd+ - | bc)
-          successful_tests=$(grep -oP 'tests="(\d+)"\s+failures="0"\s+errors="0"' $GITHUB_WORKSPACE/$module/surefire-reports/*.xml | wc -l)
-          
-          echo "::set-output name=$module_total_tests::$total_tests"
-          echo "::set-output name=$module_successful_tests::$successful_tests"
+          cd "$module" || exit 1
+          if [ -d "target/surefire-reports" ]; then
+            echo "Processing module: $GITHUB_WORKSPACE/$module/surefire-reports"
+            total_tests=$(grep -oP 'tests="(\d+)"' $GITHUB_WORKSPACE/$module/surefire-reports/*.xml | grep -oP '\d+' | paste -sd+ - | bc)
+            successful_tests=$(grep -oP 'tests="(\d+)"\s+failures="0"\s+errors="0"' $GITHUB_WORKSPACE/$module/surefire-reports/*.xml | wc -l)
+            
+            echo "::set-output name=$module_total_tests::$total_tests"
+            echo "::set-output name=$module_successful_tests::$successful_tests"
+          fi
         done
       working-directory: ${{ github.workspace }}
 
