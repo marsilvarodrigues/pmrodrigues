@@ -32,54 +32,55 @@ jobs:
       run: |
         modules=( "common" "email-service" "security" "users-schema-modules" )
         for module in "${modules[@]}"; do
-          echo "Processing module: ./$module/target/surefire-reports"                  
+          echo "Processing module: ./$module/target/surefire-reports"     
+          mkdir -p $GITHUB_WORKSPACE/surefire-reports/$module
           cp -r ./$module/target/surefire-reports/* $GITHUB_WORKSPACE/surefire-reports/$module          
         done
       working-directory: ${{ github.workspace }}
 
 
-#    - name: Analyze JUnit Results
-#      run: |
-#        modules=( "common" "email-service" "security" "users-schema-modules" )
-#        for module in "${modules[@]}"; do
-#          echo "Processing module: $GITHUB_WORKSPACE/$module/surefire-reports"
-#          total_tests=$(grep -oP 'tests="(\d+)"' $GITHUB_WORKSPACE/$module/surefire-reports/*.xml | grep -oP '\d+' | paste -sd+ - | bc)
-#          successful_tests=$(grep -oP 'tests="(\d+)"\s+failures="0"\s+errors="0"' $GITHUB_WORKSPACE/$module/surefire-reports/*.xml | wc -l)
-#
-#          echo "::set-output name=$module_total_tests::$total_tests"
-#          echo "::set-output name=$module_successful_tests::$successful_tests"
-#        done
-#      working-directory: ${{ github.workspace }}
-#
-#    - name: Create Test Results Chart
-#      uses: actions/github-script@v5
-#      with:
-#        script: |
-#          const totalTests = parseInt(process.env.total_tests);
-#          const successfulTests = parseInt(process.env.successful_tests);
-#
-#          const failedTests = totalTests - successfulTests;
-#
-#          const chartData = {
-#            labels: ['Total Tests', 'Successful Tests', 'Failed Tests'],
-#            datasets: [
-#              {
-#                label: 'Test Results',
-#                data: [totalTests, successfulTests, failedTests],
-#                backgroundColor: ['#36a2eb', '#4caf50', '#f44336'],
-#              },
-#            ],
-#          };
-#
-#          const { data } = await octokit.rest.issues.createComment({
-#            issue_number: context.issue.number,
-#            owner: context.repo.owner,
-#            repo: context.repo.repo,
-#            body: `![Test Results Chart](https://quickchart.io/chart?c=${encodeURIComponent(JSON.stringify(chartData))})`,
-#          });
-#      env:
-#        total_tests: ${{ steps.test-results.outputs.total_tests }}
-#        successful_tests: ${{ steps.test-results.outputs.successful_tests }}
+    - name: Analyze JUnit Results
+      run: |
+        modules=( "common" "email-service" "security" "users-schema-modules" )
+        for module in "${modules[@]}"; do
+          echo "Processing module: $GITHUB_WORKSPACE/$module/surefire-reports"
+          total_tests=$(grep -oP 'tests="(\d+)"' $GITHUB_WORKSPACE/$module/surefire-reports/*.xml | grep -oP '\d+' | paste -sd+ - | bc)
+          successful_tests=$(grep -oP 'tests="(\d+)"\s+failures="0"\s+errors="0"' $GITHUB_WORKSPACE/$module/surefire-reports/*.xml | wc -l)
+          
+          echo "::set-output name=$module_total_tests::$total_tests"
+          echo "::set-output name=$module_successful_tests::$successful_tests"
+        done
+      working-directory: ${{ github.workspace }}
+
+    - name: Create Test Results Chart
+      uses: actions/github-script@v5
+      with:
+        script: |
+          const totalTests = parseInt(process.env.total_tests);
+          const successfulTests = parseInt(process.env.successful_tests);
+
+          const failedTests = totalTests - successfulTests;
+
+          const chartData = {
+            labels: ['Total Tests', 'Successful Tests', 'Failed Tests'],
+            datasets: [
+              {
+                label: 'Test Results',
+                data: [totalTests, successfulTests, failedTests],
+                backgroundColor: ['#36a2eb', '#4caf50', '#f44336'],
+              },
+            ],
+          };
+
+          const { data } = await octokit.rest.issues.createComment({
+            issue_number: context.issue.number,
+            owner: context.repo.owner,
+            repo: context.repo.repo,
+            body: `![Test Results Chart](https://quickchart.io/chart?c=${encodeURIComponent(JSON.stringify(chartData))})`,
+          });
+      env:
+        total_tests: ${{ steps.test-results.outputs.total_tests }}
+        successful_tests: ${{ steps.test-results.outputs.successful_tests }}
 
     - name: Stop Docker Compose
       run: |
