@@ -25,11 +25,9 @@ jobs:
         java-version: '18'
 
     - name: Build with Maven
-      run: mvn clean package jacoco:report
-      working-directory: .
-
-    - name: Run JUnit Tests and Save Results
-      run: cp -r */target/surefire-reports/ $GITHUB_WORKSPACE/surefire-reports/
+      run: | 
+        mvn clean package jacoco:report
+        cp -r */target/surefire-reports/ $GITHUB_WORKSPACE/surefire-reports/
       working-directory: .
 
     - name: Analyze JUnit Results
