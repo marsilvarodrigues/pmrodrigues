@@ -36,7 +36,7 @@ jobs:
           if [ -d "target/surefire-reports" ]; then
             echo "Processing module: ./$module/target/surefire-reports"     
             mkdir -p $GITHUB_WORKSPACE/surefire-reports/$module
-            cp -r ./$module/target/surefire-reports/* $GITHUB_WORKSPACE/surefire-reports/$module
+            cp -r ./target/surefire-reports/* $GITHUB_WORKSPACE/surefire-reports/$module
           fi
         done
       working-directory: ${{ github.workspace }}
