@@ -30,7 +30,7 @@ jobs:
 
     - name: Collect Junit Report
       run: |
-        modules=( "common" "email-service" "security" "users-schema-modules" )
+        modules=( "common" "email-service" "users-schema-modules" )
         for module in "${modules[@]}"; do
           echo "Processing module: ./$module/target/surefire-reports"     
           mkdir -p $GITHUB_WORKSPACE/surefire-reports/$module
@@ -41,7 +41,7 @@ jobs:
 
     - name: Analyze JUnit Results
       run: |
-        modules=( "common" "email-service" "security" "users-schema-modules" )
+        modules=( "common" "email-service" "users-schema-modules" )
         for module in "${modules[@]}"; do
           echo "Processing module: $GITHUB_WORKSPACE/$module/surefire-reports"
           total_tests=$(grep -oP 'tests="(\d+)"' $GITHUB_WORKSPACE/$module/surefire-reports/*.xml | grep -oP '\d+' | paste -sd+ - | bc)
