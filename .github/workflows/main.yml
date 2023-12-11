@@ -39,7 +39,7 @@ jobs:
           echo "Successful Tests: $successful_tests"
           echo "::set-output name=total_tests::$total_tests"
           echo "::set-output name=successful_tests::$successful_tests"
-        working-directory: $GITHUB_WORKSPACE
+      working-directory: $GITHUB_WORKSPACE
 
     - name: Create Test Results Chart
       uses: actions/github-script@v5
