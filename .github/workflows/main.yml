@@ -37,7 +37,7 @@ jobs:
           cp -r target/surefire-reports/ $GITHUB_WORKSPACE/surefire-reports/$module
           cd ..
         done
-      working-directory: .
+      working-directory: $GITHUB_WORKSPACE
 
     - name: Analyze JUnit Results
       id: test-results
