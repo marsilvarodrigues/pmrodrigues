@@ -33,7 +33,7 @@ jobs:
         modules=( "common" "email-service" "security" "users-schema-modules" )
         for module in "${modules[@]}"; do
           echo "Processing module: ./$module/target/surefire-reports"                  
-          cp -r ./$module/target/surefire-reports $GITHUB_WORKSPACE/surefire-reports/$module          
+          cp -r ./$module/target/surefire-reports/* $GITHUB_WORKSPACE/surefire-reports/$module          
         done
       working-directory: ${{ github.workspace }}
 
