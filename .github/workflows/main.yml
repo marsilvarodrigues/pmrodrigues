@@ -1,9 +1,11 @@
-name: Docker Compose Actions Workflow
+name: Preparing PMRodrigues Projects
 on: push
 jobs:
   test:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-latest    
     steps:
       - uses: actions/checkout@v2
-      - name: Build the stack
+        with:
+          compose-file: "./infrastructure/docker-compose.yaml"
+      - name: Build the stack      
         run: docker-compose up -d
