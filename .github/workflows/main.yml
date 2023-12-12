@@ -29,11 +29,10 @@ jobs:
       working-directory: .
 
     - name: Workflow test
-      uses: actions/checkout@v4
+      uses: mikepenz/action-junit-report@v4
+      if: success() || failure()
       with:
-        artifact: test-results
-        path: '**/surefire-reports.xml'
-        reporter: java-junit
+        report_paths: '**/target/surefire-reports/TEST-*.xml'
 
     - name: Stop Docker Compose
       run: |
