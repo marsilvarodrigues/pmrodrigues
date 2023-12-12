@@ -42,123 +42,19 @@ jobs:
         done
       working-directory: ${{ github.workspace }}
 
+  report:
+    name: Workflow test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ./
+        with:
+          artifact: test-results
+          name: Workflow Report
+          path: '**/surefire-reports.xml'
+          reporter: java-junit
 
-    - name: Analyze JUnit Results
-      run: |
-        modules=( "common" "email-service" "security" "users-schema-modules" )
-        results=()
-
-        for module in "${modules[@]}"; do
-          if [ -d "$module/surefire-reports" ]; then
-            echo "Processing module: $GITHUB_WORKSPACE/$module/surefire-reports"
-            total_tests=$(grep -oP 'tests="(\d+)"' $GITHUB_WORKSPACE/$module/surefire-reports/*.xml | grep -oP '\d+' | paste -sd+ - | bc)
-            successful_tests=$(grep -oP 'tests="(\d+)"\s+failures="0"\s+errors="0"' $GITHUB_WORKSPACE/$module/surefire-reports/*.xml | wc -l)
-
-            results+=("{\"module\": \"$module\", \"total_tests\": $total_tests, \"successful_tests\": $successful_tests}")
-          fi
-        done
-        
-        
-        json_content="["
-        for result in "${results[@]}"; do
-          json_content+="$result,"
-        done
-        json_content="${json_content%,}"  # Remove a vírgula extra do final
-        json_content+="]"
-  
-        # Salva a string JSON em um arquivo
-        echo "$json_content" > "$GITHUB_WORKSPACE/test-results.json"
-
-      working-directory: ${{ github.workspace }}
-
-    - name: Create Test Results Chart
-      uses: actions/github-script@v5
-      with:
-        script: |
-          const fs = require('fs');
-          
-          // Lê o conteúdo do arquivo JSON
-          const jsonContent = fs.readFileSync(process.env.GITHUB_WORKSPACE + '/test-results.json', 'utf8');
-          if (!jsonContent.trim()) {
-            throw new Error('O conteúdo do arquivo JSON está vazio.');         
-          }
-          const results = JSON.parse(jsonContent);
-          
-          // Loop através de cada módulo e cria um gráfico para cada um
-          for (const module of results) {
-            const totalTests = module.total_tests;
-            const successfulTests = module.successful_tests;
-            const failedTests = totalTests - successfulTests;
-          
-            const chartData = {
-              type: 'doughnut',
-              data: {
-                datasets: [
-                  {
-                    data: [successfulTests, failedTests],
-                    backgroundColor: ['green', 'red'],
-                    label: module,
-                    borderWidth: 10,
-                  },
-                ],
-                labels: [Success, Failed],
-              },
-              options: {
-                circumference: Math.PI,
-                rotation: Math.PI,
-                cutoutPercentage: 80,
-                layout: {
-                  padding: 40,
-                },
-                legend: {
-                  display: true,
-                },
-                plugins: {
-                  datalabels: {
-                    color: '#000',
-                    anchor: 'end',
-                    align: 'end',
-                    formatter: (val) => val + '%',
-                    font: {
-                      size: 25,
-                      weight: 'bold',
-                    },
-                  },
-                  doughnutlabel: {
-                    labels: [
-                      {
-                        text: '\nTotal',
-                        font: {
-                          size: 20,
-                        },
-                      },
-                      {
-                        text: '\n' + totalTests,
-                        color: '#000',
-                        font: {
-                          size: 40,
-                          weight: 'bold',
-                        },
-                      },
-                    ],
-                  },
-                },
-              },
-            };
-          
-            // Cria um comentário na issue com o gráfico
-            const { data } = await github.issues.createComment({
-               issue_number: issueNumber,
-               owner: process.env.GITHUB_REPOSITORY_OWNER,
-               repo: process.env.GITHUB_REPOSITORY,
-               body: `## Test Results for Module: ${module.module}\n\n![Test Results Chart](https://quickchart.io/chart?c=${encodeURIComponent(JSON.stringify(chartData))})`,
-            });
-          }      
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        GITHUB_REPOSITORY_OWNER: ${{ github.repository_owner }}
-        GITHUB_REPOSITORY: ${{ github.repository }}
-        GITHUB_ISSUE_NUMBER: ${{ github.event.issue.number }}
+  cleanup:
 
     - name: Stop Docker Compose
       run: |
