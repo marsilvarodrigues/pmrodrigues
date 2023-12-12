@@ -33,6 +33,8 @@ jobs:
       if: success() || failure()
       with:
         report_paths: '**/target/surefire-reports/TEST-*.xml'
+        detailed_summary: true
+        include_passed: true
 
     - name: Stop Docker Compose
       if: success() || failure()
