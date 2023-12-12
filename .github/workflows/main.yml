@@ -42,10 +42,10 @@ jobs:
         done
       working-directory: ${{ github.workspace }}
 
-  report:
-    name: Workflow test
-    runs-on: ubuntu-latest
-    steps:
+
+    - name: Workflow test
+      runs-on: ubuntu-latest
+      steps:
       - uses: actions/checkout@v4
       - uses: ./
         with:
@@ -53,8 +53,6 @@ jobs:
           name: Workflow Report
           path: '**/surefire-reports.xml'
           reporter: java-junit
-
-  cleanup:
 
     - name: Stop Docker Compose
       run: |
