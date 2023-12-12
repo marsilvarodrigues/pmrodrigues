@@ -58,8 +58,15 @@ jobs:
           fi
         done
         
-        echo "${results[@]}" > $GITHUB_WORKSPACE/test-results.json
-        cat $GITHUB_WORKSPACE/test-results.json
+        json_content="["
+        for result in "${results[@]}"; do
+          json_content+="$result,"
+        done
+        json_content="${json_content%,}"  # Remove a vírgula extra do final
+        json_content+="]"
+  
+        # Salva a string JSON em um arquivo
+        echo "$json_content" > "$GITHUB_WORKSPACE/test-results.json"
 
       working-directory: ${{ github.workspace }}
 
@@ -71,7 +78,9 @@ jobs:
           
           // Lê o conteúdo do arquivo JSON
           const jsonContent = fs.readFileSync(process.env.GITHUB_WORKSPACE + '/test-results.json', 'utf8');
-          console.log(jsonContent);
+          if (!jsonContent.trim()) {
+            throw new Error('O conteúdo do arquivo JSON está vazio.');         
+          }
           const results = JSON.parse(jsonContent);
           
           // Loop através de cada módulo e cria um gráfico para cada um
