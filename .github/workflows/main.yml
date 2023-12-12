@@ -76,7 +76,7 @@ jobs:
       with:
         script: |
           const fs = require('fs');
-          
+          const github = require('@actions/github'); 
           // Lê o conteúdo do arquivo JSON
           const jsonContent = fs.readFileSync(process.env.GITHUB_WORKSPACE + '/test-results.json', 'utf8');
           if (!jsonContent.trim()) {
@@ -154,6 +154,8 @@ jobs:
               body: `## Test Results for Module: ${module.module}\n\n![Test Results Chart](https://quickchart.io/chart?c=${encodeURIComponent(JSON.stringify(chartData))})`,
             });
           }      
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
     - name: Stop Docker Compose
       run: |
