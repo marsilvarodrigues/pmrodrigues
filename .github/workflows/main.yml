@@ -76,7 +76,7 @@ jobs:
       with:
         script: |
           const fs = require('fs');
-          const github = require('@actions/github'); 
+          
           // Lê o conteúdo do arquivo JSON
           const jsonContent = fs.readFileSync(process.env.GITHUB_WORKSPACE + '/test-results.json', 'utf8');
           if (!jsonContent.trim()) {
@@ -148,14 +148,17 @@ jobs:
           
             // Cria um comentário na issue com o gráfico
             const { data } = await github.issues.createComment({
-              issue_number: context.issue.number,
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              body: `## Test Results for Module: ${module.module}\n\n![Test Results Chart](https://quickchart.io/chart?c=${encodeURIComponent(JSON.stringify(chartData))})`,
+               issue_number: issueNumber,
+               owner: process.env.GITHUB_REPOSITORY_OWNER,
+               repo: process.env.GITHUB_REPOSITORY,
+               body: `## Test Results for Module: ${module.module}\n\n![Test Results Chart](https://quickchart.io/chart?c=${encodeURIComponent(JSON.stringify(chartData))})`,
             });
           }      
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        GITHUB_REPOSITORY_OWNER: ${{ github.repository_owner }}
+        GITHUB_REPOSITORY: ${{ github.repository }}
+        GITHUB_ISSUE_NUMBER: ${{ github.event.issue.number }}
 
     - name: Stop Docker Compose
       run: |
