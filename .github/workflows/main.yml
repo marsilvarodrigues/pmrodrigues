@@ -29,8 +29,7 @@ jobs:
       working-directory: .
 
     - name: Workflow test
-    - uses: actions/checkout@v4
-    - uses: ./
+      uses: actions/checkout@v4
       with:
         artifact: test-results
         path: '**/surefire-reports.xml'
