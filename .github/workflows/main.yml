@@ -25,7 +25,7 @@ jobs:
         java-version: '18'
 
     - name: Build with Maven
-      run: mvn clean package jacoco:report
+      run: mvn clean package jacoco:report -Dmaven.test.failure.ignore=true
       working-directory: .
 
     - name: Workflow test
@@ -35,10 +35,12 @@ jobs:
         report_paths: '**/target/surefire-reports/TEST-*.xml'
 
     - name: Stop Docker Compose
+      if: success() || failure()
       run: |
         sudo docker-compose -f infrastructure/docker-compose.yaml down
       working-directory: .
 
     - name: Clean up Docker
+      if: success() || failure()
       run: |
         docker system prune -af
