@@ -47,6 +47,7 @@ jobs:
         pass-emoji: ':green_circle:'
         fail-emoji: ':red_circle:'
 
+
     - name: Stop Docker Compose
       if: success() || failure()
       run: |
