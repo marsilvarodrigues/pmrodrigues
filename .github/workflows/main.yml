@@ -6,7 +6,7 @@ on:
       - main
 
 jobs:
-  build:
+  prepare-environment-to:
     runs-on: ubuntu-latest
 
     steps:
@@ -18,6 +18,10 @@ jobs:
         sudo docker-compose -f infrastructure/docker-compose.yaml up -d
       working-directory: .
 
+  compile:
+    runs-on: ubuntu-latest
+
+    steps:
     - name: Set up Java
       uses: actions/setup-java@v2
       with:
@@ -36,18 +40,10 @@ jobs:
         detailed_summary: true
         include_passed: true
 
-    - name: Add coverage to PR
-      uses: madrapps/jacoco-report@v1.6.1
-      with:
-        paths: '**/target/site/jacoco-resources/jacoco.xml'
-        token: ${{ secrets.GITHUB_TOKEN }}
-        min-coverage-overall: 40
-        min-coverage-changed-files: 60
-        title: '# :lobster: Coverage Report'
-        pass-emoji: ':green_circle:'
-        fail-emoji: ':red_circle:'
+  clean-up:
+    runs-on: ubuntu-latest
 
-
+    steps:
     - name: Stop Docker Compose
       if: success() || failure()
       run: |
