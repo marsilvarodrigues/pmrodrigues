@@ -6,7 +6,7 @@ on:
       - main
 
 jobs:
-  prepare-environment-to-test:
+  prepare_unit_test:
     runs-on: ubuntu-latest
 
     steps:
@@ -17,19 +17,12 @@ jobs:
       run: |
         sudo docker-compose -f infrastructure/docker-compose.yaml up -d
 
-  test:
-    runs-on: ubuntu-latest
-    needs: [prepare-environment-to-test]
-
-    steps:
     - name: Set up Java
       uses: actions/setup-java@v2
       with:
         distribution: 'temurin'
         java-version: '18'
 
-    - name: Checkout repository
-      uses: actions/checkout@v3
 
     - name: Build with Maven
       run: mvn clean package -Dmaven.test.failure.ignore=true
@@ -41,14 +34,6 @@ jobs:
         report_paths: '**/target/surefire-reports/TEST-*.xml'
         detailed_summary: true
         include_passed: true
-
-  clean-up:
-    runs-on: ubuntu-latest
-    needs: [prepare-environment-to-test, test]
-    steps:
-
-    - name: Checkout repository
-      uses: actions/checkout@v3
 
     - name: Stop Docker Compose
       if: success() || failure()
