@@ -57,7 +57,7 @@ jobs:
             results+=("{\"module\": \"$module\", \"total_tests\": $total_tests, \"successful_tests\": $successful_tests}")
           fi
         done
-
+        echo "${results[@]}"
         echo "${results[@]}" > $GITHUB_WORKSPACE/test-results.json
 
       working-directory: ${{ github.workspace }}
