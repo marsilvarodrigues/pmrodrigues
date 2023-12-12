@@ -33,7 +33,6 @@ jobs:
     - uses: ./
       with:
         artifact: test-results
-        name: Workflow Report
         path: '**/surefire-reports.xml'
         reporter: java-junit
 
