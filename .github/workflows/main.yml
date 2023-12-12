@@ -28,13 +28,24 @@ jobs:
       run: mvn clean package jacoco:report -Dmaven.test.failure.ignore=true
       working-directory: .
 
-    - name: Workflow test
+    - name: Test Report
       uses: mikepenz/action-junit-report@v4
       if: success() || failure()
       with:
         report_paths: '**/target/surefire-reports/TEST-*.xml'
         detailed_summary: true
         include_passed: true
+
+    - name: Add coverage to PR
+      uses: madrapps/jacoco-report@v1.6.1
+      with:
+        paths: '**/target/site/jacoco-resources/jacoco.xml'
+        token: ${{ secrets.GITHUB_TOKEN }}
+        min-coverage-overall: 40
+        min-coverage-changed-files: 60
+        title: '# :lobster: Coverage Report'
+        pass-emoji: ':green_circle:'
+        fail-emoji: ':red_circle:'
 
     - name: Stop Docker Compose
       if: success() || failure()
