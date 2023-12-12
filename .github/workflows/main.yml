@@ -58,6 +58,7 @@ jobs:
           fi
         done
         
+        
         json_content="["
         for result in "${results[@]}"; do
           json_content+="$result,"
