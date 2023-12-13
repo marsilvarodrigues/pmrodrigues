@@ -24,10 +24,7 @@ import org.springframework.test.context.ContextConfiguration;
 
 import java.time.Instant;
 import java.time.LocalDateTime;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Random;
-import java.util.UUID;
+import java.util.*;
 import java.util.stream.IntStream;
 
 import static com.pmrodrigues.users.specifications.SpecificationPhone.type;
@@ -88,7 +85,7 @@ class TestPhoneRepository {
     @Test
     void shouldList() {
 
-        HashMap<PhoneType, Long> counts = new HashMap<>();
+        Map<PhoneType, Long> counts = new HashMap<>();
         Random random = new Random();
         val phoneTypes = PhoneType.values();
         for( PhoneType type : phoneTypes) {
@@ -107,8 +104,14 @@ class TestPhoneRepository {
             phoneRepository.save(phone);
         });
 
-        val phones = phoneRepository.findAll(type(PhoneType.CELLPHONE), PageRequest.of(0, 10));
+        val phoneType = counts.entrySet()
+                .stream()
+                .sorted((e1, e2) -> e1.getValue().compareTo(e2.getValue()))
+                .findFirst()
+                .get();
+
+        val phones = phoneRepository.findAll(type(phoneType.getKey()), PageRequest.of(0, 10));
         assertFalse(phones.isEmpty());
-        assertEquals(counts.get(PhoneType.CELLPHONE), phones.getTotalElements());
+        assertEquals(phoneType.getValue(), phones.getTotalElements());
     }
 }
