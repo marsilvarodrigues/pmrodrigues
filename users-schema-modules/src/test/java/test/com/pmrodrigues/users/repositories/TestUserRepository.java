@@ -12,7 +12,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.test.context.ContextConfiguration;
 
-import javax.persistence.EntityManager;
+import jakarta.persistence.EntityManager;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
