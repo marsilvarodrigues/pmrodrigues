@@ -4,9 +4,9 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.*;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
+import org.apache.hc.client5.http.classic.methods.HttpGet;
+import org.apache.hc.core5.http.ClassicHttpRequest;
 import org.apache.http.HttpHeaders;
-import org.apache.http.client.methods.HttpEntityEnclosingRequestBase;
-import org.apache.http.client.methods.HttpUriRequest;
 import org.jboss.resteasy.client.jaxrs.ResteasyClientBuilder;
 import org.keycloak.admin.client.KeycloakBuilder;
 import org.springframework.boot.web.client.RestTemplateBuilder;
@@ -98,16 +98,9 @@ abstract class AbstractRestClient<E> {
 
         rest.setRequestFactory(new HttpComponentsClientHttpRequestFactory() {
             @Override
-            public HttpUriRequest createHttpUriRequest(HttpMethod httpMethod, URI uri) {
-                if (httpMethod.equals(GET)) {
-                    HttpEntityEnclosingRequestBase httpEntityEnclosingRequestBase = new HttpEntityEnclosingRequestBase() {
-                        @Override
-                        public String getMethod() {
-                            return GET.name();
-                        }
-                    };
-                    httpEntityEnclosingRequestBase.setURI(uri);
-                    return httpEntityEnclosingRequestBase;
+            public ClassicHttpRequest createHttpUriRequest(HttpMethod httpMethod, URI uri) {
+                if (httpMethod.equals(HttpMethod.GET)) {
+                    return new HttpGet(uri);
                 } else {
                     return super.createHttpUriRequest(httpMethod, uri);
                 }
@@ -134,21 +127,21 @@ abstract class AbstractRestClient<E> {
 
     protected E get(UUID id) {
         val response =  this.getRest().getForEntity(this.getURL() + "/" + id, this.getParameterizedType());
-        this.httpStatus = response.getStatusCode();
+        this.httpStatus = HttpStatus.resolve(response.getStatusCode().value());
         this.entity = response.getBody();
         return this.entity;
     }
 
     protected E get() {
         val response =  this.getRest().getForEntity(this.getURL() + "/" + id, this.getParameterizedType());
-        this.httpStatus = response.getStatusCode();
+        this.httpStatus = HttpStatus.resolve(response.getStatusCode().value());
         return response.getBody();
     }
 
     protected E put() {
         val httpEntity = new HttpEntity<E>(entity);
         val response = this.getRest().exchange(this.getURL() + "/" + id, HttpMethod.PUT, httpEntity, this.getParameterizedType());
-        this.httpStatus = response.getStatusCode();
+        this.httpStatus = HttpStatus.resolve(response.getStatusCode().value());
         this.entity = response.getBody();
         return this.entity;
     }
@@ -156,7 +149,7 @@ abstract class AbstractRestClient<E> {
     protected List<E> search(HttpEntity<E> httpEntity) {
         val responseType = new ParameterizedTypeReference<HelperPage<E>>() {};
         val response = this.getRest().exchange(this.getURL(), GET, httpEntity, responseType);
-        this.httpStatus = response.getStatusCode();
+        this.httpStatus = HttpStatus.resolve(response.getStatusCode().value());
 
         val type = mapper.getTypeFactory()
                 .constructParametricType(HelperPage.class, this.getParameterizedType());

@@ -7,7 +7,7 @@ import lombok.NoArgsConstructor;
 import lombok.val;
 import org.springframework.data.jpa.domain.Specification;
 
-import javax.persistence.criteria.JoinType;
+import jakarta.persistence.criteria.JoinType;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.UUID;
