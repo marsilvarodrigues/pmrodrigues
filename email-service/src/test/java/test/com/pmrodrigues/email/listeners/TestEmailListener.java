@@ -16,7 +16,7 @@ import org.mockito.quality.Strictness;
 import org.springframework.http.MediaType;
 import org.springframework.mail.javamail.JavaMailSender;
 
-import javax.mail.internet.MimeMessage;
+import jakarta.mail.internet.MimeMessage;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;

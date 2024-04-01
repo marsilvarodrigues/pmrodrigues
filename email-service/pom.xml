@@ -12,8 +12,8 @@
     <artifactId>email-service</artifactId>
 
     <properties>
-        <spring-version>5.3.19</spring-version>
-        <spring-boot.version>2.6.7</spring-boot.version>
+        <spring-version>6.0.0</spring-version>
+        <spring-boot.version>3.2.4</spring-boot.version>
         <jackson-databind.version>2.13.3</jackson-databind.version>
     </properties>
 
@@ -66,7 +66,13 @@
     <dependency>
         <groupId>org.junit.jupiter</groupId>
         <artifactId>junit-jupiter-api</artifactId>
-        <version>5.8.2</version>
+        <version>5.10.2</version>
+        <scope>test</scope>
+    </dependency>
+    <dependency>
+        <groupId>org.junit.jupiter</groupId>
+        <artifactId>junit-jupiter</artifactId>
+        <version>5.10.2</version>
         <scope>test</scope>
     </dependency>
 
@@ -80,13 +86,23 @@
     <dependency>
         <groupId>org.yaml</groupId>
         <artifactId>snakeyaml</artifactId>
-        <version>1.30</version>
+        <version>1.33</version>
     </dependency>
     <dependency>
         <groupId>org.springframework</groupId>
         <artifactId>spring-web</artifactId>
         <version>${spring-version}</version>
     </dependency>
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-context</artifactId>
+            <version>${spring-version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-context-support</artifactId>
+            <version>${spring-version}</version>
+        </dependency>
     <dependency>
         <groupId>javax.annotation</groupId>
         <artifactId>javax.annotation-api</artifactId>
@@ -181,6 +197,11 @@
         <artifactId>swagger-annotations</artifactId>
         <version>1.6.6</version>
     </dependency>
+        <dependency>
+            <groupId>jakarta.mail</groupId>
+            <artifactId>jakarta.mail-api</artifactId>
+            <version>2.1.3</version>
+        </dependency>
     </dependencies>
 
     <build>
@@ -203,7 +224,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
-                <version>3.0.0-M6</version>
+                <version>3.2.5</version>
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
