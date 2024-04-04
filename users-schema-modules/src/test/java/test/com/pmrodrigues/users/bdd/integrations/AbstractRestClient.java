@@ -7,14 +7,13 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.hc.client5.http.classic.methods.HttpGet;
 import org.apache.hc.core5.http.ClassicHttpRequest;
 import org.apache.http.HttpHeaders;
+import org.apache.http.client.methods.HttpEntityEnclosingRequestBase;
+import org.apache.http.client.methods.HttpUriRequest;
 import org.jboss.resteasy.client.jaxrs.ResteasyClientBuilder;
 import org.keycloak.admin.client.KeycloakBuilder;
 import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.core.ParameterizedTypeReference;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpMethod;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
+import org.springframework.http.*;
 import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
 import org.springframework.security.oauth2.core.AuthorizationGrantType;
 import org.springframework.web.client.RestTemplate;
@@ -45,7 +44,7 @@ abstract class AbstractRestClient<E> {
     private URI location;
     private Class<E> parameterizedType;
     @Getter
-    private HttpStatus httpStatus;
+    private HttpStatusCode httpStatus;
     @Getter
     @Setter
     private UUID id;
@@ -127,21 +126,21 @@ abstract class AbstractRestClient<E> {
 
     protected E get(UUID id) {
         val response =  this.getRest().getForEntity(this.getURL() + "/" + id, this.getParameterizedType());
-        this.httpStatus = HttpStatus.resolve(response.getStatusCode().value());
+        this.httpStatus = response.getStatusCode();
         this.entity = response.getBody();
         return this.entity;
     }
 
     protected E get() {
         val response =  this.getRest().getForEntity(this.getURL() + "/" + id, this.getParameterizedType());
-        this.httpStatus = HttpStatus.resolve(response.getStatusCode().value());
+        this.httpStatus = (HttpStatus) response.getStatusCode();
         return response.getBody();
     }
 
     protected E put() {
         val httpEntity = new HttpEntity<E>(entity);
         val response = this.getRest().exchange(this.getURL() + "/" + id, HttpMethod.PUT, httpEntity, this.getParameterizedType());
-        this.httpStatus = HttpStatus.resolve(response.getStatusCode().value());
+        this.httpStatus = (HttpStatus) response.getStatusCode();
         this.entity = response.getBody();
         return this.entity;
     }
@@ -149,7 +148,7 @@ abstract class AbstractRestClient<E> {
     protected List<E> search(HttpEntity<E> httpEntity) {
         val responseType = new ParameterizedTypeReference<HelperPage<E>>() {};
         val response = this.getRest().exchange(this.getURL(), GET, httpEntity, responseType);
-        this.httpStatus = HttpStatus.resolve(response.getStatusCode().value());
+        this.httpStatus = response.getStatusCode();
 
         val type = mapper.getTypeFactory()
                 .constructParametricType(HelperPage.class, this.getParameterizedType());

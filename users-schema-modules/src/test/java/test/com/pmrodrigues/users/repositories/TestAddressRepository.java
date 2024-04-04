@@ -37,7 +37,6 @@ import static org.junit.jupiter.api.Assertions.*;
 @EnableJpaRepositories(basePackages = {"com.pmrodrigues.users.repositories"})
 @EnableJpaAuditing
 @EntityScan("com.pmrodrigues.users.model")
-@AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 class TestAddressRepository {
 
     @Autowired

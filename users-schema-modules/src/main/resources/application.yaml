@@ -12,6 +12,9 @@ logging:
       - com.pmrodrigues
 
 spring:
+  test:
+    database:
+      replace: none
   output:
     ansi:
       enabled: DETECT
