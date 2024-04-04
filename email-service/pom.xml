@@ -14,7 +14,9 @@
     <properties>
         <spring-version>6.1.5</spring-version>
         <spring-boot.version>3.2.4</spring-boot.version>
+
         <jackson-databind.version>2.13.3</jackson-databind.version>
+
     </properties>
 
     <dependencies>
@@ -122,7 +124,9 @@
     <dependency>
         <groupId>org.springframework.kafka</groupId>
         <artifactId>spring-kafka</artifactId>
+
         <version>2.9.11</version>
+
     </dependency>
     <dependency>
         <groupId>com.fasterxml.jackson.core</groupId>

@@ -4,9 +4,9 @@ import lombok.NonNull;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
+import org.apache.hc.client5.http.classic.methods.HttpGet;
+import org.apache.hc.core5.http.ClassicHttpRequest;
 import org.apache.http.HttpHeaders;
-import org.apache.http.client.methods.HttpEntityEnclosingRequestBase;
-import org.apache.http.client.methods.HttpUriRequest;
 import org.jboss.resteasy.client.jaxrs.ResteasyClientBuilder;
 import org.keycloak.admin.client.KeycloakBuilder;
 import org.springframework.boot.web.client.RestTemplateBuilder;
@@ -84,16 +84,9 @@ public abstract class AbstractStepsConfiguration<E> {
 
         rest.setRequestFactory(new HttpComponentsClientHttpRequestFactory() {
             @Override
-            public HttpUriRequest createHttpUriRequest(HttpMethod httpMethod, URI uri) {
+            public ClassicHttpRequest createHttpUriRequest(HttpMethod httpMethod, URI uri) {
                 if (httpMethod.equals(HttpMethod.GET)) {
-                    HttpEntityEnclosingRequestBase httpEntityEnclosingRequestBase = new HttpEntityEnclosingRequestBase() {
-                        @Override
-                        public String getMethod() {
-                            return HttpMethod.GET.name();
-                        }
-                    };
-                    httpEntityEnclosingRequestBase.setURI(uri);
-                    return httpEntityEnclosingRequestBase;
+                    return new HttpGet(uri);
                 } else {
                     return super.createHttpUriRequest(httpMethod, uri);
                 }
@@ -195,7 +188,7 @@ public abstract class AbstractStepsConfiguration<E> {
     }
 
     protected HttpStatus getStatusCode() {
-        if (this.returned != null) return this.returned.getStatusCode();
+        if (this.returned != null) return HttpStatus.resolve(this.returned.getStatusCode().value());
         return null;
     }
 
