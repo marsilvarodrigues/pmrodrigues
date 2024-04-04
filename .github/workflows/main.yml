@@ -3,7 +3,7 @@ name: PMRodrigues Project Setup
 on:
   push:
     branches:
-      - '*'
+      - 'main'
 
 jobs:
   prepare_unit_test:
@@ -12,9 +12,6 @@ jobs:
     steps:
     - name: Checkout repository
       uses: actions/checkout@v2
-
-    - name: ChatGPT CodeReviewer
-      uses: anc95/ChatGPT-CodeReview@v1.0.13
 
     - name: Set up Docker Compose
       run: |
