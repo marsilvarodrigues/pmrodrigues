@@ -11,6 +11,9 @@ logging:
       - com.pmrodrigues
 
 spring:
+  test:
+    database:
+      replace: none
   autoconfigure:
     exclude: org.keycloak.adapters.springboot.KeycloakAutoConfiguration
   output:

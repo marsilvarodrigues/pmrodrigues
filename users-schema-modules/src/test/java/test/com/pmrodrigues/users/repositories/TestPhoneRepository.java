@@ -106,6 +106,7 @@ class TestPhoneRepository {
 
         val phoneType = counts.entrySet()
                 .stream()
+                .filter(c -> c.getValue() > 0L)
                 .sorted((e1, e2) -> e1.getValue().compareTo(e2.getValue()))
                 .findFirst()
                 .get();

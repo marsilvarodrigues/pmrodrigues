@@ -4,9 +4,10 @@ import lombok.NonNull;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
-import org.apache.hc.client5.http.classic.methods.HttpGet;
-import org.apache.hc.core5.http.ClassicHttpRequest;
 import org.apache.http.HttpHeaders;
+import org.apache.http.client.methods.HttpEntityEnclosingRequestBase;
+import org.apache.hc.client5.http.classic.methods.HttpGet;
+import org.apache.http.client.methods.HttpUriRequest;
 import org.jboss.resteasy.client.jaxrs.ResteasyClientBuilder;
 import org.keycloak.admin.client.KeycloakBuilder;
 import org.springframework.boot.web.client.RestTemplateBuilder;
@@ -18,6 +19,7 @@ import org.springframework.web.client.RestTemplate;
 import test.com.pmrodrigues.users.bdd.integrations.AddressRestClient;
 import test.com.pmrodrigues.users.bdd.integrations.UserRestClient;
 import test.com.pmrodrigues.users.helper.HelperPage;
+import org.apache.hc.core5.http.ClassicHttpRequest;
 
 import java.lang.reflect.ParameterizedType;
 import java.net.URI;
@@ -188,7 +190,7 @@ public abstract class AbstractStepsConfiguration<E> {
     }
 
     protected HttpStatus getStatusCode() {
-        if (this.returned != null) return HttpStatus.resolve(this.returned.getStatusCode().value());
+        if (this.returned != null) return (HttpStatus) this.returned.getStatusCode();
         return null;
     }
 
