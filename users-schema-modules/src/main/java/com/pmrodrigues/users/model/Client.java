@@ -8,7 +8,7 @@ import org.springframework.data.annotation.LastModifiedBy;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
-import jakarta.persistence.*;
+import javax.persistence.*;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.Period;

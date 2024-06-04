@@ -2,7 +2,7 @@ package com.pmrodrigues.users.model;
 
 import lombok.*;
 
-import jakarta.persistence.*;
+import javax.persistence.*;
 import java.util.UUID;
 
 @Entity

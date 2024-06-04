@@ -14,8 +14,8 @@
     <packaging>jar</packaging>
 
     <properties>
-        <spring-version>6.1.5</spring-version>
-        <spring-boot.version>3.2.4</spring-boot.version>
+        <spring-version>5.3.19</spring-version>
+        <spring-boot.version>2.6.7</spring-boot.version>
         <jackson-databind.version>2.13.3</jackson-databind.version>
     </properties>
 
