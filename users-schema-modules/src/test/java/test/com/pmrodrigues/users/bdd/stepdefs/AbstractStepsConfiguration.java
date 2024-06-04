@@ -6,7 +6,6 @@ import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 import org.apache.http.HttpHeaders;
 import org.apache.http.client.methods.HttpEntityEnclosingRequestBase;
-import org.apache.hc.client5.http.classic.methods.HttpGet;
 import org.apache.http.client.methods.HttpUriRequest;
 import org.jboss.resteasy.client.jaxrs.ResteasyClientBuilder;
 import org.keycloak.admin.client.KeycloakBuilder;
@@ -19,7 +18,6 @@ import org.springframework.web.client.RestTemplate;
 import test.com.pmrodrigues.users.bdd.integrations.AddressRestClient;
 import test.com.pmrodrigues.users.bdd.integrations.UserRestClient;
 import test.com.pmrodrigues.users.helper.HelperPage;
-import org.apache.hc.core5.http.ClassicHttpRequest;
 
 import java.lang.reflect.ParameterizedType;
 import java.net.URI;
@@ -86,9 +84,16 @@ public abstract class AbstractStepsConfiguration<E> {
 
         rest.setRequestFactory(new HttpComponentsClientHttpRequestFactory() {
             @Override
-            public ClassicHttpRequest createHttpUriRequest(HttpMethod httpMethod, URI uri) {
+            public HttpUriRequest createHttpUriRequest(HttpMethod httpMethod, URI uri) {
                 if (httpMethod.equals(HttpMethod.GET)) {
-                    return new HttpGet(uri);
+                    HttpEntityEnclosingRequestBase httpEntityEnclosingRequestBase = new HttpEntityEnclosingRequestBase() {
+                        @Override
+                        public String getMethod() {
+                            return HttpMethod.GET.name();
+                        }
+                    };
+                    httpEntityEnclosingRequestBase.setURI(uri);
+                    return httpEntityEnclosingRequestBase;
                 } else {
                     return super.createHttpUriRequest(httpMethod, uri);
                 }

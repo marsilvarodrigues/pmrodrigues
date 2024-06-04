@@ -4,8 +4,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.*;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
-import org.apache.hc.client5.http.classic.methods.HttpGet;
-import org.apache.hc.core5.http.ClassicHttpRequest;
 import org.apache.http.HttpHeaders;
 import org.apache.http.client.methods.HttpEntityEnclosingRequestBase;
 import org.apache.http.client.methods.HttpUriRequest;
@@ -13,7 +11,10 @@ import org.jboss.resteasy.client.jaxrs.ResteasyClientBuilder;
 import org.keycloak.admin.client.KeycloakBuilder;
 import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.core.ParameterizedTypeReference;
-import org.springframework.http.*;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
 import org.springframework.security.oauth2.core.AuthorizationGrantType;
 import org.springframework.web.client.RestTemplate;
@@ -44,7 +45,7 @@ abstract class AbstractRestClient<E> {
     private URI location;
     private Class<E> parameterizedType;
     @Getter
-    private HttpStatusCode httpStatus;
+    private HttpStatus httpStatus;
     @Getter
     @Setter
     private UUID id;
@@ -97,9 +98,16 @@ abstract class AbstractRestClient<E> {
 
         rest.setRequestFactory(new HttpComponentsClientHttpRequestFactory() {
             @Override
-            public ClassicHttpRequest createHttpUriRequest(HttpMethod httpMethod, URI uri) {
-                if (httpMethod.equals(HttpMethod.GET)) {
-                    return new HttpGet(uri);
+            public HttpUriRequest createHttpUriRequest(HttpMethod httpMethod, URI uri) {
+                if (httpMethod.equals(GET)) {
+                    HttpEntityEnclosingRequestBase httpEntityEnclosingRequestBase = new HttpEntityEnclosingRequestBase() {
+                        @Override
+                        public String getMethod() {
+                            return GET.name();
+                        }
+                    };
+                    httpEntityEnclosingRequestBase.setURI(uri);
+                    return httpEntityEnclosingRequestBase;
                 } else {
                     return super.createHttpUriRequest(httpMethod, uri);
                 }
