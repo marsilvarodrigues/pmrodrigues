@@ -13,9 +13,9 @@
 
     <properties>
         <spring-version>5.3.19</spring-version>
-        <spring-boot.version>2.6.7</spring-boot.version>
+        <spring-boot.version>2.7.18</spring-boot.version>
 
-        <jackson-databind.version>2.13.3</jackson-databind.version>
+        <jackson-databind.version>2.17.1</jackson-databind.version>
 
     </properties>
 
@@ -131,7 +131,7 @@
     <dependency>
         <groupId>com.fasterxml.jackson.core</groupId>
         <artifactId>jackson-databind</artifactId>
-        <version>2.13.4.2</version>
+        <version>${jackson-databind.version}</version>
     </dependency>
 
     <dependency>
